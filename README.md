@@ -16,7 +16,8 @@ Canvas2d has been tested and should work in
 Examples
 --------
 
-I just begin to set it free so, for right now, there isn't much to show. Some example and a draft documentation can be found at [here](http://www.somethinglikethis.it/canvas2d/).
+I just begin to set it free so, for right now, there isn't much to show.
+Some example and a draft documentation can be found at [www.somethinglikethis.it/canvas2d](http://www.somethinglikethis.it/canvas2d/).
 
 Usage
 --------
