@@ -92,4 +92,4 @@ Canvas2d is released under [MIT license](http://opensource.org/licenses/mit-lice
 
 Credits
 -------
-Canvas2d javascript library was created by [Fabio Fantini](https://github.com/Canvas2d). You can contact me at [info@somethinglikethis.it](mailto:info@somethinglikethis.it)
+Canvas2d javascript library was created by [Fabio Fantini](https://github.com/elbatico1/Canvas2d). You can contact me at [info@somethinglikethis.it](mailto:info@somethinglikethis.it)
