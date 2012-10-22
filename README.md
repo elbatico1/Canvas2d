@@ -88,7 +88,7 @@ tween.addTweener(myobj,{param...,duration:mls,ease:"easeNone",onStart:function,o
 				
 License
 -------
-Canvas2d plugin is released under [MIT license](http://opensource.org/licenses/mit-license.php).
+Canvas2d is released under [MIT license](http://opensource.org/licenses/mit-license.php).
 
 Credits
 -------
