@@ -70,21 +70,29 @@ and a separated object **Colors** in wich are placed some utils for converting a
 ## Some simple example
 
 ### Stage
-```var stage=new Canvas2d.Stage("container",560,300,true);```
+```
+var stage=new Canvas2d.Stage("container",560,300,true);
+```
 
 ### Sprite
-```var sprite=new Canvas2d.Sprite("mysprite");```
+```
+var sprite=new Canvas2d.Sprite("mysprite");
+```
 
 ### DisplayObjects
-```var myobj=new Canvas2d.DisplayObjects("myobj");
+```
+var myobj=new Canvas2d.DisplayObjects("myobj");
 myobj.rect(localx,localy,width,height,color,linecolor,linewidth);
 sprite.add(myobj);
 stage.add(sprite);
-stage.draw();```
+stage.draw();
+```
 
 ### Tweener
-```var tween=new Canvas2d.Tweener();
-tween.addTweener(myobj,{param...,duration:mls,ease:"easeNone",onStart:function,onTween:function,onEnd:function});```
+```
+var tween=new Canvas2d.Tweener();
+tween.addTweener(myobj,{param...,duration:mls,ease:"easeNone",onStart:function,onTween:function,onEnd:function});
+```
 				
 License
 -------
