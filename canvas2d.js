@@ -79,14 +79,8 @@ Canvas2d.Stage=function(container,width,height,enableevent){
     this.index=0;
     this.children=[];
     this.evtListeners={};
-    //var agentList=/iphone|ipad|ipod|palm|series60|symbian|android|windows ce|windows phone|blackberry/g;
     var agent=navigator.userAgent.toLowerCase();
     this.agent=agent;
-    /*if(agent.search(agentList) > -1){
-        this._functestmobile();
-    }else{
-        this._functest();
-    }*/
     if(this.enabledEvent){
         if("ontouchstart" in window){
             this._functestmobile();
@@ -203,7 +197,7 @@ Canvas2d.Stage=function(container,width,height,enableevent){
             }
         };
     }else{
-//console.log('is there',window.fire);
+        
     }
 };
 Canvas2d.Stage.prototype={
