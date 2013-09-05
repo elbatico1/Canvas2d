@@ -46,7 +46,7 @@ var Canvas2d={
 *@param enableevent {enable event detection } default true
 */
 Canvas2d.Stage=function(container,width,height,enableevent){
-    this.enabledEvent=enableevent==false?enableevent:true;
+    this.enabledEvent=enableevent===false?enableevent:true;
     this.className="Stage";
     this.visible=true;
     this.date=new Date();
@@ -56,7 +56,7 @@ Canvas2d.Stage=function(container,width,height,enableevent){
     this.container.style.width=width+'px';
     this.container.style.height=height+'px';
     this.container.style.position='absolute';
-    this.container.onmousedown=function(){return false;}
+    this.container.onmousedown=function(){return false;};
     Canvas2d.container.id=container;
     Canvas2d.container.width=width;
     Canvas2d.container.height=height;
@@ -168,7 +168,7 @@ Canvas2d.Stage=function(container,width,height,enableevent){
             isChild:function(target){
                 var id=-1;
                 for(var i=0;i<this.loop.length;i++){
-                    if(this.loop[i].target == target){
+                    if(this.loop[i].target === target){
                         id=i;
                         break;
                     }
@@ -178,7 +178,7 @@ Canvas2d.Stage=function(container,width,height,enableevent){
             removeLoop:function(target){
                 var id=-1;
                 for(var i=0;i<this.loop.length;i++){
-                    if(this.loop[i].target == target){
+                    if(this.loop[i].target === target){
                         id=i;
                         break;
                     }
@@ -186,7 +186,7 @@ Canvas2d.Stage=function(container,width,height,enableevent){
                 if(id > -1){
                     this.loop.splice(id,1);
                 }
-                if(this.loop.length == 0){this.stop();}
+                if(this.loop.length === 0){this.stop();}
             },
             _init:function(){
                 var date = new Date();
@@ -352,7 +352,7 @@ Canvas2d.Stage.prototype={
 */
     addEvent:function(type,func){
        if(type in this.evtListeners){
-           this.evtListeners[type].func.push(func)
+           this.evtListeners[type].func.push(func);
        }else{
            this.evtListeners[type]={'func':[func]};
        }
@@ -371,7 +371,7 @@ Canvas2d.Stage.prototype={
                     break;
                 }
             }
-            if(this.evtListeners[type].func.length == 0){
+            if(this.evtListeners[type].func.length === 0){
                 delete this.evtListeners[type];
             }
         }
@@ -381,7 +381,7 @@ Canvas2d.Stage.prototype={
 *@param child { object - 'Container' or 'Sprite' }
 */
     add:function(child){
-        if(child.parent || child.className == "DisplayObjects"){return;}
+        if(child.parent || child.className === "DisplayObjects"){return;}
         child.index=this.indexCount;
         child.parent=this;
         this.children.push(child);
@@ -393,7 +393,7 @@ Canvas2d.Stage.prototype={
 *@param child { object - 'Container' or 'Sprite' }
 */
     remove:function(child){
-        if(child.parent != this){return;}
+        if(child.parent !== this){return;}
         child.parent=undefined;
         this.children.splice(child.index,1);
         this.container.removeChild(child.canvas);
@@ -409,11 +409,11 @@ Canvas2d.Stage.prototype={
 *@param n { number or string - index where to move the element 'top' last 'bottom' first}
 */
     zOrder:function(child,n){
-        if(child.parent != this){return;}
+        if(child.parent !== this){return;}
         var i;
-        if(typeof n == 'string'){
+        if(typeof n === 'string'){
             var len=this.children.length;
-            var el=n=='top'?len-1:n=='bottom'?0:len-1;
+            var el=n==='top'?len-1:n==='bottom'?0:len-1;
             this.children.splice(child.index,1);
             this.children.splice(el,0,child);
             for (i = 0; i < len; i++) {
@@ -438,7 +438,7 @@ Canvas2d.Stage.prototype={
         var that=this;
         function _childRecursion(child){
             for(var i=0;i<child.length;i++){
-                if(child[i].className=="Sprite"){
+                if(child[i].className==="Sprite"){
                     that.container.appendChild(child[i].canvas);
                 }else{
                     _childRecursion(child[i].children);
@@ -472,10 +472,10 @@ Canvas2d.Stage.prototype={
             mouse.click=false;
             mouse.dragstop=false;
             mouse.gestureend=false;
-            mouse.touchmove=e.type=='touchmove'?true:false;
-            if(e.type == 'touchstart'){
+            mouse.touchmove=e.type==='touchmove'?true:false;
+            if(e.type === 'touchstart'){
                 mouse.touchstart=true;
-            }else if(mouse.touchstart && e.type == 'touchend'){
+            }else if(mouse.touchstart && e.type === 'touchend'){
                 mouse.touchstart=false;
                 mouse.touchend=true;
                 mouse.click=true;
@@ -532,7 +532,7 @@ Canvas2d.Stage.prototype={
             }else if(isgchange){
                 _gesturehandler(e,that,e);
             }else if(isgend){
-                _teststagehandler(testTouch(e),'gestureend',e)
+                _teststagehandler(testTouch(e),'gestureend',e);
             }
             
             if(!isgstart && !isgchange && isgend && mouse.touchend){
@@ -575,8 +575,8 @@ Canvas2d.Stage.prototype={
         }
         this._evtData=[_testhandlermobile];
         function _tLen(e){
-            if(e.type != 'touchend'){
-                if(e.touches.length == 2){
+            if(e.type !== 'touchend'){
+                if(e.touches.length === 2){
                     return true;
                 }
             }
@@ -592,7 +592,7 @@ Canvas2d.Stage.prototype={
         }
         function _gesturehandler(e,target,opt){
             if('gesturechange' in target.evtListeners){
-                var p=target==that?that:target.parent;var m1,m2;
+                var p=target===that?that:target.parent;var m1,m2;
                 m1=that._parentOffset(e.touches[0],p);
                 m2=that._parentOffset(e.touches[1],p);
                 var a,r,s,a2;
@@ -606,7 +606,7 @@ Canvas2d.Stage.prototype={
             }
         }
         function _gestureShandler(e,target,opt){
-            var p=target==that?that:target.parent;var m1,m2;
+            var p=target===that?that:target.parent;var m1,m2;
                 m1=that._parentOffset(e.touches[0],p);
                 m2=that._parentOffset(e.touches[1],p);
                 radius=Math.sqrt(Math.pow(m1.x-m2.x, 2)+Math.pow(m1.y-m2.y, 2));
@@ -699,8 +699,8 @@ Canvas2d.Stage.prototype={
         var isover,isout,over,out,dstart,ddrag,dstop,target,lasttarget,ptarget,plasttarget,pover,pout,pisout,pisover;
         var offx=0,offy=0,poffx,poffy;
         function _resethandler(e){
-            if(e.type=='mouseout' && lasttarget){_outhandler(e,lasttarget);}
-            if(e.type=='mouseout' && ptarget){_outhandler(e,plasttarget);}
+            if(e.type==='mouseout' && lasttarget){_outhandler(e,lasttarget);}
+            if(e.type==='mouseout' && ptarget){_outhandler(e,plasttarget);}
             isover=isout=over=out=dstart=ddrag=dstop=target=lasttarget=ptarget=plasttarget=pover=pout=pisover=pisout=false;
             mouse={'mouseup':false,'mousedown':false,'mousemove':false,'click':false,'mouseover':false,'mouseout':false,'dragstart':false,'drag':false,'dragstop':false};
         }
@@ -711,11 +711,11 @@ Canvas2d.Stage.prototype={
             mouse.mouseup=false;
             mouse.dragstop=false;
             mouse.dragstart=false;
-            mouse.mousemove=e.type=='mousemove'?true:false;
-            _testoverout(e);_testoveroutP(e)
-            if(e.type == 'mousedown'){
+            mouse.mousemove=e.type==='mousemove'?true:false;
+            _testoverout(e);_testoveroutP(e);
+            if(e.type === 'mousedown'){
                 mouse.mousedown=true;
-            }else if(e.type == 'mouseup' && mouse.mousedown){
+            }else if(e.type === 'mouseup' && mouse.mousedown){
                 mouse.mousedown=false;
                 mouse.click=true;
                 mouse.mouseup=true;
@@ -769,7 +769,7 @@ Canvas2d.Stage.prototype={
         }
         function _testoveroutP(e){
             pover=ptarget?true:false;
-            pout=plasttarget?plasttarget==ptarget?false:true:false;
+            pout=plasttarget?plasttarget===ptarget?false:true:false;
             if(pout){
                 if(!pisout){
                     pisout=true;
@@ -787,7 +787,7 @@ Canvas2d.Stage.prototype={
         }
         function _testoverout(e){
             over=target?true:false;
-            out=lasttarget?lasttarget==target?false:true:false;
+            out=lasttarget?lasttarget===target?false:true:false;
             if(out){
                 if(!isout){
                     isout=true;
@@ -882,8 +882,8 @@ Canvas2d.Stage.prototype={
         x=e.pageX-(Math.floor(b.left)+window.pageXOffset);
         y=e.pageY-(Math.floor(b.top)+window.pageYOffset);
         g=child.parent._global();
-        x1=child.className=='Sprite'?x/g.scaleX:x;
-        y1=child.className=='Sprite'?y/g.scaleY:y;
+        x1=child.className==='Sprite'?x/g.scaleX:x;
+        y1=child.className==='Sprite'?y/g.scaleY:y;
         r=Math.sqrt(Math.pow(x1-g.x,2)+Math.pow(y1-g.y,2));
         a=Math.atan2(y-g.y,x-g.x)-g.rotation;
         cos=Math.cos(a)*r;
@@ -902,11 +902,11 @@ Canvas2d.Stage.prototype={
     },
     _parentOffset:function(e,child){
         var g,x,y,r,a,cos,sin,x1,y1,b=this.container.getBoundingClientRect();
-        g=child._global()
+        g=child._global();
         x=e.pageX-(Math.floor(b.left)+window.pageXOffset);
         y=e.pageY-(Math.floor(b.top)+window.pageYOffset);
-        x1=child.className=='Sprite'?x/g.scaleX:x;
-        y1=child.className=='Sprite'?y/g.scaleY:y;
+        x1=child.className==='Sprite'?x/g.scaleX:x;
+        y1=child.className==='Sprite'?y/g.scaleY:y;
         r=Math.sqrt(Math.pow(x1-g.x,2)+Math.pow(y1-g.y,2));
         a=Math.atan2(y-g.y,x-g.x)-g.rotation;
         cos=Math.cos(a)*r;
@@ -934,7 +934,7 @@ Canvas2d.Stage.prototype={
     },
 /**
 *draw - Stage - draw all the children on the stage.
-*@param { not required }
+*@param ctx { not required }
 *@example myStage.draw();
 */
     draw:function(ctx){
@@ -977,7 +977,7 @@ Canvas2d.Sprite=function(name){
     this.scaleY=1;
     this.rotation=0;
     this.evtListeners={};
-}
+};
 Canvas2d.Sprite.prototype={
 /**
 *addEvent - Sprite method - add an event to the objetc
@@ -992,7 +992,7 @@ Canvas2d.Sprite.prototype={
 */
     addEvent:function(type,func){
        if(type in this.evtListeners){
-           this.evtListeners[type].func.push(func)
+           this.evtListeners[type].func.push(func);
        }else{
            this.evtListeners[type]={'func':[func]};
        }
@@ -1011,7 +1011,7 @@ Canvas2d.Sprite.prototype={
                     break;
                 }
             }
-            if(this.evtListeners[type].func.length == 0){
+            if(this.evtListeners[type].func.length === 0){
                 delete this.evtListeners[type];
             }
         }
@@ -1021,7 +1021,7 @@ Canvas2d.Sprite.prototype={
 *@param child { object - 'DisplayObjects' only }
 */
     add:function(child){
-        if(child.parent || child.className!='DisplayObjects'){return;}
+        if(child.parent || child.className!=='DisplayObjects'){return;}
         child.parent=this;
         child.index=this.indexCount;
         this.indexCount++;
@@ -1032,7 +1032,7 @@ Canvas2d.Sprite.prototype={
 *@param child { object - 'DisplayObjects' only }
 */
     remove:function(child){
-        if(child.parent != this){return;}
+        if(child.parent !== this){return;}
         child.parent=undefined;
         this.children.splice(child.index,1);
         this.indexCount--;
@@ -1046,9 +1046,9 @@ Canvas2d.Sprite.prototype={
 */
     zOrder:function(n){
         var i;
-        if(typeof n == 'string'){
+        if(typeof n === 'string'){
             var len=this.parent.children.length;
-            var el=n=='top'?len-1:n=='bottom'?0:len-1;
+            var el=n==='top'?len-1:n==='bottom'?0:len-1;
             this.parent.children.splice(this.index,1);
             this.parent.children.splice(el,0,this);
             for (i = 0; i < len; i++) {
@@ -1074,7 +1074,7 @@ Canvas2d.Sprite.prototype={
     },
     _global:function(){
         var g=this.parent._global(),cos,sin;
-        if(this.parent.rotation!=0){
+        if(this.parent.rotation!==0){
             var a=Math.atan2(this.y, this.x)+this.parent.rotation;
             var r=Math.sqrt(Math.pow(this.x, 2)+Math.pow(this.y, 2));
             cos=r*Math.cos(a);
@@ -1103,7 +1103,7 @@ Canvas2d.Sprite.prototype={
    },
 /**
 *draw - Sprite - draw all the children onto the Sprite-( the actual canvas ).
-*@param { not required }
+*@param ctx { not required }
 *@example mySprite.draw();
 */
     draw:function(ctx){
@@ -1197,7 +1197,7 @@ Canvas2d.DisplayObjects.prototype={
 */
    addEvent:function(type,func){
        if(type in this.evtListeners){
-           this.evtListeners[type].func.push(func)
+           this.evtListeners[type].func.push(func);
        }else{
            this.evtListeners[type]={'func':[func]};
        }
@@ -1227,9 +1227,9 @@ Canvas2d.DisplayObjects.prototype={
 */
     zOrder:function(n){
         var i;
-        if(typeof n == 'string'){
+        if(typeof n === 'string'){
             var len=this.parent.children.length;
-            var el=n=='top'?len-1:n=='bottom'?0:len-1;
+            var el=n==='top'?len-1:n==='bottom'?0:len-1;
             this.parent.children.splice(this.index,1);
             this.parent.children.splice(el,0,this);
             for (i = 0; i < len; i++) {
@@ -1283,7 +1283,7 @@ Canvas2d.DisplayObjects.prototype={
 //internal - switch the current color and return always an array rgb value
    _parseColor:function(color){
        if(!color){console.log(color,' isn\'t a valid value.');return undefined;}
-       if(typeof color == 'string'){
+       if(typeof color === 'string'){
            var result=color.replace(/\s/g,"").toLowerCase();
            var re,ar;
            if(result.indexOf('rgb') > -1){
@@ -1368,7 +1368,7 @@ Canvas2d.DisplayObjects.prototype={
        fc.width=this.width+this.lineWidth*2;
        fc.height=this.height+this.lineWidth*2;
        var xc=fc.getContext("2d");
-       if(this.type == "polygon" || this.type=="shape"){
+       if(this.type === "polygon" || this.type==="shape"){
            ox=this.x-this.width/2;oy=this.y-this.height/2;
            this.x=Math.abs(this._coord.x[0])+this.lineWidth;this.y=Math.abs(this._coord.y[0])+this.lineWidth;
        }else{
@@ -1383,7 +1383,7 @@ Canvas2d.DisplayObjects.prototype={
    },
 /**
 *clone - DisplayObjects - clone this Object
-*@param c { new Canvas2d.DisplayObjects}
+*@param n { new Canvas2d.DisplayObjects}
 *@example { var cloned = myObject.clone(new Canvas2d.DisplayObjects);}
 *@return a new Canvas2d.DisplayObjects
 */
@@ -1391,13 +1391,13 @@ Canvas2d.DisplayObjects.prototype={
     var c=new Canvas2d.DisplayObjects(n);
     var ts=Object.prototype.toString;
     for(var o in this){
-        if(ts.call(this[o])!="[object Function]"){
+        if(ts.call(this[o])!=="[object Function]"){
             switch(o){
             case "id":break;
             case "parent":break;
             case "name":break;
             default:
-                if(ts.call(this[o])=="[object Object]"){
+                if(ts.call(this[o])==="[object Object]"){
                     var no={};
                     for(var t in this[o]){
                         no[t]=this[o][t];
@@ -1465,7 +1465,7 @@ Canvas2d.DisplayObjects.prototype={
 */
    polygon:function(x,y,points,color,linecolor,linewidth,close){
        this.type='polygon';
-       this.close=close==false?close:true;
+       this.close=close===false?close:true;
        this.x=this.localX=x;
        this.y=this.localY=y;
        this.points=points;
@@ -1497,7 +1497,7 @@ Canvas2d.DisplayObjects.prototype={
 */
    shape:function(x,y,obj,color,linecolor,linewidth,close){
        this.type='shape';
-       this.close=close==false?close:true;
+       this.close=close===false?close:true;
        this.x=this.localX=x;
        this.y=this.localY=y;
        this.obj=obj;
@@ -1706,7 +1706,7 @@ Canvas2d.DisplayObjects.prototype={
        c.width=this.width;
        c.height=this.height;
        var cx=c.getContext("2d");
-       cx.drawImage(this.imageData,0,0,this.width,this.height)
+       cx.drawImage(this.imageData,0,0,this.width,this.height);
        var data=cx.getImageData(0, 0, this.width, this.height);
        switch(type){
            case "invert":
@@ -1809,13 +1809,13 @@ Canvas2d.DisplayObjects.prototype={
        this._progressEvent=progressaction;
         this._completeEvent=completeaction;
        this.source=source?source:this.source;
-       if(typeof this.source == 'object'){
+       if(typeof this.source === 'object'){
            this.image=this.source;
            this.width=this.image.width;
            this.height=this.image.height;
            this.isLoading=false;
             this.loadComplete=true;
-           if(this.type == 'clip'){
+           if(this.type === 'clip'){
             this._setFrames(show);
             }else{
                 if(this._completeEvent){this._completeEvent.apply(this,[this]);}
@@ -1864,7 +1864,7 @@ Canvas2d.DisplayObjects.prototype={
             this.caller.height=this.caller.image.height;
             this.caller.isLoading=false;
             this.caller.loadComplete=true;
-            if(this.caller.type == 'clip'){
+            if(this.caller.type === 'clip'){
                 this.caller._setFrames(this.show);
             }else{
                 if(this.caller._completeEvent){this.caller._completeEvent.apply(this.caller,[this.caller]);}
@@ -1923,30 +1923,31 @@ Canvas2d.DisplayObjects.prototype={
                     caller.height=caller.image.height;
                     caller.isLoading=false;
                     caller.loadComplete=true;
-                    if(caller.type == 'clip'){
+                    if(caller.type === 'clip'){
                         caller._setFrames(show);
                     }else{
                         if(caller._completeEvent){caller._completeEvent.apply(caller,[caller]);}
                         if(show && caller.parent){caller.draw(caller.parent.ctx);}
                     }
-                }
+                };
                 var type=caller.source.split('.');
-                var t=type[type.length-1]=='jpg'?'jpeg':type[type.length-1];
+                var t=type[type.length-1]==='jpg'?'jpeg':type[type.length-1];
                 img.src = "data:image/"+t+";base64," + outputStr;
             }
         }
     },
 /**
 *_setFrames - DisplayObjects INTERNAL ONLY
+*@param {boolean} show dethermin if the image as to be shown as soon as ready
 */
    _setFrames:function(show){
-       if(!this.frameList || this.type != 'clip'){return;}
+       if(!this.frameList || this.type !== 'clip'){return;}
        var c=document.createElement('canvas');
        var ctx,i,data;
         var that=this;
         function lo(){
             that.frameList[this.indice].data=this;
-            if(this.indice == that.frameList.length-1){
+            if(this.indice === that.frameList.length-1){
                 if(that._completeEvent){that._completeEvent.apply(that,[that]);}
                 if(show && that.parent){that.draw(that.parent.ctx);}
             }
@@ -1967,7 +1968,13 @@ Canvas2d.DisplayObjects.prototype={
         }
    },
 /**
-*_setStyle - DisplayObjects internal - set the constructor style
+*_setStyle - DisplayObjects INTERNAL ONLY - set the constructor style
+*@param {color} color { a color as array rgb hex string or name }
+*@param linecolor { a color as array rgb or hex string or name }
+*@param linewidth { the width of the stroke }
+*@param linecap { string - 'butt' or 'round' or 'square' - default 'butt' }
+*@param linejoin {strin - 'bevel' or 'round' or 'miter' - default 'miter' }
+*@param miterlimit { number - default 10 }
 */
    _setStyle:function(color,linecolor,linewidth,linecap,linejoin,miterlimit){
        this.color=color;
@@ -1978,7 +1985,8 @@ Canvas2d.DisplayObjects.prototype={
        this.lineMiter=parseInt(miterlimit)?parseInt(miterlimit):10;
    },
 /**
-*_setLineStyle - DisplayObjects internal - set the line style when drawning
+*_setLineStyle - DisplayObjects INTERNAL ONLY - set the line style when drawning
+*@param {context} ctx
 */
    _setLineStyle:function(ctx){
         if(this.lineGradient){
@@ -2024,7 +2032,8 @@ Canvas2d.DisplayObjects.prototype={
         }
     },
 /**
-*_setFillStyle - DisplayObjects internal - set the fill style when drawning
+*_setFillStyle - DisplayObjects INTERNAL ONLY - set the fill style when drawning
+*@param {context} ctx
 */
     _setFillStyle:function(ctx){
         if(this.gradient){
@@ -2055,7 +2064,12 @@ Canvas2d.DisplayObjects.prototype={
         }
     },
 /**
-*_setFont - DisplayObjects internal - set the constructor text fonts properties
+*_setFont - DisplayObjects INTERNAL ONLY - set the constructor text fonts properties
+*@param fontweight { string - font weigth 'bold', 'italic', 'normal' etc.. - default 'normal' }
+*@param fontsize { number - font width in pixel - default 10 }
+*@param font { string - type font - default 'Verdana'}
+*@param align { string - 'start' or 'end' or 'left' or 'right' or 'center' - default 'start' }
+*@param base { string - 'top' or 'hanging' or 'middle' or 'alphabetic' or 'ideographic' or 'bottom' - default 'alphabetic' }
 */
     _setFont:function(fontweight,fontsize,font,align,base){
         this.fontWeigth=fontweight?fontweight:this.fontWeigth;
@@ -2066,7 +2080,8 @@ Canvas2d.DisplayObjects.prototype={
         this.baseLine=(this._baseList[base])?base:'alphabetic';
     },
 /**
-*_setShadow - DisplayObjects internal - set the fill shadow style when drawning
+*_setShadow - DisplayObjects INTERNAL ONLY - set the fill shadow style when drawning
+*@param {context} ctx
 */
     _setShadow:function(ctx){
         if(this.shadow){
@@ -2077,7 +2092,8 @@ Canvas2d.DisplayObjects.prototype={
         }
     },
 /**
-*_setLineShadow - DisplayObjects internal - set the stroke shadow style when drawning
+*_setLineShadow - DisplayObjects INTERNAL ONLY - set the stroke shadow style when drawning
+*@param {context} ctx
 */
     _setLineShadow:function(ctx){
         if(this.lineShadow){
@@ -2088,20 +2104,21 @@ Canvas2d.DisplayObjects.prototype={
         }
     },
 /**
-*_setGradient - DisplayObjects internal - set the fill gradient style when drawning
+*_setGradient - DisplayObjects INTERNAL ONLY - set the fill gradient style when drawning
 *@example var linearGradient={'offset':[0,1],'color':[color,color],'type':'linear','coord':{'x0':0,'y0':0,'x1':30,'y1':30}};
 *var radialGradient={'offset':[0,1],'color':[color,color],'type':'radial','coord':{'x0':0,'y0':0,'r0':0,'x1':30,'y1':30,'r1':15}};
 *all REQUIRED
 *linear: two array with 'offset' number [0,1] and 'color' [color,color],
 *an object 'coord' { x0 y0 - stating point, x1 y1 - ending point }
 *for radial 'coord' { x0 y0 r0- stating point and radius, x1 y1 r1 - ending point and radius }
+*@param {context} ctx
 */
     _setGradient:function(ctx){
         var gradient;
         var g=this.gradient;
-        if(g.type=='linear'){
+        if(g.type==='linear'){
             gradient=ctx.createLinearGradient(g.coord.x0,g.coord.y0,g.coord.x1,g.coord.y1);
-        }else if(g.type=='radial'){
+        }else if(g.type==='radial'){
             gradient=ctx.createRadialGradient(g.coord.x0,g.coord.y0,g.coord.r0,g.coord.x1,g.coord.y1,g.coord.r1);
         }
         for(var i=0;i<g.color.length;i++){
@@ -2111,20 +2128,21 @@ Canvas2d.DisplayObjects.prototype={
         ctx.fill();
     },
 /**
-*_setLineGradient - DisplayObjects internal - set the stroke gradient style when drawning
+*_setLineGradient - DisplayObjects INTERNAL ONLY - set the stroke gradient style when drawning
 *@example var linearGradient={'offset':[0,1],'color':[color,color],'type':'linear','coord':{'x0':0,'y0':0,'x1':30,'y1':30}};
 *var radialGradient={'offset':[0,1],'color':[color,color],'type':'radial','coord':{'x0':0,'y0':0,'r0':0,'x1':30,'y1':30,'r1':15}};
 *all REQUIRED
 *linear: two array with 'offset' number [0,1] and 'color' [color,color],
 *an object 'coord' { x0 y0 - stating point, x1 y1 - ending point }
 *for radial 'coord' { x0 y0 r0- stating point and radius, x1 y1 r1 - ending point and radius }
+*@param {context} ctx
 */
     _setLineGradient:function(ctx){
         var gradient;
         var g=this.lineGradient;
-        if(g.type=='linear'){
+        if(g.type==='linear'){
             gradient=ctx.createLinearGradient(g.coord.x0,g.coord.y0,g.coord.x1,g.coord.y1);
-        }else if(g.type=='radial'){
+        }else if(g.type==='radial'){
             gradient=ctx.createRadialGradient(g.coord.x0,g.coord.y0,g.coord.r0,g.coord.x1,g.coord.y1,g.coord.r1);
         }
         for(var i=0;i<g.color.length;i++){
@@ -2135,6 +2153,8 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *_drawRect - DisplayObjects INTERNAL ONLY -
+*@param {context} ctx
+*@param {context} buffer
 */
     _drawRect:function(ctx,buffer){
         ctx.save();
@@ -2154,6 +2174,8 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *_drawRoundRect - DisplayObjects INTERNAL ONLY -
+*@param {context} ctx
+*@param {context} buffer
 */
     _drawRoundRect:function(ctx,buffer){
         ctx.save();
@@ -2186,6 +2208,8 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *_drawPolygon - DisplayObjects INTERNAL ONLY -
+*@param {context} ctx
+*@param {context} buffer
 */
     _drawPolygon:function(ctx,buffer){
         ctx.save();
@@ -2196,7 +2220,7 @@ Canvas2d.DisplayObjects.prototype={
         ctx.beginPath();
         var pX=[],pY=[];
         for(var i=0;i<this.points.length;i++){
-            if(i==0){ctx.moveTo(this.localX+this.points[i][0],this.localY+this.points[i][1]);}else{
+            if(i===0){ctx.moveTo(this.localX+this.points[i][0],this.localY+this.points[i][1]);}else{
                 ctx.lineTo(this.points[i][0]+this.localX,this.points[i][1]+this.localY);
             }
             pX.push(this.points[i][0]+this.localX);
@@ -2218,6 +2242,8 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *_drawShape - DisplayObjects INTERNAL ONLY -
+*@param {context} ctx
+*@param {context} buffer
 */
     _drawShape:function(ctx,buffer){
         ctx.save();
@@ -2276,16 +2302,18 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *_drawLine - DisplayObjects INTERNAL ONLY -
+*@param {context} ctx
+*@param {context} buffer
 */
     _drawLine:function(ctx,buffer){
         ctx.save();
-        ctx.translate(this.x,this.y)
+        ctx.translate(this.x,this.y);
         ctx.scale(this.scaleX,this.scaleY);
         ctx.rotate(this.rotation);
         ctx.globalAlpha=this._g.alpha;
         ctx.beginPath();
-        ctx.moveTo(this.points[0][0]+this.localX,this.points[0][1]+this.localY)
-        ctx.lineTo(this.points[1][0]+this.localX,this.points[1][1]+this.localY)
+        ctx.moveTo(this.points[0][0]+this.localX,this.points[0][1]+this.localY);
+        ctx.lineTo(this.points[1][0]+this.localX,this.points[1][1]+this.localY);
         ctx.closePath();
         this._setLineStyle(ctx);
        var pX=[],pY=[];
@@ -2305,10 +2333,12 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *_drawCircle - DisplayObjects INTERNAL ONLY -
+*@param {context} ctx
+*@param {context} buffer
 */
     _drawCircle:function(ctx,buffer){
         ctx.save();
-        ctx.translate(this.x,this.y)
+        ctx.translate(this.x,this.y);
         ctx.scale(this.scaleX,this.scaleY);
         ctx.rotate(this.rotation);
         ctx.globalAlpha=this._g.alpha;
@@ -2324,10 +2354,12 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *_drawText - DisplayObjects INTERNAL ONLY -
+*@param {context} ctx
+*@param {context} buffer
 */
     _drawText:function(ctx,buffer){
         ctx.save();
-        ctx.translate(this.x,this.y)
+        ctx.translate(this.x,this.y);
         ctx.scale(this.scaleX,this.scaleY);
         ctx.rotate(this.rotation);
         ctx.globalAlpha=this._g.alpha;
@@ -2363,7 +2395,7 @@ Canvas2d.DisplayObjects.prototype={
         }
             var measure=ctx.measureText(this.txt);
         this.width=measure.width;
-        if(this.align=='center'){offsetX=this.width/2;}else if(this.align == 'right'||this.align=='end'){offsetX=this.width;}
+        if(this.align==='center'){offsetX=this.width/2;}else if(this.align === 'right'||this.align==='end'){offsetX=this.width;}
         ctx.beginPath();
         ctx.rect(this.localX-offsetX-this.paddingLeft,this.localY-offsetY-this.paddingTop,this.width+(this.paddingLeft*2),this.height+(this.paddingTop*2));
         ctx.closePath();
@@ -2436,6 +2468,8 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *_drawImage - DisplayObjects INTERNAL ONLY -
+*@param {context} ctx
+*@param {context} buffer
 */
     _drawImage:function(ctx,buffer){
         ctx.save();
@@ -2445,8 +2479,8 @@ Canvas2d.DisplayObjects.prototype={
         ctx.globalAlpha=this._g.alpha;
         
         if(this.loadComplete && this.image){
-            this.width=this.imageCrop.dw==-1?this.width:this.imageCrop.dw;
-            this.height=this.imageCrop.dh==-1?this.height:this.imageCrop.dh;
+            this.width=this.imageCrop.dw===-1?this.width:this.imageCrop.dw;
+            this.height=this.imageCrop.dh===-1?this.height:this.imageCrop.dh;
             ctx.beginPath();
             ctx.rect(this.localX-(this.paddingLeft),this.localY-(this.paddingTop),this.width+(this.paddingLeft*2),this.height+(this.paddingTop*2));
             ctx.closePath();
@@ -2474,6 +2508,8 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *_drawClip - DisplayObjects INTERNAL ONLY -
+*@param {context} ctx
+*@param {context} buffer
 */
     _drawClip:function(ctx,buffer){
         if(!this.frameList){return;}
@@ -2585,7 +2621,7 @@ Canvas2d.Tweener.prototype={
         return window.rqanim.getTimeInterval();
     },
     addTweener:function(o, args){
-        if(o.parent == null || o.parent == undefined){console.log(typeof o.parent, 'provide a nested object');return;}
+        if(o.parent === null || o.parent === undefined){console.log(typeof o.parent, 'provide a nested object');return;}
         var twnobj={};
         var properties=['x','y','width','height','rotation','scaleX','scaleY','lineWidth','fontSize'];
         var x,colorReq,r,g,b,rqAlpha,rqlineAlpha,alpha,lineAlpha,colorSrc;
@@ -2594,7 +2630,7 @@ Canvas2d.Tweener.prototype={
         var duration=args['duration']?args['duration']:1000;
         for(var i in args){
             for(var n =0;n<properties.length;n++){
-                if(i == properties[n]){
+                if(i === properties[n]){
                     x=(args[i] > o[i])? args[i]-o[i] : -(o[i]-args[i]);
                     twnobj[i]={'ease':ease,'to':x,'ct':0,'d':duration,'from':o[i],'prop':i,'request':args[i],'target':o};
                 }
@@ -2604,7 +2640,7 @@ Canvas2d.Tweener.prototype={
         if(!o['shadow']){return;}
         twnobj['shadow']={'ease':ease,'to':[],'ct':0,'d':duration,'from':[],'prop':'shadow','subprop':[],'request':[],'target':o};
         for(var io in args['shadow']){
-            if(io=="color"){
+            if(io==="color"){
                 colorReq=Colors.ParseColor(args['shadow'][io]);
             colorSrc=Colors.ParseColor(o['shadow'][io]);
             r=colorReq[0]-colorSrc[0];
@@ -2628,7 +2664,7 @@ Canvas2d.Tweener.prototype={
         if(!o['lineShadow']){return;}
         twnobj['lineShadow']={'ease':ease,'to':[],'ct':0,'d':duration,'from':[],'prop':'lineShadow','subprop':[],'request':[],'target':o};
         for(var oi in args['lineShadow']){
-            if(oi=="color"){
+            if(oi==="color"){
                 colorReq=Colors.ParseColor(args['lineShadow'][oi]);
                 colorSrc=Colors.ParseColor(o['lineShadow'][oi]);
                 r=colorReq[0]-colorSrc[0];
@@ -2707,7 +2743,7 @@ Canvas2d.Tweener.prototype={
                     for(var nn in that.children){
                         n++;
                     }
-                    if(n == -1){
+                    if(n === -1){
                         window.rqanim.removeLoop(that);
                     }
                     that._states(obj);
@@ -2719,12 +2755,12 @@ Canvas2d.Tweener.prototype={
             }
             that._states(that.children[o].state);
             for(var oo in that.children[o]){
-                if(oo != 'state'){
+                if(oo !== 'state'){
                     var ct=window.rqanim.getTimeInterval();
-                    if(oo == 'rgb' || oo == 'rgbl'){
+                    if(oo === 'rgb' || oo === 'rgbl'){
                         that.children[o][oo].ct+=ct;
                         that._tweenColor(that.children[o][oo], that.children[o].state);
-                    }else if(oo == 'shadow' || oo=='lineShadow'){
+                    }else if(oo === 'shadow' || oo==='lineShadow'){
                         that.children[o][oo].ct+=ct;
                         that._tweenS(that.children[o][oo], that.children[o].state);
                     }else{
@@ -2733,7 +2769,7 @@ Canvas2d.Tweener.prototype={
                     }
                 }
             }
-            if(that.children[o].state.target.className == 'DisplayObjects'){
+            if(that.children[o].state.target.className === 'DisplayObjects'){
                 tree[that.children[o].state.target.parent.id]=that.children[o].state.target.parent;
             }else{
                 tree[that.children[o].state.target.id]=that.children[o].state.target;
@@ -2762,7 +2798,7 @@ Canvas2d.Tweener.prototype={
     _tweenS:function(args,ctrl){
         if((args['ct']/args['d']) >= 1){args['ct']=1;args['d']=1;ctrl.end=true;}
         for(var o=0;o<args['to'].length;o++){
-            if(args['subprop'][o]=="color"){
+            if(args['subprop'][o]==="color"){
                 var r,g,b;
                 r=this[args.ease](args['ct'], args['from'][o][0], args['to'][o][0], args['d']);
                 g=this[args.ease](args['ct'], args['from'][o][1], args['to'][o][1], args['d']);
@@ -3078,7 +3114,7 @@ Canvas2d.Tweener.prototype={
 * @return		The correct value.
 */
     easeInExpo:function(t,b,c,d,p_params){
-            return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b - c * 0.001;
+            return (t===0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b - c * 0.001;
     },
 /**
 * Easing equation function for an exponential (2^t) easing out: decelerating from zero velocity.
@@ -3091,7 +3127,7 @@ Canvas2d.Tweener.prototype={
 * @return		The correct value.
 */
     easeOutExpo:function(t,b,c,d,p_params){
-            return (t==d) ? b+c : c * 1.001 * (-Math.pow(2, -10 * t/d) + 1) + b;
+            return (t===d) ? b+c : c * 1.001 * (-Math.pow(2, -10 * t/d) + 1) + b;
     },
 /**
 * Easing equation function for an exponential (2^t) easing in/out: acceleration until halfway, then deceleration.
@@ -3104,8 +3140,8 @@ Canvas2d.Tweener.prototype={
 * @return		The correct value.
 */
     easeInOutExpo:function(t,b,c,d,p_params){
-            if (t==0) return b;
-            if (t==d) return b+c;
+            if (t===0) return b;
+            if (t===d) return b+c;
             if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b - c * 0.0005;
             return c/2 * 1.0005 * (-Math.pow(2, -10 * --t) + 2) + b;
     },
@@ -3190,8 +3226,8 @@ Canvas2d.Tweener.prototype={
 * @return		The correct value.
 */
     easeInElastic:function(t,b,c,d,p_params){
-            if (t==0) return b;
-            if ((t/=d)==1) return b+c;
+            if (t===0) return b;
+            if ((t/=d)===1) return b+c;
             var p = !(p_params) || isNaN(p_params.period) ? d*.3 : p_params.period;
             var s;
             var a = !(p_params) || isNaN(p_params.amplitude) ? 0 : p_params.amplitude;
@@ -3216,8 +3252,8 @@ Canvas2d.Tweener.prototype={
 * @return		The correct value.
 */
     easeOutElastic:function(t,b,c,d,p_params){
-            if (t==0) return b;
-            if ((t/=d)==1) return b+c;
+            if (t===0) return b;
+            if ((t/=d)===1) return b+c;
             var p = !(p_params) || isNaN(p_params.period) ? d*.3 : p_params.period;
             var s;
             var a = !(p_params) || isNaN(p_params.amplitude) ? 0 : p_params.amplitude;
@@ -3242,8 +3278,8 @@ Canvas2d.Tweener.prototype={
 * @return		The correct value.
 */
     easeInOutElastic:function(t,b,c,d,p_params){
-            if (t==0) return b;
-            if ((t/=d/2)==2) return b+c;
+            if (t===0) return b;
+            if ((t/=d/2)===2) return b+c;
             var p = !(p_params) || isNaN(p_params.period) ? d*(.3*1.5) : p_params.period;
             var s;
             var a = !(p_params) || isNaN(p_params.amplitude) ? 0 : p_params.amplitude;
@@ -3399,17 +3435,17 @@ Canvas2d.Tweener.prototype={
         for(var o in ctrl){
             switch (o) {
                 case 'start':
-                    if(ctrl[o]==true && ctrl['onStart']){
+                    if(ctrl[o]===true && ctrl['onStart']){
                         ctrl['onStart'].apply(ctrl['target'], [ctrl['target']]);
                     }
                     break;
                 case 'tweening':
-                    if(ctrl[o]==true && ctrl['onTween']){
+                    if(ctrl[o]===true && ctrl['onTween']){
                         ctrl['onTween'].apply(ctrl['target'], [ctrl['target']]);
                     }
                     break;
                 case 'end':
-                    if(ctrl[o]==true && ctrl['onEnd']){
+                    if(ctrl[o]===true && ctrl['onEnd']){
                         ctrl['onEnd'].apply(ctrl['target'], [ctrl['target']]);
                     }
                     break;
@@ -3437,7 +3473,7 @@ var Colors={
     _toR:function(h){return parseInt((this._cutHex(h)).substring(0,2),16);},
     _toG:function(h){return parseInt((this._cutHex(h)).substring(2,4),16);},
     _toB:function(h){return parseInt((this._cutHex(h)).substring(4,6),16);},
-    _cutHex:function(h){return (h.charAt(0)=="#") ? h.substring(1,7):h;},
+    _cutHex:function(h){return (h.charAt(0)==="#") ? h.substring(1,7):h;},
 /**
 *Hex - static function
 *@param rgb { an array of length 3 digits }
@@ -3445,8 +3481,8 @@ var Colors={
 */
     Hex:function(rgb){return "#"+this._toHex(rgb[0])+this._toHex(rgb[1])+this._toHex(rgb[2]);},
     _toHex:function(N){
-        if (N==null) return "00";
-        N=parseInt(N);if (N==0 || isNaN(N)) return "00";
+        if (N===null) return "00";
+        N=parseInt(N);if (N===0 || isNaN(N)) return "00";
         N=Math.max(0,N);N=Math.min(N,255);N=Math.round(N);
         return "0123456789ABCDEF".charAt((N-N%16)/16)+ "0123456789ABCDEF".charAt(N%16);
     },
@@ -3465,7 +3501,7 @@ var Colors={
         var max = Math.max(r, g, b), min = Math.min(r, g, b);
         var h, s, l = (max + min) / 2;
 
-        if(max == min){
+        if(max === min){
             h = s = 0; // achromatic
         }else{
             var d = max - min;
@@ -3493,7 +3529,7 @@ var Colors={
     HslToRgb:function(h, s, l){
         var r, g, b;
 
-        if(s == 0){
+        if(s === 0){
             r = g = b = l; // achromatic
         }else{
             function hue2rgb(p, q, t){
@@ -3530,9 +3566,9 @@ var Colors={
         var h, s, v = max;
 
         var d = max - min;
-        s = max == 0 ? 0 : d / max;
+        s = max === 0 ? 0 : d / max;
 
-        if(max == min){
+        if(max === min){
             h = 0; // achromatic
         }else{
             switch(max){
@@ -3585,7 +3621,7 @@ var Colors={
         var r=Math.round(Math.random()*255);
         var g=Math.round(Math.random()*255);
         var b=Math.round(Math.random()*255);
-        if(t=='array'){
+        if(t==='array'){
             return [Math.round(Math.random()*255),Math.round(Math.random()*255),Math.round(Math.random()*255)];
         }else{
             return 'rgb('+r+','+g+','+b+')';
@@ -3594,7 +3630,7 @@ var Colors={
     },
     ParseColor:function(color){
        if(!color){return undefined;}
-       if(typeof color == 'string'){
+       if(typeof color === 'string'){
            var result=color.replace(/\s/g,"").toLowerCase();
            var re,ar;
            if(result.indexOf('rgb') > -1){
