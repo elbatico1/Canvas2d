@@ -1125,6 +1125,7 @@ Canvas2d.Sprite.prototype={
 /**
 *DisplayObjects - object element of all shapes, texts, images and movieclip
 *@param name { name off the object }
+*@example myObject=new Canvas2d.DisplayObjects('myobj');
 */
 Canvas2d.DisplayObjects=function(name){
     this.visible=true;
@@ -2588,6 +2589,9 @@ Canvas2d.DisplayObjects.prototype={
         }
     }
 };
+/**
+*@namespace Tweener
+**/
 Canvas2d.Tweener=function(){
     this.children={};
 };
@@ -3456,13 +3460,14 @@ Canvas2d.Tweener.prototype={
 
     }
 };
-//////////////////////////////////////////////////////////////
-//Colors - list of function to manage colors
-//Rgb - return an array of length 3 digits corresponding to red green and blue values - required a color hex string
-//Hex - return a color hex string and require an array of length 3 digits corrensponding to red green and blue values
-//RandomRgb - return an array rgb of random value
-//namedColor - an object of 1567 entries of colors by name with a corresponding value rgb and hex
-//////////////////////////////////////////////////////////////
+/**
+*@namespace Colors
+*@description Colors - list of function to manage colors
+*Rgb - return an array of length 3 digits corresponding to red green and blue values - required a color hex string
+*Hex - return a color hex string and require an array of length 3 digits corrensponding to red green and blue values
+*RandomRgb - return an array rgb of random value
+*namedColor - an object of 1567 entries of colors by name with a corresponding value rgb and hex
+*/
 var Colors={
 /**
 *Rgd - static function
