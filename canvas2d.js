@@ -159,10 +159,9 @@ Canvas2d.Stage=function(container,width,height,enableevent){
             addLoop:function(target,func){
                 this.prId++;
                 if(!this.isChild(target)){
-                    this.loop.push({'target':target,'func':func,'id':this.prId});
                     this.start();
+                    this.loop.push({'target':target,'func':func,'id':this.prId});
                 }
-                
                 return this.prId;
             },
             isChild:function(target){
