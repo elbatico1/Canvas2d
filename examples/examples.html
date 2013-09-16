@@ -7,6 +7,7 @@
         <script type="text/javascript" src="../canvas2d.js"></script>
         <script type="text/javascript" src="js/basic.js"></script>
         <script type="text/javascript">
+            var stop,start;
             window.onload=function(){
                 init();
             };
@@ -18,5 +19,8 @@
     </head>
     <body>
         <div id="container"></div>
+        <input type="button" value="stop" name="stop" onclick="javascript:stop();"/>
+        <input type="button" value="start" name="start" onclick="javascript:start();"/>
+        <p id="out"></p>
     </body>
 </html>
