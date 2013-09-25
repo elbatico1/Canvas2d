@@ -1132,31 +1132,31 @@ Canvas2d.DisplayObjects=function(name){
     this.evtListeners={};
     this.parent=null;
     this.name=name?name:'';
-   this.id="displayObjects_"+(Canvas2d.globalId++).toString()+"_"+this.name;
-   this.index=0;
-   this.type='';
-   this.x=0;
-   this.y=0;
-   this.width=0;
-   this.height=0;
-   this.localX=0;
-   this.localY=0;
-   this.scaleX=1;
-   this.scaleY=1;
-   this.rotation=0;
-   this.alpha=1;
-   this.lineAlpha=1;
-   this.color=null;
-   this.lineColor=null;
-   this.lineWidth=1;
-   this.lineCap='butt';
-   this.lineJoin='miter';
-   this.lineMiter=10;
-   this.backUpImage=null;
-   this.imageData=null;
-   this.imageCrop={dw:-1,dh:-1,dx:0,dy:0};
-   this.doneimage=false;
-   this.currentFilter=null;
+    this.id="displayObjects_"+(Canvas2d.globalId++).toString()+"_"+this.name;
+    this.index=0;
+    this.type='';
+    this.x=0;
+    this.y=0;
+    this.width=0;
+    this.height=0;
+    this.localX=0;
+    this.localY=0;
+    this.scaleX=1;
+    this.scaleY=1;
+    this.rotation=0;
+    this.alpha=1;
+    this.lineAlpha=1;
+    this.color=null;
+    this.lineColor=null;
+    this.lineWidth=1;
+    this.lineCap='butt';
+    this.lineJoin='miter';
+    this.lineMiter=10;
+    this.backUpImage=null;
+    this.imageData=null;
+    this.imageCrop={dw:-1,dh:-1,dx:0,dy:0};
+    this.doneimage=false;
+    this.currentFilter=null;
 };
 Canvas2d.DisplayObjects.prototype={
     txt:'',
@@ -1247,7 +1247,7 @@ Canvas2d.DisplayObjects.prototype={
     },
 /**
 *setColor - DisplayObjects - set the color of object
-*@param color { an hex string or an array length 3 digits or a name }
+*@param color { hex, name, array, string:rgb, hsl, hsv }
 */
    setColor:function(color){
        if(!color){return;}
@@ -1255,7 +1255,7 @@ Canvas2d.DisplayObjects.prototype={
    },
 /**
 *setLineColor - DisplayObjects - set the color of object
-*@param linecolor { an hex string or an array length 3 digits or a name }
+*@param linecolor { hex, name, array, string:rgb, hsl, hsv }
 */
    setLineColor:function(linecolor){
        if(!linecolor){return;}
@@ -2363,7 +2363,7 @@ Canvas2d.DisplayObjects.prototype={
         ctx.scale(this.scaleX,this.scaleY);
         ctx.rotate(this.rotation);
         ctx.globalAlpha=this._g.alpha;
-        this.fontStyle=this.fontWeigth+' '+this.fontSize.toString()+'px '+this.fontType;
+        this.fontStyle=this.fontWeigth+' '+this.fontSize+'px '+this.fontType;
         ctx.font=this.fontStyle;
         ctx.textAlign=this.align;
         ctx.textBaseline=this.baseLine;
@@ -2394,7 +2394,7 @@ Canvas2d.DisplayObjects.prototype={
                 break;
         }
             var measure=ctx.measureText(this.txt);
-        this.width=measure.width;
+        this.width=measure.width+this.paddingLeft;
         if(this.align==='center'){offsetX=this.width/2;}else if(this.align === 'right'||this.align==='end'){offsetX=this.width;}
         ctx.beginPath();
         ctx.rect(this.localX-offsetX-this.paddingLeft,this.localY-offsetY-this.paddingTop,this.width+(this.paddingLeft*2),this.height+(this.paddingTop*2));
@@ -2589,8 +2589,9 @@ Canvas2d.DisplayObjects.prototype={
     }
 };
 /**
-*@namespace Tweener
-**/
+ * Tweener - Canvas2d prototype
+ * @returns {void}
+ */
 Canvas2d.Tweener=function(){
     this.children={};
 };
@@ -2623,11 +2624,17 @@ Canvas2d.Tweener.prototype={
     getTimeInterval:function(){
         return window.rqanim.getTimeInterval();
     },
+/**
+ * addTweener - Tweener - Add an objects with parameter to be transitioned
+ * @param {object} o a Sprite or DisplayObjects element
+ * @param {object} args a list of parameter
+ * @returns {unresolved}
+ */
     addTweener:function(o, args){
         if(o.parent === null || o.parent === undefined){console.log(typeof o.parent, 'provide a nested object');return;}
         var twnobj={};
-        var properties=['x','y','width','height','rotation','scaleX','scaleY','lineWidth','fontSize'];
-        var x,colorReq,r,g,b,rqAlpha,rqlineAlpha,alpha,lineAlpha,colorSrc;
+        var properties=['x','y','width','height','rotation','scaleX','scaleY','lineWidth','fontSize','radius'];
+        var x,colorReq,r,g,b,rqAlpha,rqlineAlpha,alpha,lineAlpha,colorSrc,data=args['data']?args['data']:null;
         var delay=args['delay']?args['delay']:0;
         var ease=args['ease']?args['ease']:'easeNone';
         var duration=args['duration']?args['duration']:1000;
@@ -2638,6 +2645,22 @@ Canvas2d.Tweener.prototype={
                     twnobj[i]={'ease':ease,'to':x,'ct':0,'d':duration,'from':o[i],'prop':i,'request':args[i],'target':o};
                 }
             }
+        }
+        if(args['obj']){
+        if(!o['obj']){return;}
+        twnobj['obj']={'ease':ease,'to':[],'ct':0,'d':duration,'from':[],'prop':'obj','subprop':[],'index':0,'request':[],'target':o};
+        for(var io in args['obj']){
+            twnobj['obj'].index=io;
+            for(var obje in args['obj'][io]){
+                for(var ele=0;ele<args['obj'][io][obje].length;ele++){
+                    twnobj['obj'].request.push(args['obj'][io][obje][ele]);
+                    twnobj['obj'].from.push(o['obj'][io][obje][ele]);
+                    x=(args['obj'][io][obje][ele] > o['obj'][io][obje][ele])? args['obj'][io][obje][ele]-o['obj'][io][obje][ele] : -(o['obj'][io][obje][ele]-args['obj'][io][obje][ele]);
+                    twnobj['obj'].to.push(x);
+                    twnobj['obj'].subprop.push(obje);
+                }
+            }
+        }
         }
         if(args['shadow']){
         if(!o['shadow']){return;}
@@ -2663,7 +2686,7 @@ Canvas2d.Tweener.prototype={
             }
         }
         }
-        if(args['lineShadow']){
+        if('lineShadow' in args){
         if(!o['lineShadow']){return;}
         twnobj['lineShadow']={'ease':ease,'to':[],'ct':0,'d':duration,'from':[],'prop':'lineShadow','subprop':[],'request':[],'target':o};
         for(var oi in args['lineShadow']){
@@ -2703,21 +2726,21 @@ Canvas2d.Tweener.prototype={
             b=colorReq[2]-colorSrc[2];
             twnobj['rgbl']={'ease':ease,"tor":r,"tog":g,"tob":b,"ct":0,"d":duration,"fromr":colorSrc[0],"fromg":colorSrc[1],"fromb":colorSrc[2],"prop":'lineColor',"request":colorReq,'target':o};
         }
-        if(args['alpha']){
-            rqAlpha=(args['alpha']>1)?args['alpha']/100:args['alpha'];
+        if('alpha' in args){
+            rqAlpha=args['alpha'];
             alpha=rqAlpha-o.alpha;
             twnobj['alpha']={'ease':ease,'to':alpha,'ct':0,'d':duration,'from':o.alpha,'prop':'alpha','request':rqAlpha,'target':o};
         }
-        if(args['lineAlpha']){
+        if('lineAlpha' in args){
             rqAlpha=(args['lineAlpha']>1)?args['lineAlpha']/100:args['lineAlpha'];
-            lineAlpha=rqlineAlpha-o.lineAlpha;
+            lineAlpha=rqAlpha-o.lineAlpha;
             twnobj['lineAlpha']={'ease':ease,'to':lineAlpha,'ct':0,'d':duration,'from':o.lineAlpha,'prop':'lineAlpha','request':rqlineAlpha,'target':o};
         }
         var onStart=args['onStart']?args['onStart']:null;
         var onTween=args['onTween']?args['onTween']:null;
         var onEnd=args['onEnd']?args['onEnd']:null;
         
-        twnobj['state']={'start':true,'tweening':false,'end':false,'onStart':onStart,'onTween':onTween,'onEnd':onEnd,'target':o,'duration':duration,'delay':delay};
+        twnobj.state={'start':true,'tweening':false,'end':false,'onStart':onStart,'onTween':onTween,'onEnd':onEnd,'target':o,'duration':duration,'delay':delay,'data':data};
         
         if(delay > 0){
             var that=this.children;
@@ -2727,6 +2750,11 @@ Canvas2d.Tweener.prototype={
             window.rqanim.addLoop(this,this._callTween);
         }
     },
+/**
+ * removeTweener - Tweener -
+ * @param {object} child - a tweener object
+ * @returns {void}
+ */
     removeTweener:function(child){
         if(child.id in this.children){
             delete this.children[child.id];
@@ -2766,6 +2794,9 @@ Canvas2d.Tweener.prototype={
                     }else if(oo === 'shadow' || oo==='lineShadow'){
                         that.children[o][oo].ct+=ct;
                         that._tweenS(that.children[o][oo], that.children[o].state);
+                    }else if(oo === 'obj'){
+                        that.children[o][oo].ct+=ct;
+                        that._tweenO(that.children[o][oo], that.children[o].state);
                     }else{
                     	that.children[o][oo].ct+=ct;
                         that._tween(that.children[o][oo], that.children[o].state);
@@ -2814,6 +2845,14 @@ Canvas2d.Tweener.prototype={
             }
         }
     },
+    _tweenO:function(args,ctrl){
+        if((args['ct']/args['d']) >= 1){args['ct']=1;args['d']=1;ctrl.end=true;}
+        for(var o=0;o<args['to'].length;o++){
+            var n;
+            n=this[args.ease](args['ct'], args['from'][o], args['to'][o], args['d']);
+            args['target'][args['prop']][args['index']][args['subprop'][o]][o]=n;
+        }
+    },
 //////////////////////////////////////////////
 //Equations - From Caurina Tweener
 //
@@ -2825,8 +2864,8 @@ Canvas2d.Tweener.prototype={
 //http://code.google.com/p/tweener/
 /////////////////////////////////////////////
 /**
+ * easeNone
 * Easing equation function for a simple linear tweening, with no easing.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2838,8 +2877,8 @@ Canvas2d.Tweener.prototype={
             return c*t/d + b;
     },
 /**
+ * easeInQuad
 * Easing equation function for a quadratic (t^2) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2851,8 +2890,8 @@ Canvas2d.Tweener.prototype={
             return c*(t/=d)*t + b;
     },
 /**
+ * easeOutQuad
 * Easing equation function for a quadratic (t^2) easing out: decelerating to zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2864,8 +2903,8 @@ Canvas2d.Tweener.prototype={
             return -c *(t/=d)*(t-2) + b;
     },
 /**
+ * easeInOutQuad
 * Easing equation function for a quadratic (t^2) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2878,8 +2917,8 @@ Canvas2d.Tweener.prototype={
             return -c/2 * ((--t)*(t-2) - 1) + b;
     },
 /**
+ * easeOutInQuad
 * Easing equation function for a quadratic (t^2) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2892,8 +2931,8 @@ Canvas2d.Tweener.prototype={
             return this.easeInQuad((t*2)-d, b+c/2, c/2, d, p_params);
     },
 /**
+ * easeInCubic
 * Easing equation function for a cubic (t^3) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2905,8 +2944,8 @@ Canvas2d.Tweener.prototype={
             return c*(t/=d)*t*t + b;
     },
 /**
+ * easeOutCubic
 * Easing equation function for a cubic (t^3) easing out: decelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2918,8 +2957,8 @@ Canvas2d.Tweener.prototype={
             return c*((t=t/d-1)*t*t + 1) + b;
     },
 /**
+ * easeInOutCubic
 * Easing equation function for a cubic (t^3) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2932,8 +2971,8 @@ Canvas2d.Tweener.prototype={
             return c/2*((t-=2)*t*t + 2) + b;
     },
 /**
+ * easeOutInCubic
 * Easing equation function for a cubic (t^3) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2946,8 +2985,8 @@ Canvas2d.Tweener.prototype={
             return this.easeInCubic((t*2)-d, b+c/2, c/2, d, p_params);
     },
 /**
+ * easeInQuart
 * Easing equation function for a quartic (t^4) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2959,8 +2998,8 @@ Canvas2d.Tweener.prototype={
             return c*(t/=d)*t*t*t + b;
     },
 /**
+ * easeOutQuart
 * Easing equation function for a quartic (t^4) easing out: decelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2972,8 +3011,8 @@ Canvas2d.Tweener.prototype={
             return -c * ((t=t/d-1)*t*t*t - 1) + b;
     },
 /**
+ * easeInOutQuart
 * Easing equation function for a quartic (t^4) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -2986,8 +3025,8 @@ Canvas2d.Tweener.prototype={
             return -c/2 * ((t-=2)*t*t*t - 2) + b;
     },
 /**
+ * easeOutInQuart
 * Easing equation function for a quartic (t^4) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3000,8 +3039,8 @@ Canvas2d.Tweener.prototype={
             return this.easeInQuart((t*2)-d, b+c/2, c/2, d, p_params);
     },
 /**
+ * easeInQuint
 * Easing equation function for a quintic (t^5) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3013,8 +3052,8 @@ Canvas2d.Tweener.prototype={
             return c*(t/=d)*t*t*t*t + b;
     },
 /**
+ * easeOutQuint
 * Easing equation function for a quintic (t^5) easing out: decelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3026,8 +3065,8 @@ Canvas2d.Tweener.prototype={
             return c*((t=t/d-1)*t*t*t*t + 1) + b;
     },
 /**
+ * easeInOutQuint
 * Easing equation function for a quintic (t^5) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3040,8 +3079,8 @@ Canvas2d.Tweener.prototype={
             return c/2*((t-=2)*t*t*t*t + 2) + b;
     },
 /**
+ * easeOutInQuint
 * Easing equation function for a quintic (t^5) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3054,8 +3093,8 @@ Canvas2d.Tweener.prototype={
             return this.easeInQuint((t*2)-d, b+c/2, c/2, d, p_params);
     },
 /**
+ * easeInSine
 * Easing equation function for a sinusoidal (sin(t)) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3067,8 +3106,8 @@ Canvas2d.Tweener.prototype={
             return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
     },
 /**
+ * easeOutSine
 * Easing equation function for a sinusoidal (sin(t)) easing out: decelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3080,8 +3119,8 @@ Canvas2d.Tweener.prototype={
             return c * Math.sin(t/d * (Math.PI/2)) + b;
     },
 /**
+ * easeInOutSine
 * Easing equation function for a sinusoidal (sin(t)) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3093,8 +3132,8 @@ Canvas2d.Tweener.prototype={
             return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
     },
 /**
+ * easeOutInSine
 * Easing equation function for a sinusoidal (sin(t)) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3107,8 +3146,8 @@ Canvas2d.Tweener.prototype={
             return this.easeInSine((t*2)-d, b+c/2, c/2, d, p_params);
     },
 /**
+ * easeInExpo
 * Easing equation function for an exponential (2^t) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3120,8 +3159,8 @@ Canvas2d.Tweener.prototype={
             return (t===0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b - c * 0.001;
     },
 /**
+ * easeOutExpo
 * Easing equation function for an exponential (2^t) easing out: decelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3133,8 +3172,8 @@ Canvas2d.Tweener.prototype={
             return (t===d) ? b+c : c * 1.001 * (-Math.pow(2, -10 * t/d) + 1) + b;
     },
 /**
+ * easeInOutExpo
 * Easing equation function for an exponential (2^t) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3149,8 +3188,8 @@ Canvas2d.Tweener.prototype={
             return c/2 * 1.0005 * (-Math.pow(2, -10 * --t) + 2) + b;
     },
 /**
+ * easeOutInExpo
 * Easing equation function for an exponential (2^t) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3163,8 +3202,8 @@ Canvas2d.Tweener.prototype={
             return this.easeInExpo((t*2)-d, b+c/2, c/2, d, p_params);
     },
 /**
+ * easeInCirc
 * Easing equation function for a circular (sqrt(1-t^2)) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3176,8 +3215,8 @@ Canvas2d.Tweener.prototype={
             return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
     },
 /**
+ * easeOutCirc
 * Easing equation function for a circular (sqrt(1-t^2)) easing out: decelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3189,8 +3228,8 @@ Canvas2d.Tweener.prototype={
             return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
     },
 /**
+ * easeInOutCirc
 * Easing equation function for a circular (sqrt(1-t^2)) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3203,8 +3242,8 @@ Canvas2d.Tweener.prototype={
             return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
     },
 /**
+ * easeOutInCirc
 * Easing equation function for a circular (sqrt(1-t^2)) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3217,8 +3256,8 @@ Canvas2d.Tweener.prototype={
             return this.easeInCirc((t*2)-d, b+c/2, c/2, d, p_params);
     },
 /**
+ * easeInElastic
 * Easing equation function for an elastic (exponentially decaying sine wave) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3243,8 +3282,8 @@ Canvas2d.Tweener.prototype={
             return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
     },
 /**
+ * easeOutElastic
 * Easing equation function for an elastic (exponentially decaying sine wave) easing out: decelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3269,8 +3308,8 @@ Canvas2d.Tweener.prototype={
             return (a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b);
     },
 /**
+ * easeInOutElastic
 * Easing equation function for an elastic (exponentially decaying sine wave) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3296,8 +3335,8 @@ Canvas2d.Tweener.prototype={
             return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
     },
 /**
+ * easeOutInElastic
 * Easing equation function for an elastic (exponentially decaying sine wave) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3312,8 +3351,8 @@ Canvas2d.Tweener.prototype={
             return this.easeInElastic((t*2)-d, b+c/2, c/2, d, p_params);
     },
 /**
+ * easeInBack
 * Easing equation function for a back (overshooting cubic easing: (s+1)*t^3 - s*t^2) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3327,8 +3366,8 @@ Canvas2d.Tweener.prototype={
             return c*(t/=d)*t*((s+1)*t - s) + b;
     },
 /**
+ * easeOutBack
 * Easing equation function for a back (overshooting cubic easing: (s+1)*t^3 - s*t^2) easing out: decelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3342,8 +3381,8 @@ Canvas2d.Tweener.prototype={
             return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
     },
 /**
+ * easeInOutBack
 * Easing equation function for a back (overshooting cubic easing: (s+1)*t^3 - s*t^2) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3358,8 +3397,8 @@ Canvas2d.Tweener.prototype={
             return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
     },
 /**
+ * easeOutInBack
 * Easing equation function for a back (overshooting cubic easing: (s+1)*t^3 - s*t^2) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3373,8 +3412,8 @@ Canvas2d.Tweener.prototype={
             return this.easeInBack((t*2)-d, b+c/2, c/2, d, p_params);
     },
 /**
+ * easeInBounce
 * Easing equation function for a bounce (exponentially decaying parabolic bounce) easing in: accelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3386,8 +3425,8 @@ Canvas2d.Tweener.prototype={
             return c - this.easeOutBounce (d-t, 0, c, d) + b;
     },
 /**
+ * easeOutBounce
 * Easing equation function for a bounce (exponentially decaying parabolic bounce) easing out: decelerating from zero velocity.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3407,8 +3446,8 @@ Canvas2d.Tweener.prototype={
             }
     },
 /**
+ * easeInOutBounce
 * Easing equation function for a bounce (exponentially decaying parabolic bounce) easing in/out: acceleration until halfway, then deceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3421,8 +3460,8 @@ Canvas2d.Tweener.prototype={
             else return this.easeOutBounce (t*2-d, 0, c, d) * .5 + c*.5 + b;
     },
 /**
+ * easeOutInBounce
 * Easing equation function for a bounce (exponentially decaying parabolic bounce) easing out/in: deceleration until halfway, then acceleration.
-*
 * @param t		Current time (in frames or seconds).
 * @param b		Starting value.
 * @param c		Change needed in value.
@@ -3439,17 +3478,17 @@ Canvas2d.Tweener.prototype={
             switch (o) {
                 case 'start':
                     if(ctrl[o]===true && ctrl['onStart']){
-                        ctrl['onStart'].apply(ctrl['target'], [ctrl['target']]);
+                        ctrl['onStart'].apply(ctrl['target'], [ctrl]);
                     }
                     break;
                 case 'tweening':
                     if(ctrl[o]===true && ctrl['onTween']){
-                        ctrl['onTween'].apply(ctrl['target'], [ctrl['target']]);
+                        ctrl['onTween'].apply(ctrl['target'], [ctrl]);
                     }
                     break;
                 case 'end':
                     if(ctrl[o]===true && ctrl['onEnd']){
-                        ctrl['onEnd'].apply(ctrl['target'], [ctrl['target']]);
+                        ctrl['onEnd'].apply(ctrl['target'], [ctrl]);
                     }
                     break;
                 default:
@@ -3460,7 +3499,7 @@ Canvas2d.Tweener.prototype={
     }
 };
 /**
-*@namespace Colors
+*Colors - object -
 *@description Colors - list of function to manage colors
 *Rgb - return an array of length 3 digits corresponding to red green and blue values - required a color hex string
 *Hex - return a color hex string and require an array of length 3 digits corrensponding to red green and blue values
@@ -3469,7 +3508,7 @@ Canvas2d.Tweener.prototype={
 */
 var Colors={
 /**
-*Rgd - static function
+*Rgd - Colors - static function
 *@param hex { a string rapresenting an hex color }
 *@return an array length 3 rgb values [255,0,255]
 */
@@ -3479,7 +3518,7 @@ var Colors={
     _toB:function(h){return parseInt((this._cutHex(h)).substring(4,6),16);},
     _cutHex:function(h){return (h.charAt(0)==="#") ? h.substring(1,7):h;},
 /**
-*Hex - static function
+*Hex - Colors - static function
 *@param rgb { an array of length 3 digits }
 *@return a string hex value #FF0FF
 */
@@ -3491,7 +3530,8 @@ var Colors={
         return "0123456789ABCDEF".charAt((N-N%16)/16)+ "0123456789ABCDEF".charAt(N%16);
     },
 /**
-*http://http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+ * RgbToHsl - Colors
+* @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
 * Converts an RGB color value to HSL.
 * Assumes r, g, and b are contained in the set [0, 255] and
 * returns h, s, and l in the set [0, 1].
@@ -3521,7 +3561,8 @@ var Colors={
         return [ h, s, l];
     },
 /**
-*http://http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+ * HslToRgb - Colors
+* @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
 * Converts an HSL color value to RGB.
 * Assumes h, s, and l are contained in the set [0, 1] and
 * returns r, g, and b in the set [0, 255].
@@ -3555,7 +3596,8 @@ var Colors={
         return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     },
 /**
-*http://http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+ * RgbToHsv - Colors
+* @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
 * Converts an RGB color value to HSV.
 * Assumes r, g, and b are contained in the set [0, 255] and
 * returns h, s, and v in the set [0, 1].
@@ -3586,7 +3628,8 @@ var Colors={
         return [h, s, v];
     },
 /**
-*http://http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+ * HsvToRgb - Colors
+* @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
 * Converts an HSV color value to RGB.
 * Assumes h, s, and v are contained in the set [0, 1] and
 * returns r, g, and b in the set [0, 255].
@@ -3616,6 +3659,7 @@ var Colors={
         return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     },
 /**
+ * RandomRgb - Colors
 * Pick a random rgb color
 * @param type { return an array if !type, return a string 'rgb(r,g,b)' if type }
 * @return string 'rgb(255,0,255)' or array [255,0,255]
