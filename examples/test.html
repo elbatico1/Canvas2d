@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+        <link type='text/css' rel='stylesheet' href='font/fontset.css'/>
+        <script type='text/javascript' src='../canvas2d.js'></script>
+        <script type='text/javascript' src='js/stats.js'></script>
+        <script type='text/javascript'>
+            window.onload=function(){
+                var stats=new Stats();
+                //document.body.appendChild(stats.domElement);
+                var width='innerWidth' in window?window.innerWidth:document.documentElement.clientWidth;
+                var height='innerHeight' in window?window.innerHeight:document.documentElement.clientHeight;
+                height=300;//width=900;
+                var phantom=document.getElementById('phantom'),params,prop=[],fun=[],curr,found,ind=-1,i,o,dom=document.getElementById('desc');
+                var obj={},count=[],b=/\*/g,bb=/(@\w+)/g,protoList=['Stage','Sprite','DisplayObjects','Tweener','Colors'],d,ease='easeOutExpo';
+                var inRef={Stage:'Stage',Sprite:'Sprite',DisplayObjects:'DisplayObjects',Tweener:'Tweener',Colors:'Colors'};
+                var xrq=new XMLHttpRequest();
+                xrq.onload=function(){
+                    params=xrq.responseText;
+                };
+                xrq.open('get','../canvas2d.js',false);
+                xrq.send();
+                params=params.replace('/\n?\r/g','\n').split('\n');
+                var ok=false,ney=false;
+                for(i=0;i<params.length;i++){
+                    if(params[i].indexOf('/**')>-1){
+                        prop.push('');
+                        ok=true;ind++;
+                    }else if(params[i].indexOf('*/')>-1){
+                        ok=false;ney=true;
+                    }
+                    if(ok){
+                        prop[ind]+=params[i];
+                    }else if(ney){
+                        prop[ind]=prop[ind].substr(4,prop[ind].length);
+                        found=/\w+/.exec(prop[ind]);
+                        if(found[0].indexOf('_')<0){
+                            var proper={};
+                        proper[found]=prop[ind];
+                        fun.push(proper);
+                        
+                        }
+                        ney=false;
+                    }
+                }
+                //console.log(prop,fun);
+                prop={};ind=-1;
+                for(i=0;i<fun.length;i++){
+                    for(o in fun[i]){
+                        if(o in inRef){
+                            ok=true;curr=o;
+                            prop[curr]={};
+                            count.push(0);
+                            prop[curr][o]=fun[i][o];
+                            ind++;
+                        }else{
+                            if(ok){
+                                prop[curr][o]=fun[i][o];
+                                count[ind]+=1;
+                            }
+                        }
+                    }
+                }
+                //var json=JSON.stringify(prop);
+                //console.log(json);
+                //console.log(prop,count);
+                var stage=new Canvas2d.Stage('container',width,height);
+                var stageRef=new Canvas2d.Stage('container2',width,height);
+                var tween=new Canvas2d.Tweener(),w=0,ww=0;
+                var back=new Canvas2d.Sprite('main',false);
+                var bck=new Canvas2d.DisplayObjects('',false);
+                var grad={'color':['hsla(250,60%,80%,1)','hsla(180,50%,50%,0)'],'offset':[0,1],'coord':{'x0':width/2,'y0':0,r0:0,'x1':width/2,'y1':height/1.1,r1:width/2},'type':'linear'};
+                bck.rect(0,0,width,height);
+                bck.gradient=grad;
+                back.add(bck);
+                stage.add(back);
+                var objectsLayer=new Canvas2d.Sprite('main');
+                var layerSh,layerSa,l,la,sa,font='verdana,helvetica,daniel black,sans-serif',x,y,ar=[],sao,index1=0,color,layerRef;
+                for(i=0;i<protoList.length;i++){
+                    ok=prop[protoList[i]];
+                    l=new Canvas2d.DisplayObjects(protoList[i]);
+                    l.text(protoList[i],0,0,'bold',26,font,'black',null,'center','middle');
+                    l.paddingLeft=l.paddingTop=5;
+                    ar.push(l);
+                    w=i===0?ar[0].width:ar[i-1].width;
+                    ww+=w;
+                    l.x=ww+(l.width/2)+(30*i)+50;l.y=20;
+                    l.addEvent('click',protoClick);
+                    l.addEvent('mouseover',mOver);
+                    l.addEvent('mouseout',mOut);
+                    index1=0;color=360/count[i];
+                    layerSa=new Canvas2d.Sprite('suba_'+protoList[i]);
+                    layerSh=new Canvas2d.Sprite('suba_'+protoList[i],false);
+                    for(o in ok){
+                        la=new Canvas2d.DisplayObjects();
+                        la.text(o,0,0,'normal',16,font,'black',null,'left','bottom');
+                        la.paddingLeft=la.paddingTop=4;
+                        la.x=l.x;la.y=l.y+10;la.alpha=0;
+                        la.origin={x:la.x,y:la.y,set:false};
+                        la.dest={x:0,y:0,set:false};
+                        layerSa.add(la);
+                        sa=new Canvas2d.DisplayObjects();
+                        sao=[{'moveTo':[la.x,la.y]}, {'quadraticCurveTo':[la.x,la.y,la.x,la.y]}];
+			sa.shape(0,0,sao,null,'hsl('+(color*index1)+',100%,50%)',1.2,false);
+                        sa.lineAlpha=0.3;
+                        layerSh.add(sa);
+                        la.content=sa;
+                        sa.origin={x:sa.x,y:sa.y};
+                        sa.content=la;
+                        la.ref={x:25,y:height-15,txt:'<p>'+ok[o].replace(b,'<br>').replace(bb,'<b>$1</b>')+'</p>',isopen:false,result:ok[o]};
+                        la.addEvent('click',clickRef);
+                        la.addEvent('mouseover',mOver);
+                        la.addEvent('mouseout',mOut);
+                        index1++;
+                    }
+                    layerSa.visible=false;
+                    l.content={line:layerSh,label:layerSa,isopen:false,n:count[i]};
+                    stage.add(layerSh);
+                    stage.add(layerSa);
+                    objectsLayer.add(l);
+                }
+                stage.add(objectsLayer);
+                stage.draw();
+                var currentObject=null,currentLabel=null,func=null,fstop=null;
+                function protoClick(e){
+                    /*if(stageRef.children.length!==0){
+                        for(i=0;i<layerRef.children.length;i++){
+                            tween.removeTweener(layerRef.children[i]);
+                            if(i===layerRef.children.length-1){
+                                stageRef.remove(layerRef);
+                            }
+                        }
+                    }*/
+                    currentLabel=null;phantom.style.display='none';
+                    if(currentObject!==null&&currentObject!==e){
+                        if(currentObject.target.id!==e.target.id){
+                            protoClick(currentObject);
+                        }
+                    }
+                    currentObject=null;
+                    var o=e.target.content.label.children;
+                    var oo=e.target.content.line.children;
+                    var dx=150,dy=30,xy=0;
+                    if(!e.target.content.isopen){
+                        for(var i=0;i<o.length;i++){
+                            o[i].content.lineAlpha=0.3;
+                            o[i].content.linewidth=1;
+                            if(!o[i].origin.set){
+                                if(o[i].txt in inRef){
+                                    x=45;y=100;
+                                }else{
+                                    dy=(30*xy);
+                                    x=width-dx;y=(e.target.y+50)+dy;xy++;
+                                }
+                                o[i].dest.x=x,o[i].dest.y=y;
+                            }else{
+                                x=o[i].dest.x;y=o[i].dest.y;
+                            }func=i===0?testTween:null;oo[i].lineWidth=1.2;
+                            tween.addTweener(o[i],{x:x,y:y,duration:1000,ease:ease,alpha:1,delay:10*i,onStart:func,data:e});
+                            tween.addTweener(oo[i],{obj:{'1':{quadraticCurveTo:[x/2,y+100,x,y]}},duration:1000,ease:ease,delay:10*i});
+                            if(!o[i].origin.set){
+                                if(dy>(height/2)){
+                                    xy=0;
+                                    dx+=150;
+                                }
+                                o[i].origin.set=true;
+                            }
+                        }
+                        e.target.content.isopen=true;
+                    }else{
+                        for(var i=0;i<o.length;i++){
+                            if(o[i].ref.isopen){
+                                o[i].ref.isopen=false;
+                                //phantom.style.display='none';
+                                
+                            }
+                            
+                            x=o[i].origin.x;y=o[i].origin.y;fstop=i===0?noV:null;
+                            tween.addTweener(o[i],{scaleX:1,scaleY:1,x:x,y:y,duration:800,ease:'easeInBack',alpha:0,delay:10*(o.length-i),onEnd:fstop});
+                            tween.addTweener(oo[i],{obj:{'1':{quadraticCurveTo:[x,y,x,y]}},duration:800,ease:'easeInBack',delay:10*(o.length-i)});
+                        }
+                        e.target.content.isopen=false;
+                    }
+                    
+                }
+                function clickRef(e){
+                    if(currentLabel!==null&&currentLabel!==e){
+                        if(currentLabel.target.id!==e.target.id){
+                            clickRef(currentLabel);
+                        }
+                    }
+                    e.target.color='black';
+                    e.target.fontSize=16;
+                    
+                    if(!e.target.ref.isopen){
+                        //phantomstyle.borderColor=e.target.content.lineColor;
+                        //phantom.style.top=5+e.target.y+'px';
+                        //phantom.style.left=(e.target.x-420/2)+'px';
+                        e.target.ref.isopen=true;currentLabel=e;//phantom.style.display='block';//phantom.innerHTML=e.target.ref.txt;
+                        parseResult(e.target.ref.result);
+                        x=e.target.ref.x;y=e.target.ref.y;
+                        tween.addTweener(e.target,{scaleX:2,scaleY:2,x:x,y:y,duration:1000,ease:ease,onTween:func,data:true});
+                        tween.addTweener(e.target.content,{obj:{'1':{quadraticCurveTo:[x+250,y,x,y]}},lineWidth:2,lineAlpha:1,duration:1000,ease:ease});
+                        
+                    }else{
+                        x=e.target.dest.x;currentLabel=null;//phantom.style.display='none';
+                        y=e.target.dest.y;//func=i===0?moveLabel:null;
+                        tween.addTweener(e.target,{scaleX:1,scaleY:1,x:x,y:y,duration:1000,ease:ease,onStart:func,data:false});
+                        tween.addTweener(e.target.content,{obj:{'1':{quadraticCurveTo:[x/2,y+100,x,y]}},lineWidth:1.2,lineAlpha:0.3,duration:1000,ease:ease});
+                        e.target.ref.isopen=false;
+                    }
+                    
+                }
+                var ptype,pdescription,pparam,pexample,preturns,plink,psee,pproperty;
+                ptype=/(\w+?\s?\w+)\s(\w+)/;
+                pdescription=/(.*)/;
+                pparam=/\{(\w+?\s?\w+)\}\s(\w*)\s(.*)/;
+                pexample=/(.*)/;
+                preturns=/\{(\w+?\s?\w+)\}\s(\w+)\s(.*)/;
+                plink=/(.*)/;
+                psee=/(.*)/;
+                pproperty=/\{(\w+?\s?\w+)\}\s(\w*)\s(.*)/;
+                function parseResult(e){
+                    var b=/\*/g;
+                    var t=e.replace(b,"");
+                    var p=/(@\w+)/g;
+                    var a=t.split(p);
+                    var c=[],d;
+                    for(var i=0;i<a.length;i++){
+                        if(i/2===parseInt(i/2)&&i!==0){
+                            switch(a[i-1]){
+                                case '@type':
+                                    d=ptype.exec(a[i]);
+                                    c.push({r:a[i-1].substr(1,a[i-1].length),type:d[1],class:d[2]});
+                                    break;
+                                case '@description':
+                                    d=pdescription.exec(a[i]);
+                                    c.push({r:a[i-1].substr(1,a[i-1].length),description:d[1]});
+                                    break;
+                                case '@param':
+                                    d=pparam.exec(a[i]);
+                                    c.push({r:a[i-1].substr(1,a[i-1].length),type:d[1],name:d[2],description:d[3]});
+                                    break;
+                                case '@example':
+                                    d=pexample.exec(a[i]);
+                                    c.push({r:a[i-1].substr(1,a[i-1].length),example:d[1]});
+                                    break;
+                                case '@returns':
+                                    d=preturns.exec(a[i]);
+                                    c.push({r:a[i-1].substr(1,a[i-1].length),type:d[1],name:d[2],description:d[3]});
+                                    break;
+                                case '@link':
+                                    d=plink.exec(a[i]);
+                                    c.push({r:a[i-1].substr(1,a[i-1].length),url:d[1]});
+                                    break;
+                                case '@see':
+                                    d=psee.exec(a[i]);
+                                    c.push({r:a[i-1].substr(1,a[i-1].length),target:d[1]});
+                                    break;
+                                case '@property':
+                                    d=pproperty.exec(a[i]);
+                                    c.push({r:a[i-1].substr(1,a[i-1].length),type:d[1],name:d[2],description:d[3]});
+                                    break;
+                                default:
+                                    console.log('default',a[i-1]);
+                                    break;
+                            }
+                        }
+                    }
+                    if(stageRef.children.length!==0){
+                        stageRef.remove(layerRef);
+                        setReference(c);
+                    }else{
+                        setReference(c);
+                    }
+                    
+                }
+                function testTween(e){
+                    e.target.parent.visible=true;
+                    currentObject=e.data;
+                }
+                var step=0;
+                function moveLabel(e){
+                    if(e.data){
+                        //phantom.style.top=5+e.target.y+'px';
+                        //phantom.style.left=(e.target.x-420/2)+'px';
+                        step+=(tween.getTimeInterval()/e.duration);
+                        step=step>1?1:step;
+                        //phantom.style.opacity=step;
+                        ////phantom.innerHTML=e.target.ref.txt;
+                        ////phantom.style.borderColor=e.target.content.lineColor;
+                    }else{
+                        //phantom.style.opacity=0;
+                        step=0;
+                    }
+                }
+                function mOver(e){
+                    stage.container.style.cursor='pointer';
+                    if(e.target.txt in inRef){
+                        e.target.color='azure';
+                    }else{
+                        //e.target.backGround.color='blue';
+                        e.target.color=e.target.content.lineColor;
+                        e.target.fontSize=16*1.2;
+                        e.target.content.lineAlpha=1;
+                        e.target.content.lineWidth=2;
+                        e.target.content.parent.draw();
+                    }
+                    e.target.parent.draw();
+                }
+                function mOut(e){
+                    stage.container.style.cursor='default';
+                    if(e.target.txt in inRef){
+                        e.target.color='black';
+                    }else{
+                        //e.target.backGround.color='black';
+                        e.target.color='black';
+                        e.target.fontSize=16;
+                        e.target.content.lineAlpha=e.target.ref.isopen?1:0.3;
+                        e.target.content.lineWidth=e.target.ref.isopen?2:1;
+                        e.target.content.parent.draw();
+                    }
+                    e.target.parent.draw();
+                }
+                function noV(e){
+                    e.target.parent.visible=false;
+                }
+                function getStats(){
+                    stats.begin();
+                    stats.end();
+                }
+                //stage.addLoop(stage,getStats);
+                var para,indexRef=0;
+                function setReference(e){
+                    for( i=0;i<stage.children.length;i++){
+                        stage.children[i].enabledEvent=false;
+                    }
+                    layerRef=new Canvas2d.Sprite('');
+                    var back=new Canvas2d.DisplayObjects('');
+                    back.rect(0,0,stageRef.width,stageRef.height,'whitesmoke');
+                    layerRef.add(back);
+                    for(var i=0;i<e.length;i++){
+                        indexRef=0;ar=[];w=0,ww=0;
+                        for(var o in e[i]){
+                            para=o==='r'?'':o;
+                            var refTextField=new Canvas2d.DisplayObjects('',false);
+                            refTextField.text(e[i][o],0,0,'normal',16,font,setLabelColor(o),null,'left','hang');
+                            ar.push(refTextField);
+                            w=indexRef===0?4:ar[indexRef-1].width;
+                            ww+=w;
+                            refTextField.x=ww+(4*indexRef);
+                            refTextField.alpha=0;
+                            refTextField.y=(20*i)+(60);
+                            if(o==='url'){
+                                refTextField.enabledEvent=true;
+                                refTextField.addEvent('click',goTo);
+                            }
+                            layerRef.add(refTextField);
+                            indexRef++;
+                        }
+                    }
+                    
+                    stageRef.add(layerRef);
+                    back.width=layerRef.getBound().width;back.height=layerRef.getBound().height+40;
+                    layerRef.addEvent('mousemove',refMove);
+                        for( i=0;i<layerRef.children.length;i++){var fu=i===layerRef.children.length-1?go:null;
+                            tween.addTweener(layerRef.children[i],{txt:'matrix',alpha:1,duration:600,ease:'easeInQuad',delay:40*i,onEnd:fu});
+                        }
+                        function go(e){
+                            for( i=0;i<stage.children.length;i++){
+                                stage.children[i].enabledEvent=true;
+                            }
+                        }
+                }
+                var list={r:"rgb(42, 209, 209)",type:"red",class:"blue",description:"gray",name:"orange",example:"black",url:"slateblue",target:"violet"};
+                function setLabelColor(e){
+                    return list[e];
+                }
+                function goTo(e){
+                    
+                    window.open(e.target.txt,'_blank');
+                }
+                function refMove(e){
+                    e.target.y=-(e.mouse.y-10);
+                    e.target.parent.draw();
+                }
+                var dimo=document.getElementsByTagName('script')[0];
+            };
+        </script>
+        <style type='text/css'>
+            body{margin:0 auto 0 auto;padding:0;height:100%;text-align:center;}
+            #container{box-shadow: 0 0 15px black;}
+            #phantom{border: 2px dotted black;opacity:0;max-height:245px;overflow:auto;display:none;position:absolute;top:0;left:0;background-color: transparent;width:420px;padding:5px;}
+         #phantom h2{margin:1px;padding: 1px;}
+         #phantom p{margin:1px;padding: 1px;}
+         #desc{width:100%;position: absolute;float:left;text-align: left;top:300px;display: none;}
+         #desc div, #desc p{float:left;}
+         #container2{top:300px;}
+        </style>
+    </head>
+    <body>
+        <div id='container'></div>
+        <div id='phantom'></div>
+        <div id='desc'></div>
+        <div id="container2"></div>
+    </body>
+</html>
