@@ -1791,8 +1791,8 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * polygon - DisplayObjects - create a polygon
-     * @description create a polygon
      * @type constructor polygon
+     * @description create a polygon
      * @param {number} x LOCAL orizontal coordinate
      * @param {number} y LOCAL vertical coordinate
      * @param {array} points a collection of two points coordinates [[x,y],..]
