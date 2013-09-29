@@ -134,7 +134,7 @@ Examples.prototype.img=function(c,w,h){
     label.x=label.y=10;
     sprite.add(label);
     var img=new Canvas2d.DisplayObjects('img_0');
-    img.img(0,0,'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/zoom2.jpg',false,'silver',4,4);
+    img.img(0,0,'img/zoom2.jpg',false,'silver',4,4);//,'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/zoom2.jpg',false,'silver',4,4);
     sprite.add(img);
     stage.add(sprite);
     img.loadImage(null,progress,complete,false);
@@ -186,7 +186,7 @@ Examples.prototype.clip=function(c,w,h){
     }
     obj.reverse();
     var clip=new Canvas2d.DisplayObjects('clip_0');
-    clip.clip(0,0,'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/walk.png',obj,false,false);
+    clip.clip(0,0,'img/walk.png',obj,false,false);//,'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/walk.png',obj,false,false);
     clip.loadImage(null,null,onComplete,false);
     anim.add(clip);
     stage.add(anim);
