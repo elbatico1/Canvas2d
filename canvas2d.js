@@ -420,7 +420,7 @@ Canvas2d.Stage.prototype = {
      *@description take a screen shot of stage
      *@param {string} type a type of image image/jpeg-png
      *@param {number} quality a value rapresenting the quality of the returned image in range 0-10
-     *@example image.src= stage.getDataURL('image/png',8);
+     *@example image.src=stage.getDataURL('image/png',8);
      *@returns {image data} data image
      *@see text
      *@link text
@@ -1263,6 +1263,28 @@ Canvas2d.Sprite.prototype = {
         }
     },
     /**
+     * getBound - Sprite -
+     * @type method Sprite
+     * @description get the actual measure based on all the childrens object
+     * @example var myValue= sprite.getBound(); result in {width:value,height:value}
+     * @returns {object} bounds width and hwight
+     * @see text
+     * @link text
+     */
+    getBound: function(){
+        var ax=[],ay=[],aw=[],ah=[];
+        for (var i = 0; i < this.children.length; i++) {
+            ax.push(this.children[i].x+this.children[i].width);
+            ay.push(this.children[i].y+this.children[i].height);
+        }
+        function compareNumbers(a, b) {
+            return a - b;
+        }
+        ax.sort(compareNumbers);
+        ay.sort(compareNumbers);
+        return {width:ax[ax.length-1],height:ay[ay.length-1]};
+    },
+    /**
      * zOrder - Sprite - change the order of a nested DisplayObjects passing either a index number or a string 'top' or 'bottom'
      * @type method Sprite
      * @description change the order of a nested DisplayObjects passing either a index number or a string 'top' or 'bottom'
@@ -1901,6 +1923,7 @@ Canvas2d.DisplayObjects.prototype = {
      * line - DisplayObjects - creatye a line
      * @type constructor line
      * @description create a line
+     * @property {array} points contain two array corresponding to the coordinates x,y of [x0,y0],[x1,y1]
      * @param {number} x LOCAL orizontal coordinate
      * @param {number} y LOCAL vertical coordinate
      * @param {number} x0 starting orizontal coordinate
@@ -3121,6 +3144,7 @@ Canvas2d.DisplayObjects.prototype = {
  */
 Canvas2d.Tweener = function() {
     this.children = {};
+    this.charList=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',' ','0','1','2','3','4','5','6','7','8','9',',','"','\'',',',':',';','(',')','[',']','{','}','*','@','.','!','?','\\','/','<','>','#','+','-','_','=','^','ì','è','é','ò','à','ù','&','$','£','|','∞','°','ç'];
 };
 Canvas2d.Tweener.prototype = {
     /**
@@ -3188,7 +3212,7 @@ Canvas2d.Tweener.prototype = {
             return;
         }
         var twnobj = {};
-        var properties = ['x', 'y', 'width', 'height', 'rotation', 'scaleX', 'scaleY', 'lineWidth', 'fontSize', 'radius'];
+        var properties = ['x', 'y', 'width', 'height', 'rotation', 'scaleX', 'scaleY', 'lineWidth', 'fontSize', 'radius','startAngle','endAngle'];
         var x, colorReq, r, g, b, rqAlpha, rqlineAlpha, alpha, lineAlpha, colorSrc, data = args['data'] ? args['data'] : null;
         var delay = args['delay'] ? args['delay'] : 0;
         var ease = args['ease'] ? args['ease'] : 'easeNone';
@@ -3197,15 +3221,15 @@ Canvas2d.Tweener.prototype = {
             for (var n = 0; n < properties.length; n++) {
                 if (i === properties[n]) {
                     x = (args[i] > o[i]) ? args[i] - o[i] : -(o[i] - args[i]);
-                    twnobj[i] = {'ease': ease, 'to': x, 'ct': 0, 'd': duration, 'from': o[i], 'prop': i, 'request': args[i], 'target': o};
+                    twnobj[i] = {ease: ease, to: x, ct: 0, d: duration, from: o[i], prop: i, request: args[i], target: o};
                 }
             }
         }
-        if (args['obj']) {
+        if ('obj' in args) {
             if (!o['obj']) {
                 return;
             }
-            twnobj['obj'] = {'ease': ease, 'to': [], 'ct': 0, 'd': duration, 'from': [], 'prop': 'obj', 'subprop': [], 'index': 0, 'request': [], 'target': o};
+            twnobj['obj'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'obj', subprop: [], 'index': 0, request: [], target: o};
             for (var io in args['obj']) {
                 twnobj['obj'].index = io;
                 for (var obje in args['obj'][io]) {
@@ -3219,11 +3243,30 @@ Canvas2d.Tweener.prototype = {
                 }
             }
         }
-        if (args['shadow']) {
+        if('txt' in args){
+            if(o['txt']==='') return;
+            args.txt=args.txt!==''?args.txt:'cutFwd';
+            r=[];var d=[];g=o['txt'];
+            for(i=0;i<this.charList.length;i++){
+                d.push(this.charList[i]);
+            }
+            d=this._shuffle(d);
+            for(i=0;i<g.length;i++){
+                for(x=0;x<d.length;x++){
+                    if(g.charAt(i)===d[x]){
+                        r.push(x);
+                        break;
+                    }
+                }
+            }
+            twnobj['txt']={ease: ease, to: g.length, ct: 0, d: duration, from: 0, prop: 'txt', subprop: r, request: '', target: o, text:o.txt, type:args.txt, charlist:d};
+            o.txt='';
+        }
+        if ('shadow' in args) {
             if (!o['shadow']) {
                 return;
             }
-            twnobj['shadow'] = {'ease': ease, 'to': [], 'ct': 0, 'd': duration, 'from': [], 'prop': 'shadow', 'subprop': [], 'request': [], 'target': o};
+            twnobj['shadow'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'shadow', subprop: [], request: [], target: o};
             for (var io in args['shadow']) {
                 if (io === "color") {
                     colorReq = Colors.ParseColor(args['shadow'][io]);
@@ -3249,7 +3292,7 @@ Canvas2d.Tweener.prototype = {
             if (!o['lineShadow']) {
                 return;
             }
-            twnobj['lineShadow'] = {'ease': ease, 'to': [], 'ct': 0, 'd': duration, 'from': [], 'prop': 'lineShadow', 'subprop': [], 'request': [], 'target': o};
+            twnobj['lineShadow'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'lineShadow', subprop: [], request: [], target: o};
             for (var oi in args['lineShadow']) {
                 if (oi === "color") {
                     colorReq = Colors.ParseColor(args['lineShadow'][oi]);
@@ -3271,37 +3314,37 @@ Canvas2d.Tweener.prototype = {
                 }
             }
         }
-        if (args['color']) {
+        if ('color' in args) {
             colorReq = Colors.ParseColor(args['color']);
             colorSrc = Colors.ParseColor(o.color);
             r = colorReq[0] - colorSrc[0];
             g = colorReq[1] - colorSrc[1];
             b = colorReq[2] - colorSrc[2];
-            twnobj['rgb'] = {'ease': ease, "tor": r, "tog": g, "tob": b, "ct": 0, "d": duration, "fromr": colorSrc[0], "fromg": colorSrc[1], "fromb": colorSrc[2], "prop": 'color', "request": colorReq, 'target': o};
+            twnobj['rgb'] = {ease: ease, tor: r, tog: g, tob: b, ct: 0, d: duration, fromr: colorSrc[0], fromg: colorSrc[1], fromb: colorSrc[2], prop: 'color', request: colorReq, target: o};
         }
-        if (args['linecolor']) {
+        if ('linecolor' in args) {
             colorReq = Colors.ParseColor(args['linecolor']);
             colorSrc = Colors.ParseColor(o.lineColor);
             r = colorReq[0] - colorSrc[0];
             g = colorReq[1] - colorSrc[1];
             b = colorReq[2] - colorSrc[2];
-            twnobj['rgbl'] = {'ease': ease, "tor": r, "tog": g, "tob": b, "ct": 0, "d": duration, "fromr": colorSrc[0], "fromg": colorSrc[1], "fromb": colorSrc[2], "prop": 'lineColor', "request": colorReq, 'target': o};
+            twnobj['rgbl'] = {ease: ease, tor: r, tog: g, tob: b, ct: 0, d: duration, fromr: colorSrc[0], fromg: colorSrc[1], fromb: colorSrc[2], prop: 'lineColor', request: colorReq, target: o};
         }
         if ('alpha' in args) {
             rqAlpha = args['alpha'];
             alpha = rqAlpha - o.alpha;
-            twnobj['alpha'] = {'ease': ease, 'to': alpha, 'ct': 0, 'd': duration, 'from': o.alpha, 'prop': 'alpha', 'request': rqAlpha, 'target': o};
+            twnobj['alpha'] = {ease: ease, to: alpha, ct: 0, d: duration, from: o.alpha, prop: 'alpha', request: rqAlpha, target: o};
         }
         if ('lineAlpha' in args) {
             rqAlpha = (args['lineAlpha'] > 1) ? args['lineAlpha'] / 100 : args['lineAlpha'];
             lineAlpha = rqAlpha - o.lineAlpha;
-            twnobj['lineAlpha'] = {'ease': ease, 'to': lineAlpha, 'ct': 0, 'd': duration, 'from': o.lineAlpha, 'prop': 'lineAlpha', 'request': rqlineAlpha, 'target': o};
+            twnobj['lineAlpha'] = {ease: ease, to: lineAlpha, ct: 0, d: duration, from: o.lineAlpha, prop: 'lineAlpha', request: rqlineAlpha, target: o};
         }
         var onStart = args['onStart'] ? args['onStart'] : null;
         var onTween = args['onTween'] ? args['onTween'] : null;
         var onEnd = args['onEnd'] ? args['onEnd'] : null;
 
-        twnobj.state = {'start': true, 'tweening': false, 'end': false, 'onStart': onStart, 'onTween': onTween, 'onEnd': onEnd, 'target': o, 'duration': duration, 'delay': delay, 'data': data};
+        twnobj.state = {start: true, tweening: false, end: false, onStart: onStart, onTween: onTween, onEnd: onEnd, target: o, duration: duration, delay: delay, data: data};
 
         if (delay > 0) {
             var that = this.children;
@@ -3325,8 +3368,18 @@ Canvas2d.Tweener.prototype = {
      */
     removeTweener: function(child) {
         if (child.id in this.children) {
+            this.children[child.id].state.end=true;
             delete this.children[child.id];
         }
+    },
+    _shuffle: function(array){
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+        return array;
     },
     _callTween: function(that) {
         var tree = {}, n = -1;
@@ -3365,6 +3418,9 @@ Canvas2d.Tweener.prototype = {
                     } else if (oo === 'obj') {
                         that.children[o][oo].ct += ct;
                         that._tweenO(that.children[o][oo], that.children[o].state);
+                    } else if (oo === 'txt') {
+                        that.children[o][oo].ct += ct;
+                        that._tweenT(that.children[o][oo], that.children[o].state);
                     } else {
                         that.children[o][oo].ct += ct;
                         that._tween(that.children[o][oo], that.children[o].state);
@@ -3436,6 +3492,36 @@ Canvas2d.Tweener.prototype = {
             n = this[args.ease](args['ct'], args['from'][o], args['to'][o], args['d']);
             args['target'][args['prop']][args['index']][args['subprop'][o]][o] = n;
         }
+    },
+    _tweenT: function(args, ctrl) {
+        if ((args['ct'] / args['d']) >= 1) {
+            args['ct'] = 1;
+            args['d'] = 1;
+            ctrl.end = true;
+        }var n;
+        
+        switch(args.type){
+            case 'cutFwd':
+                n = Math.floor(this[args.ease](args['ct'], args['from'], args['to'], args['d']));
+                args['target'][args['prop']]=args.text.substr(0,n);
+                break;
+            case 'cutBack':
+                n = Math.floor(this[args.ease](args['ct'], args['from'], args['to'], args['d']));
+                args['target'][args['prop']]=args.text.substr(args.to-n,n);
+                break;
+            case 'matrix':
+                for(var i=0;i<args.subprop.length;i++){
+                    n = Math.floor(this[args.ease](args['ct'], 0, args.subprop[i], args['d']));
+                    n=n>this.charList.length-1?n-this.charList.length:n;
+                    args.request+=args.charlist[n];
+                }
+                args['target'][args['prop']]=args.text=args.request;
+                args.request='';
+                break;
+            default:
+                break;
+        }
+        
     },
 //////////////////////////////////////////////
 //Equations - From Caurina Tweener
