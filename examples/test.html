@@ -4,6 +4,7 @@
         <title></title>
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
         <link type='text/css' rel='stylesheet' href='font/fontset.css'/>
+        <script src="js/exampledocs.js" type="text/javascript"></script>
         <script type='text/javascript' src='../canvas2d.js'></script>
         <script type='text/javascript' src='js/stats.js'></script>
         <script type='text/javascript'>
@@ -13,14 +14,15 @@
                 var width='innerWidth' in window?window.innerWidth:document.documentElement.clientWidth;
                 var height='innerHeight' in window?window.innerHeight:document.documentElement.clientHeight;
                 height=300;//width=900;
-                var phantom=document.getElementById('phantom'),params,prop=[],fun=[],curr,found,ind=-1,i,o,dom=document.getElementById('desc');
+                var phantom=document.getElementById('phantom'),params,prop=[],fun=[],curr,found,ind=-1,i,o,cont2=document.getElementById('container3'),exa;
                 var obj={},count=[],b=/\*/g,bb=/(@\w+)/g,protoList=['Stage','Sprite','DisplayObjects','Tweener','Colors'],d,ease='easeOutExpo';
                 var inRef={Stage:'Stage',Sprite:'Sprite',DisplayObjects:'DisplayObjects',Tweener:'Tweener',Colors:'Colors'};
                 var xrq=new XMLHttpRequest();
                 xrq.onload=function(){
                     params=xrq.responseText;
                 };
-                xrq.open('get','../canvas2d.js',false);
+                //xrq.open('get','../canvas2d.js',false);
+                xrq.open('get','https://rawgithub.com/elbatico1/Canvas2d/master/canvas2d.js',false);
                 xrq.send();
                 params=params.replace('/\n?\r/g','\n').split('\n');
                 var ok=false,ney=false;
@@ -271,6 +273,7 @@
                     }
                     if(stageRef.children.length!==0){
                         stageRef.remove(layerRef);
+                        cont2.innerHTML='';
                         setReference(c);
                     }else{
                         setReference(c);
@@ -337,6 +340,12 @@
                     for( i=0;i<stage.children.length;i++){
                         stage.children[i].enabledEvent=false;
                     }
+                    delete exa;console.log(e[0].class);
+                    var topa=e[0].class in Examples.prototype?e[0].class:false;
+                    if(topa){
+                        exa=new Examples();
+                        exa[topa]('container3',width,height);
+                    }
                     layerRef=new Canvas2d.Sprite('');
                     var back=new Canvas2d.DisplayObjects('');
                     back.rect(0,0,stageRef.width,stageRef.height,'whitesmoke');
@@ -391,19 +400,24 @@
         </script>
         <style type='text/css'>
             body{margin:0 auto 0 auto;padding:0;height:100%;text-align:center;}
-            #container{box-shadow: 0 0 15px black;}
+            #container, #container3{box-shadow: 0 0 15px black;}
             #phantom{border: 2px dotted black;opacity:0;max-height:245px;overflow:auto;display:none;position:absolute;top:0;left:0;background-color: transparent;width:420px;padding:5px;}
          #phantom h2{margin:1px;padding: 1px;}
          #phantom p{margin:1px;padding: 1px;}
          #desc{width:100%;position: absolute;float:left;text-align: left;top:300px;display: none;}
          #desc div, #desc p{float:left;}
          #container2{top:300px;}
+         #container3{top:600px;}
         </style>
     </head>
     <body>
+        
+        <div id="container2"></div>
+        <div id="container3"></div>
         <div id='container'></div>
         <div id='phantom'></div>
         <div id='desc'></div>
-        <div id="container2"></div>
+        
+        
     </body>
 </html>
