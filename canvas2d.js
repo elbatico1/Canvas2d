@@ -35,7 +35,6 @@
 var Canvas2d = {
     'globalId': 1,
     'container': {'id': 0, 'width': 0, 'height': 0, 'element': null},
-    'fakeCanvas': null,
     'fakeCtx': null
 };
 /**
@@ -90,7 +89,6 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
     this.fakeCanvas.width = width;
     this.fakeCanvas.height = height;
     this.fakeCtx = this.fakeCanvas.getContext("2d");
-    Canvas2d.fakeCanvas = this.fakeCanvas;
     Canvas2d.fakeCtx = this.fakeCtx;
     this.width = width;
     this.height = height;
@@ -493,6 +491,7 @@ Canvas2d.Stage.prototype = {
         }
         child.index = this.indexCount;
         child.parent = this;
+        this._setContainer(child,this);
         this.children.push(child);
         this.indexCount++;
         this._orderCanvases();
@@ -555,6 +554,14 @@ Canvas2d.Stage.prototype = {
             }
         }
     },
+    _setContainer:function(child,parent){
+        child.width=parent.width;
+        child.height=parent.height;
+        child.stage=parent.container;
+        child.canvas.width=parent.width;
+        child.canvas.height=parent.height;
+        child.ctx=child.canvas.getContext('2d');
+    },
     /**
      *_orderCanvases - Stage - internal function - reorder the canvases (Sprite) elements.
      */
@@ -587,11 +594,7 @@ Canvas2d.Stage.prototype = {
         this.width = w;
         this.height = h;
         for (var i = 0; i < this.children.length; i++) {
-            this.children[i].canvas.width = w;
-            this.children[i].canvas.height = h;
-            this.children[i].width = w;
-            this.children[i].height = h;
-            //this.children[i].ctx=this.children[i].canvas.getContext('2d');
+            this._setContainer(this.children[i],this);
         }
     },
     _functestmobile: function() {
@@ -1179,6 +1182,14 @@ Canvas2d.Sprite = function(name, enableevent) {
     this.rotation = 0;
     this.evtListeners = {};
 };
+function _setContainer(child,parent){
+    child.width=parent.width;
+    child.height=parent.height;
+    child.stage=parent.container;
+    child.canvas.width=parent.width;
+    child.canvas.height=parent.height;
+    child.ctx=child.canvas.getContext('2d');
+}
 Canvas2d.Sprite.prototype = {
     /**
      * addEvent - Sprite - add an event into the listening cicle
@@ -1935,6 +1946,7 @@ Canvas2d.DisplayObjects.prototype = {
      * @param {type} lineCap style of edge of line; butt, round, square; default butt
      * @param {type} lineJoin style of joining lines; bevel, round, miter; default miter
      * @param {number} lineMiter amount of exiding weight of line
+     * @example myObject.line(0,0,-10,0,10,0,'blue',2,'round','miter',10);
      * @returns {undefined} none none
      *@see text
      *@link text
@@ -3144,6 +3156,7 @@ Canvas2d.DisplayObjects.prototype = {
  */
 Canvas2d.Tweener = function() {
     this.children = {};
+    this._tempChildren = {};
     this.charList=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',' ','0','1','2','3','4','5','6','7','8','9',',','"','\'',',',':',';','(',')','[',']','{','}','*','@','.','!','?','\\','/','<','>','#','+','-','_','=','^','ì','è','é','ò','à','ù','&','$','£','|','∞','°','ç'];
 };
 Canvas2d.Tweener.prototype = {
@@ -3229,11 +3242,12 @@ Canvas2d.Tweener.prototype = {
             if (!o['obj']) {
                 return;
             }
-            twnobj['obj'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'obj', subprop: [], 'index': 0, request: [], target: o};
+            twnobj['obj'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'obj', subprop: [], index: [], request: [], target: o};
             for (var io in args['obj']) {
-                twnobj['obj'].index = io;
+                
                 for (var obje in args['obj'][io]) {
                     for (var ele = 0; ele < args['obj'][io][obje].length; ele++) {
+                        twnobj['obj'].index.push(parseInt(io));
                         twnobj['obj'].request.push(args['obj'][io][obje][ele]);
                         twnobj['obj'].from.push(o['obj'][io][obje][ele]);
                         x = (args['obj'][io][obje][ele] > o['obj'][io][obje][ele]) ? args['obj'][io][obje][ele] - o['obj'][io][obje][ele] : -(o['obj'][io][obje][ele] - args['obj'][io][obje][ele]);
@@ -3260,7 +3274,7 @@ Canvas2d.Tweener.prototype = {
                 }
             }
             twnobj['txt']={ease: ease, to: g.length, ct: 0, d: duration, from: 0, prop: 'txt', subprop: r, request: '', target: o, text:o.txt, type:args.txt, charlist:d};
-            o.txt='';
+            o._prevTxt=o.txt;o.txt='';
         }
         if ('shadow' in args) {
             if (!o['shadow']) {
@@ -3322,8 +3336,8 @@ Canvas2d.Tweener.prototype = {
             b = colorReq[2] - colorSrc[2];
             twnobj['rgb'] = {ease: ease, tor: r, tog: g, tob: b, ct: 0, d: duration, fromr: colorSrc[0], fromg: colorSrc[1], fromb: colorSrc[2], prop: 'color', request: colorReq, target: o};
         }
-        if ('linecolor' in args) {
-            colorReq = Colors.ParseColor(args['linecolor']);
+        if ('lineColor' in args) {
+            colorReq = Colors.ParseColor(args['lineColor']);
             colorSrc = Colors.ParseColor(o.lineColor);
             r = colorReq[0] - colorSrc[0];
             g = colorReq[1] - colorSrc[1];
@@ -3347,9 +3361,14 @@ Canvas2d.Tweener.prototype = {
         twnobj.state = {start: true, tweening: false, end: false, onStart: onStart, onTween: onTween, onEnd: onEnd, target: o, duration: duration, delay: delay, data: data};
 
         if (delay > 0) {
-            var that = this.children;
+            this._tempChildren[o.id]='';
+            var that = this;
             setTimeout(function() {
-                that[o.id] = twnobj;
+                if(o.id in that._tempChildren){
+                    delete that._tempChildren[o.id];
+                    that.children[o.id] = twnobj;
+                }
+                
             }, delay);
         } else {
             this.children[o.id] = twnobj;
@@ -3367,9 +3386,11 @@ Canvas2d.Tweener.prototype = {
      *@link text
      */
     removeTweener: function(child) {
+        if(child.id in this._tempChildren){
+            delete this._tempChildren[child.id];
+        }
         if (child.id in this.children) {
             this.children[child.id].state.end=true;
-            delete this.children[child.id];
         }
     },
     _shuffle: function(array){
@@ -3489,8 +3510,8 @@ Canvas2d.Tweener.prototype = {
         }
         for (var o = 0; o < args['to'].length; o++) {
             var n;
-            n = this[args.ease](args['ct'], args['from'][o], args['to'][o], args['d']);
-            args['target'][args['prop']][args['index']][args['subprop'][o]][o] = n;
+            n = this[args.ease](args.ct, args.from[o], args.to[o], args.d);
+            args.target[args.prop][args.index[o]][args.subprop[o]][o] = n;
         }
     },
     _tweenT: function(args, ctrl) {
@@ -3507,7 +3528,7 @@ Canvas2d.Tweener.prototype = {
                 break;
             case 'cutBack':
                 n = Math.floor(this[args.ease](args['ct'], args['from'], args['to'], args['d']));
-                args['target'][args['prop']]=args.text.substr(args.to-n,n);
+                args['target'][args['prop']]=args.text.substr(0,args.to-n);
                 break;
             case 'matrix':
                 for(var i=0;i<args.subprop.length;i++){
@@ -3548,6 +3569,22 @@ Canvas2d.Tweener.prototype = {
      */
     easeNone: function(t, b, c, d, p_params) {
         return c * t / d + b;
+    },
+    /**
+     * easeSine
+     * @type static method Tweener
+     * @description Easing equation function for a simple sine's curve tweening, with no easing.
+     * @param {number} t Current time (in frames or seconds).
+     * @param {number} b Starting value.
+     * @param {number} c Change needed in value.
+     * @param {number} d Expected easing duration (in frames or seconds).
+     * @param {null} p_params null object
+     * @returns {number} n The correct value.
+     * @see link
+     * @link http://code.google.com/p/tweener/
+     */
+    easeSine: function(t, b, c, d, p_params) {
+        return b+c*(Math.sin((Math.PI/d)*t));
     },
     /**
      * easeInQuad
@@ -4336,7 +4373,7 @@ var Colors = {
      * @param {string} hex the color in hex format
      * @example var myValue= Colors.Rgb('#FF00FF');
      * @returns {array} rgb the RGB representation in set [0, 255]; [r, g, b]
-     * @link text
+     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
      */
     Rgb: function(hex) {
@@ -4361,7 +4398,7 @@ var Colors = {
      * @param {array} rgb the color in rgb array format
      * @example var myValue= Colors.Hex([r, g, b]);
      * @returns {string} hex the HEX representation in string color format; '#value
-     * @link text
+     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
      */
     Hex: function(rgb) {
@@ -4547,7 +4584,7 @@ var Colors = {
      * @param {string} type string that rapresent the desired returned format value; string or array; default string
      * @example var myValue= Colors.RandomRgb('array');
      * @returns {mixed} rgb in string or array format; 'rgb(n, n, n)' or [r, g, b]
-     * @link text
+     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
      */
     RandomRgb: function(type) {
@@ -4569,12 +4606,12 @@ var Colors = {
      * @param {mixed} color any kind of accepted color formats; string, name, hex, array
      * @example var myValue= Colors.ParseColor(myObject.color);
      * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
-     * @link text
+     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
      */
     ParseColor: function(color) {
         if (!color) {
-            return undefined;
+            return [0,0,0];
         }
         if (typeof color === 'string') {
             var result = color.replace(/\s/g, "").toLowerCase();
@@ -4584,20 +4621,20 @@ var Colors = {
                 ar = re.exec(result);
                 return [parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3])];
             } else if (result.indexOf('#') > -1) {
-                var hex = Colors.Rgb(result);
+                var hex = this.Rgb(result);
                 return hex;
             } else if (result.indexOf('hsl') > -1) {
                 re = /hsl\((.*),(\d{1,3})?%,(\d{1,3})/g;
                 ar = re.exec(result);
-                var hsl = Colors.HslToRgb(parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3]));
+                var hsl = this.HslToRgb(ar[1]/360, ar[2]/100, ar[3]/100);
                 return hsl;
             } else if (result.indexOf('hsv') > -1) {
                 re = /hsv\((.*),(\d{1,3})?%,(\d{1,3})/g;
                 ar = re.exec(result);
-                var hsv = Colors.HsvToRgb(parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3]));
+                var hsv = this.HsvToRgb(ar[1]/360, ar[2]/100, ar[3]/100);
                 return hsv;
-            } else if (result in Colors.namedColor) {
-                ar = Colors.namedColor[result][1];
+            } else if (result in this.namedColor) {
+                ar = this.namedColor[result][1];
                 return ar;
             } else {
                 return [0, 0, 0];
