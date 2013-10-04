@@ -1,0 +1,18 @@
+/* 
+    Document   : documentation
+    Created on : 30-set-2013, 13.39.27
+    Author     : fabio
+    Description:
+        Purpose of the stylesheet follows.
+*/
+root { 
+    display: block;
+}
+body,#wrap{margin:0 auto 0 auto;padding:0;height:100%;text-align:center;}
+div,pre,code{margin:0;padding:0;}
+.container{position:relative;min-width:100%;height:300px;}
+#maindocs, #referense, #badgedw, #badgeup, #examples, #code{position:absolute;text-align:left;}
+#code, #referense{min-width:100%;min-height: 300px;}
+#referense, #codecode{box-shadow:inset 0 0 10px #CCC;}
+#badgeup{right:30px;}
+#badgedw{right:30px;bottom:-1px;}
