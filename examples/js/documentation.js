@@ -1,5 +1,5 @@
 function startCanvas(l){
-    var codePre=document.getElementById('codecode'),examples=document.getElementById('examples'),location=l.indexOf('localhost'>-1)?true:false;
+    var codePre=document.getElementById('codecode'),examples=document.getElementById('examples'),location=l.indexOf('localhost'>-1)?true:false;console.log(l);
     //stage elements
     var width='innerWidth' in window?window.innerWidth:document.documentElement.clientWidth;
     var height='innerHeight' in window?window.innerHeight:document.documentElment.clientHeight,h=300;
