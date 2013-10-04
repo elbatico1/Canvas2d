@@ -99,7 +99,7 @@ DisplayObjects.prototype.img = function(c, w, h, params) {
     label.text('... ', 0, 0, 'bold', 18, 'Tahoma', 'white', {'color': 'black'}, 'start', 'hanging');
     label.x = label.y = 10;
     var img = new Canvas2d.DisplayObjects('img_0');
-    img.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/zoom2.jpg', false, 'silver', 4, 4);
+    img.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'silver', 4, 4);
     sprite.add(img);
     sprite.add(label);
     stage.add(sprite);
@@ -155,7 +155,7 @@ DisplayObjects.prototype.clip = function(c, w, h, params) {
     }
     obj.reverse();
     var clip = new Canvas2d.DisplayObjects('clip_0');
-    clip.clip(0, 0, params[0] ? 'img/walk.png' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/walk.png', obj, false);
+    clip.clip(0, 0, params[0] ? 'img/walk.png' : 'http://www.somethinglikethis.it/img/hosted/walk.png', obj, false);
     clip.loadImage(null, prog, onComplete, false);
     anim.add(clip);
     stage.add(anim);
@@ -564,7 +564,7 @@ Examples.prototype.mastermind = function(c, w, h, params) {
     img.onload = function() {
         init(img);
     };
-    img.src = params[0] ? 'img/retina_wood.png' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/retina_wood.png';
+    img.src = params[0] ? 'img/retina_wood.png' : 'http://www.somethinglikethis.it/img/hosted/retina_wood.png';
 };
 Examples.prototype.stars = function(c, w, h, params) {
     function init(img) {
@@ -650,14 +650,14 @@ Examples.prototype.stars = function(c, w, h, params) {
     img.onload = function() {
         init(img);
     };
-    img.src = params[0] ? 'img/ice_age.png' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/ice_age.png';
+    img.src = params[0] ? 'img/ice_age.png' : 'http://www.somethinglikethis.it/img/hosted/ice_age.png';
 };
 DisplayObjects.prototype.setCrop = function(c, w, h, params) {
     var stage = new Canvas2d.Stage(c, w, h);
     var sp = new Canvas2d.Sprite();
     var im = new Canvas2d.DisplayObjects();
     var crop = {dx: 0, dy: 0, dw: w, dh: h};
-    im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/zoom2.jpg', false);
+    im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false);
     im.loadImage(im.source, null, complete);
     function complete(e) {
         e.parent.draw();
@@ -697,7 +697,7 @@ DisplayObjects.prototype.filter = {
 
         var im = new Canvas2d.DisplayObjects();
         var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
         im.x = 180;
         im.y = 20;
         im.loadImage(im.source, null, complete);
@@ -738,7 +738,7 @@ DisplayObjects.prototype.filter = {
 
         var im = new Canvas2d.DisplayObjects();
         var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
         im.x = 180;
         im.y = 20;
         im.loadImage(im.source, null, complete);
@@ -837,7 +837,7 @@ DisplayObjects.prototype.filter = {
 
         var im = new Canvas2d.DisplayObjects();
         var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
         im.x = 150;
         im.y = 20;
         im.loadImage(im.source, null, complete);
@@ -875,7 +875,7 @@ DisplayObjects.prototype.filter = {
 
         var im = new Canvas2d.DisplayObjects();
         var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
         im.x = 180;
         im.y = 20;
         im.loadImage(im.source, null, complete);
@@ -1309,7 +1309,7 @@ Examples.prototype.clip2 = function(c, w, h, params) {
     }
     obj.reverse();
     var clip = new Canvas2d.DisplayObjects('clip_0');
-    clip.clip(0, 0, params[0] ? 'img/walk.png' : 'https://rawgithub.com/elbatico1/Canvas2d/master/examples/img/walk.png', obj, false, false);
+    clip.clip(0, 0, params[0] ? 'img/walk.png' : 'http://www.somethinglikethis.it/img/hosted/walk.png', obj, false, false);
     clip.loadImage(null, null, onComplete, false);
     anim.add(clip);
     stage.add(anim);
