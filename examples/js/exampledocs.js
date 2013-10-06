@@ -20,6 +20,702 @@ var Stage = function() {
 var Sprite = function() {
 
 };
+Common.prototype.method = {
+    addEvent: function(c, w, h, params) {
+        var eventList = ['click', 'mouseover', 'mouseout', 'dragstart', 'drag', 'dragstop', 'mousedown', 'mouseup', 'mousemove'];
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('main');
+        var labelContainer = new Canvas2d.Sprite('label container', false);
+        var label;
+        var rect = new Canvas2d.DisplayObjects('rect');
+        rect.rect(-50, -50, 100, 100, 'lightsteelblue');
+        rect.x = stage.width / 2;
+        rect.y = stage.height / 2;
+        sprite.add(rect);
+        stage.add(labelContainer);
+        stage.add(sprite);
+        for (var i = 0; i < eventList.length; i++) {
+            rect.addEvent(eventList[i], eval(eventList[i]));
+            label = new Canvas2d.DisplayObjects(eventList[i]);
+            label.text('Current event:', 0, 0, 'normal', 20, 'Helvetica', 'black', null, 'start', 'top');
+            label.x = 20;
+            label.y = 20 + (30 * i);
+            rect[eventList[i]] = label;
+            labelContainer.add(label);
+        }
+        function click(e) {
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mouseover(e) {
+            e.target.mouseout.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mouseout(e) {
+            e.target.mousemove.txt = 'Current event: ';
+            e.target.mouseover.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function dragstart(e) {
+            e.target.dragstop.txt = 'Current event: ';
+            e.target.mousemove.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function drag(e) {
+            e.target.dragstop.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            rect.x = e.mouse.ox;
+            rect.y = e.mouse.oy;
+            stage.draw();
+        }
+        function dragstop(e) {
+            e.target.dragstart.txt = 'Current event: ';
+            e.target.drag.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mousedown(e) {
+            e.target.mouseup.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mouseup(e) {
+            e.target.mousedown.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mousemove(e) {
+            e.target.mousedown.txt = 'Current event: ';
+            e.target.mouseup.txt = 'Current event: ';
+            e.target.click.txt = 'Current event: ';
+            e.target.dragstop.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        stage.draw();
+    },
+    removeEvent: function(c, w, h, params) {
+        var eventList = ['click', 'mouseover', 'mouseout', 'dragstart', 'drag', 'dragstop', 'mousedown', 'mouseup', 'mousemove'];
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('main');
+        var labelContainer = new Canvas2d.Sprite('label container', false);
+        var evtRemover = new Canvas2d.Sprite('label remover');
+        var label, eventRemove;
+        var rect = new Canvas2d.DisplayObjects('rect');
+        rect.rect(-50, -50, 100, 100, 'lightsteelblue');
+        rect.x = stage.width / 2;
+        rect.y = stage.height / 2;
+        sprite.add(rect);
+        stage.add(labelContainer);
+        stage.add(evtRemover);
+        stage.add(sprite);
+        for (var i = 0; i < eventList.length; i++) {
+            rect.addEvent(eventList[i], eval(eventList[i]));
+            label = new Canvas2d.DisplayObjects(eventList[i]);
+            label.text('Current event:', 0, 0, 'normal', 20, 'Helvetica', 'black', null, 'start', 'top');
+            label.x = 20;
+            label.y = 20 + (30 * i);
+            rect[eventList[i]] = label;
+            labelContainer.add(label);
+            eventRemove = label.clone(eventList[i]);
+            eventRemove.txt = eventList[i];
+            eventRemove.align = 'right';
+            eventRemove.x = stage.width - 20;
+            eventRemove.y = eventRemove.height + (30 * i);
+            eventRemove.addEvent('click', addRemove);
+            eventRemove.addEvent('mouseover', mOver);
+            eventRemove.addEvent('mouseout', mOut);
+            evtRemover.add(eventRemove);
+        }
+        function click(e) {
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mouseover(e) {
+            e.target.mouseout.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mouseout(e) {
+            e.target.mousemove.txt = 'Current event: ';
+            e.target.mouseover.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function dragstart(e) {
+            e.target.dragstop.txt = 'Current event: ';
+            e.target.mousemove.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function drag(e) {
+            e.target.dragstop.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            rect.x = e.mouse.ox;
+            rect.y = e.mouse.oy;
+            stage.draw();
+        }
+        function dragstop(e) {
+            e.target.dragstart.txt = 'Current event: ';
+            e.target.drag.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mousedown(e) {
+            e.target.mouseup.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mouseup(e) {
+            e.target.mousedown.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function mousemove(e) {
+            e.target.mousedown.txt = 'Current event: ';
+            e.target.mouseup.txt = 'Current event: ';
+            e.target.click.txt = 'Current event: ';
+            e.target.dragstop.txt = 'Current event: ';
+            e.target[e.type].txt = 'Current event: ' + e.type;
+            stage.draw();
+        }
+        function addRemove(e){
+            if(e.target.name in rect.evtListeners){
+                if(eval(e.target.name) === rect.evtListeners[e.target.name].func[0]){
+                    rect.removeEvent(e.target.name, eval(e.target.name));
+                    rect[e.target.name].txt = e.target.name + ' event removed';
+                    rect[e.target.name].color = 'red';
+                }
+            }else{
+                rect.addEvent(e.target.name, eval(e.target.name));
+                rect[e.target.name].txt = e.target.name + ' event added';
+                rect[e.target.name].color = 'black';
+            }
+            stage.draw();
+        }
+        function mOver(e){
+            stage.container.style.cursor = 'pointer';
+            e.target.color = 'lightblue';
+            evtRemover.draw();
+        }
+        function mOut(e){
+            stage.container.style.cursor = 'default';
+            e.target.color = 'black';
+            evtRemover.draw();
+        }
+        stage.draw();
+    },
+    add: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('main');
+        var rect = new Canvas2d.DisplayObjects('rect');
+        rect.rect(-50, -50, 100, 100, Colors.RandomRgb());
+        var circle = new Canvas2d.DisplayObjects('circle');
+        circle.circle(0, 0, 50, 0, Math.PI*2, Colors.RandomRgb());
+        var x, y;
+        var label = new Canvas2d.DisplayObjects('addobject');
+        label.text('Add Object', 0, 0, 'normal', 20, 'Helvetica', 'black', null, 'start', 'top');
+        label.x = 20;
+        label.y = 20;
+        label.addEvent('click', addObj);
+        label.addEvent('mouseover', mOver);
+        label.addEvent('mouseout', mOut);
+        sprite.add(label);
+        stage.add(sprite);
+        stage.draw();
+        function mOver(e){
+            stage.container.style.cursor = 'pointer';
+            e.target.color = 'lightblue';
+            sprite.draw();
+        }
+        function mOut(e){
+            stage.container.style.cursor = 'default';
+            e.target.color = 'black';
+            sprite.draw();
+        }
+        function addObj(e){
+            var randomObject;
+            x = Math.random() * (stage.width-100) + 50;
+            y = Math.random() * (stage.height-100) + 50;
+            if(Math.random() * 2 < 1){
+                randomObject = rect.clone();
+                randomObject.color = Colors.RandomRgb();
+                randomObject.x = x;
+                randomObject.y = y;
+            }else{
+                randomObject = circle.clone();
+                randomObject.color = Colors.RandomRgb();
+                randomObject.x = x;
+                randomObject.y = y;
+            }
+            sprite.add(randomObject);
+            stage.draw();
+        }
+    },
+    remove: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('main');
+        var rect = new Canvas2d.DisplayObjects('rect');
+        rect.rect(-50, -50, 100, 100, Colors.RandomRgb());
+        var circle = new Canvas2d.DisplayObjects('circle');
+        circle.circle(0, 0, 50, 0, Math.PI*2, Colors.RandomRgb());
+        var x, y, label2;
+        var label = new Canvas2d.DisplayObjects('addobject');
+        label.text('Add Objects', 0, 0, 'normal', 20, 'Helvetica', 'black', null, 'start', 'top');
+        label2 = label.clone('label2');
+        label2.align = 'center';
+        label2.baseLine = 'alphabetic';
+        label2.enabledEvent = false;
+        label2.visible = false;
+        label.x = 20;
+        label.y = 20;
+        label.addEvent('click', addObj);
+        label.addEvent('mouseover', mOver);
+        label.addEvent('mouseout', mOut);
+        sprite.add(label2);
+        sprite.add(label);
+        stage.add(sprite);
+        stage.draw();
+        function mOver(e){
+            stage.container.style.cursor = 'pointer';
+            e.target.color = 'lightblue';
+            sprite.draw();
+        }
+        function mOut(e){
+            stage.container.style.cursor = 'default';
+            e.target.color = 'black';
+            sprite.draw();
+        }
+        function rOut(e){
+            stage.container.style.cursor = 'default';
+            label2.visible = false;
+            label2.x = 0;
+            label2.y = 0;
+            label2.txt = '';
+            sprite.draw();
+        }
+        function rOver(e){
+            stage.container.style.cursor = 'pointer';
+            label2.x = e.target.x;
+            label2.y = e.target.y - 10;
+            label2.txt = 'Remove';
+            label2.visible = true;
+            sprite.draw();
+        }
+        function removeObj(e){
+            rOut(e);
+            e.target.removeEvent('mouseout', rOut);
+            label2.visible = false;
+            sprite.remove(e.target);
+            stage.draw();
+        }
+        function addObj(){
+            for(var i = 0; i < Math.random() * 30; i++){
+                var randomObject;
+                x = Math.random() * (stage.width-100) + 50;
+                y = Math.random() * (stage.height-100) + 50;
+                if(Math.random() * 2 < 1){
+                    randomObject = rect.clone();
+                    randomObject.color = Colors.RandomRgb();
+                    randomObject.x = x;
+                    randomObject.y = y;
+                }else{
+                    randomObject = circle.clone();
+                    randomObject.color = Colors.RandomRgb();
+                    randomObject.x = x;
+                    randomObject.y = y;
+                }
+                randomObject.addEvent('click', removeObj);
+                randomObject.addEvent('mouseover', rOver);
+                randomObject.addEvent('mouseout', rOut);
+                sprite.add(randomObject);
+            }
+            label2.zOrder('top');
+            stage.draw();
+        }
+        addObj();
+    },
+    zOrder: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('main');
+        var sprite2 = new Canvas2d.Sprite('sprite2');
+        var sprite3 = new Canvas2d.Sprite('sprite3');
+        var orders = 'top', ordero = 'top', rectObj;
+        var rect = new Canvas2d.DisplayObjects('rect');
+        rect.rect(-50, -50, 100, 100, 'lightsteelblue', 'red', 2);
+        rect.x = stage.width / 2;
+        rect.y = stage.height / 2;
+        rect.addEvent('mouseover', mOvero);
+        rect.addEvent('mouseout', mOuto);
+        rect.addEvent('click', zOrderObject);
+        for(var i = 0; i < 4; i++){
+            rectObj = rect.clone();
+            rectObj.color = Colors.RandomRgb();
+            rectObj.x = ((stage.width / 2) - 100) + (50 * (i > 2 ? i - 2 : i));
+            rectObj.y = ((stage.height / 2) - 50) + (50 * (i > 1 ? 1 : 0));
+            sprite2.add(rectObj);
+            rectObj = rect.clone();
+            rectObj.color = Colors.RandomRgb();
+            rectObj.lineColor = 'blue';
+            rectObj.x = ((stage.width / 2) - 100) + (50 * (i > 2 ? i - 2 : i));
+            rectObj.y = ((stage.height / 2) - 50) + (50 * (i > 1 ? 1 : 0));
+            sprite3.add(rectObj);
+        }
+        sprite3.x = 10;
+        sprite3.y = -20;
+        sprite3.addEvent('drag', drag);
+        sprite2.addEvent('drag', drag);
+        var label = new Canvas2d.DisplayObjects('addobject');
+        label.text('zOrder Sprite', 0, 0, 'normal', 20, 'Helvetica', 'black', null, 'start', 'top');
+        label.x = 20;
+        label.y = 20;
+        label.addEvent('mouseover', mOver);
+        label.addEvent('mouseout', mOut);
+        label.addEvent('click', zOrderSprite);
+        
+        sprite.add(label);
+        stage.add(sprite);
+        stage.add(sprite2);
+        stage.add(sprite3);
+        stage.draw();
+        function mOver(e){
+            stage.container.style.cursor = 'pointer';
+            e.target.color = 'lightblue';
+            e.target.parent.draw();
+        }
+        function mOut(e){
+            stage.container.style.cursor = 'default';
+            e.target.color = 'black';
+            e.target.parent.draw();
+        }
+        function mOvero(e){
+            stage.container.style.cursor = 'pointer';
+        }
+        function mOuto(e){
+            stage.container.style.cursor = 'default';
+        }
+        function drag(e){
+            e.target.x = e.mouse.ox;
+            e.target.y = e.mouse.oy;
+            e.target.parent.draw();
+        }
+        function zOrderSprite(e){
+            sprite2.zOrder(orders);
+            orders = orders === 'top' ? 'bottom' : 'top';
+        }
+        function zOrderObject(e){
+            ordero = e.target.index === e.target.parent.children.length - 1 ? 'bottom' : 'top';
+            e.target.zOrder(ordero);
+            e.target.parent.draw();
+        }
+    },
+    clear: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('main');
+        var spriteLabel = new Canvas2d.Sprite('mainlabel');
+        var rect = new Canvas2d.DisplayObjects('rect');
+        rect.rect(-50, -50, 100, 100, Colors.RandomRgb());
+        var circle = new Canvas2d.DisplayObjects('circle');
+        circle.circle(0, 0, 50, 0, Math.PI*2, Colors.RandomRgb());
+        var x, y, clearCanvas;
+        var label = new Canvas2d.DisplayObjects('addobject');
+        label.text('Add Object', 0, 0, 'normal', 20, 'Helvetica', 'black', null, 'start', 'top');
+        label.x = 20;
+        label.y = 20;
+        label.addEvent('mouseover', mOver);
+        label.addEvent('mouseout', mOut);
+        clearCanvas = label.clone('clearcanvas');
+        clearCanvas.txt = 'Clear Canvas';
+        clearCanvas.y = 60;
+        clearCanvas.addEvent('click', clearAll);
+        label.addEvent('click', addObj);
+        spriteLabel.add(clearCanvas);
+        sprite.add(label);
+        stage.add(sprite);
+        stage.add(spriteLabel);
+        stage.draw();
+        function mOver(e){
+            stage.container.style.cursor = 'pointer';
+            e.target.color = 'lightblue';
+            e.target.parent.draw();
+        }
+        function mOut(e){
+            stage.container.style.cursor = 'default';
+            e.target.color = 'black';
+            e.target.parent.draw();
+        }
+        function addObj(e){
+            var randomObject;
+            x = Math.random() * (stage.width-100) + 50;
+            y = Math.random() * (stage.height-100) + 50;
+            if(Math.random() * 2 < 1){
+                randomObject = rect.clone();
+                randomObject.color = Colors.RandomRgb();
+                randomObject.x = x;
+                randomObject.y = y;
+            }else{
+                randomObject = circle.clone();
+                randomObject.color = Colors.RandomRgb();
+                randomObject.x = x;
+                randomObject.y = y;
+            }
+            sprite.add(randomObject);
+            sprite.draw();
+        }
+        function clearAll(e){
+            e.target.txt = e.target.txt === 'Draw' ? 'Clear Canvas' : 'Draw';
+            label.visible = label.visible === false ? true : false;
+            sprite.clear();
+            if(label.visible === true) sprite.draw();
+            e.target.parent.draw();
+        }
+    },
+    draw: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('main');
+        var spriteLabels = new Canvas2d.Sprite('labels');
+        var rect = new Canvas2d.DisplayObjects('rect');
+        rect.rect(-50, -50, 100, 100, Colors.RandomRgb());
+        var circle = new Canvas2d.DisplayObjects('circle');
+        circle.circle(0, 0, 50, 0, Math.PI*2, Colors.RandomRgb());
+        var x, y, label2, label3, n = 0;
+        var label = new Canvas2d.DisplayObjects('addobject');
+        label.text('Add Objects', 0, 0, 'normal', 20, 'Helvetica', 'black', null, 'start', 'top');
+        label.x = 20;
+        label3 = label.clone('label3');
+        label3.txt = 'Number of objects: ';
+        label3.y = 100;
+        label.addEvent('mouseover', mOver);
+        label.addEvent('mouseout', mOut);
+        label2 = label.clone('label2');
+        label2.txt = 'Draw';
+        label2.y = 60;
+        label2.addEvent('click', drawObj);
+        label.y = 20;
+        label.addEvent('click', addObj);
+        label3.enabledEvent = false;
+        
+        spriteLabels.add(label2);
+        spriteLabels.add(label3);
+        spriteLabels.add(label);
+        stage.add(sprite);
+        stage.add(spriteLabels);
+        stage.draw();
+        function mOver(e){
+            stage.container.style.cursor = 'pointer';
+            e.target.color = 'lightblue';
+            e.target.parent.draw();
+        }
+        function mOut(e){
+            stage.container.style.cursor = 'default';
+            e.target.color = 'black';
+            e.target.parent.draw();
+        }
+        function drawObj(e){
+            e.target.txt = e.target.txt === 'Draw' ? 'Clear' : 'Draw';
+            if(e.target.txt === 'Clear') {
+                sprite.draw();
+            }else{
+                sprite.clear();
+            }
+            e.target.parent.draw();
+        }
+        function addObj(){
+            for(var i = 0; i < Math.random() * 30; i++){
+                var randomObject;
+                x = Math.random() * (stage.width-200) + 100;
+                y = Math.random() * (stage.height-100) + 50;
+                if(Math.random() * 2 < 1){
+                    randomObject = rect.clone();
+                    randomObject.color = Colors.RandomRgb();
+                    randomObject.x = x;
+                    randomObject.y = y;
+                }else{
+                    randomObject = circle.clone();
+                    randomObject.color = Colors.RandomRgb();
+                    randomObject.x = x;
+                    randomObject.y = y;
+                }
+                sprite.add(randomObject);
+            }
+            n += i;
+            label3.txt = 'Number of objects: ' + n;
+            spriteLabels.draw();
+        }
+        addObj();
+    }
+};
+DisplayObjects.prototype.text = {
+    textAlignment: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h, false);
+        var sprite = new Canvas2d.Sprite('sprite_0');
+        var back = new Canvas2d.Sprite('back');
+        var lineO = new Canvas2d.DisplayObjects('line_orizzontal');
+        lineO.line(0, 0, 0, 0, stage.width, 0, 'lightblue', 1);
+        lineO.y = stage.height / 2.5;
+        var lineV = new Canvas2d.DisplayObjects('line_vertical');
+        lineV.line(0, 0, 0, 0, 0, stage.height, 'lightseagreen', 1);
+        lineV.x = stage.width - (stage.width / 4);
+        var vertical = ['start', 'end', 'left', 'right', 'center'];
+        var orizzontal = ['top', 'hanging', 'middle', 'alphabetic', 'ideographic', 'bottom'];
+        var type = ['normal', 'italic', 'bold', 'bold italic', 'oblique'];
+        var gap = stage.width / 8, size = 24;
+        for (var i = 0; i < orizzontal.length; i++) {
+            var label = new Canvas2d.DisplayObjects('label_0');
+            label.text(orizzontal[i], 0, 0, 'normal', size, 'Verdana', 'black', null, 'start', orizzontal[i]);
+            label.x = gap;
+            gap += label.width + 10;
+            label.y = lineO.y;
+            sprite.add(label);
+        }
+        for (i = 0; i < vertical.length; i++) {
+            label = new Canvas2d.DisplayObjects('label_0');
+            label.text(vertical[i], 0, 0, 'normal', size, 'Verdana', 'black', null, vertical[i], 'hanging');
+            label.x = lineV.x;
+            label.y = lineO.y + (label.height * i) + 10;
+            sprite.add(label);
+        }
+        gap = 40;
+        for (i = 0; i < type.length; i++) {
+            label = new Canvas2d.DisplayObjects('label_0');
+            label.text(type[i], 0, 0, type[i], size, 'Verdana', 'black', null, 'start', 'middle');
+            label.x = gap;
+            label.y = 20;
+            sprite.add(label);
+            label = new Canvas2d.DisplayObjects('label_0');
+            label.text(type[i], 0, 0, type[i], size, 'Verdana', null, null, 'start', 'middle');
+            label.lineColor = 'black';
+            label.x = gap;
+            gap += label.width + 10;
+            label.y = 60;
+            sprite.add(label);
+        }
+
+        back.add(lineO);
+        back.add(lineV);
+        stage.add(back);
+        stage.add(sprite);
+        stage.draw();
+    },
+    textTest: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('txt_container');
+        var back = new Canvas2d.Sprite('misc_container', false);
+        var align = ['left', 'right', 'center', 'start', 'end'];
+        var baseLine = ['top', 'hanging', 'middle', 'alphabetic', 'ideographic', 'bottom'];
+        var fontWeight = ['bold italic', 'normal', 'italic', 'bold', 'oblique', 'lighter'];
+        var font = ['Verdana', 'Georgia', 'Times', 'Arial', 'Fantasy', 'Helvetica'];
+        var prop, t, world, size = 18;
+        var vertical = new Canvas2d.DisplayObjects('line_v');
+        var orizontal = new Canvas2d.DisplayObjects('line_o');
+        vertical.line(0, 0, 0, -100, 0, 100, 'lightseagreen', 2);
+        orizontal.line(0, 0, -150, 0, 150, 0, 'lightseagreen', 2);
+        vertical.x = orizontal.x = stage.width / 2;
+        orizontal.y = vertical.y = stage.height / 2;
+        back.add(vertical);
+        back.add(orizontal);
+        var label = new Canvas2d.DisplayObjects('display_prop');
+        label.text('', 0, 0, 'lighter', size, font[0], 'black');
+        label.paddingLeft = label.paddingTop = 5;
+        setEvents(label);
+        for (var i = 0; i < baseLine.length; i++) {
+            t = label.clone('baseLine_' + baseLine[i]);
+            t.txt = baseLine[i];
+            t.align = 'start';
+            t.x = 20;
+            t.y = (stage.height / 2) + (t.height * i) + 20 + (4 * i);
+            sprite.add(t);
+            t = label.clone('fontWeigth_' + fontWeight[i]);
+            t.txt = fontWeight[i];
+            t.align = 'start';
+            t.x = 20;
+            t.y = (20) + (t.height * i) + 20;
+            sprite.add(t);
+            t = label.clone('fontType_' + font[i]);
+            t.txt = font[i];
+            t.align = 'end';
+            t.baseLine = 'middle';
+            t.fontType = font[i];
+            t.x = stage.width - 20;
+            t.y = (t.height * i) + 20;
+            sprite.add(t);
+            if (i < baseLine.length - 1) {
+                t = label.clone('align_' + align[i]);
+                t.txt = align[i];
+                t.align = 'end';
+                t.x = stage.width - 20;
+                t.y = (stage.height / 2) + (t.height * i) + 20;
+                sprite.add(t);
+            }
+        }
+        t = new Canvas2d.DisplayObjects('fontSize_plus');
+        t.text('Plus', 0, 0, 'normal', size, font[0], 'black', 'right', 'top');
+        t.paddingLeft = label.paddingTop = 5;
+        t.x = (stage.width / 2) - 50;
+        t.y = stage.height - 20;
+        sprite.add(t);
+        t.addEvent('click', sClick);
+        t.addEvent('mouseover', mOver);
+        t.addEvent('mouseout', mOut);
+        t = new Canvas2d.DisplayObjects('fontSize_minus');
+        t.text('Minus', 0, 0, 'normal', size, font[0], 'black', 'left', 'top');
+        t.paddingLeft = label.paddingTop = 5;
+        t.x = (stage.width / 2) + 50;
+        t.y = stage.height - 20;
+        sprite.add(t);
+        t.addEvent('click', sClick);
+        t.addEvent('mouseover', mOver);
+        t.addEvent('mouseout', mOut);
+        label.enabledEvent = false;
+        world = label.clone('helloworld');
+        world.txt = 'Hello World';
+        world.align = 'center';
+        world.baseLine = 'middle';
+        world.x = vertical.x;
+        world.y = orizontal.y;
+        sprite.add(world);
+        label.txt = world.fontStyle + ' ' + world.align + ' ' + world.baseLine;
+        label.align = 'center';
+        label.x = stage.width / 2;
+        label.y = 20;
+        sprite.add(label);
+        function setEvents(e) {
+            e.addEvent('click', click);
+            e.addEvent('mouseover', mOver);
+            e.addEvent('mouseout', mOut);
+        }
+        function click(e) {
+            prop = e.target.name.split('_');
+            world[prop[0]] = prop[1];
+            label.txt = world.fontWeigth + ' ' + world.fontSize + 'px ' + world.fontType + ' ' + world.align + ' ' + world.baseLine;
+            e.target.parent.draw();
+        }
+        function sClick(e) {
+            prop = e.target.name.split('_');
+            size += prop[1] === 'plus' ? 1 : -1;
+            size = size < 5 ? 5 : size;
+            world[prop[0]] = size;
+            label.txt = world.fontWeigth + ' ' + world.fontSize + 'px ' + world.fontType + ' ' + world.align + ' ' + world.baseLine;
+            e.target.parent.draw();
+        }
+        function mOver(e) {
+            stage.container.style.cursor = 'pointer';
+            e.target.color = 'lightseagreen';
+            e.target.parent.draw();
+        }
+        function mOut(e) {
+            stage.container.style.cursor = 'default';
+            e.target.color = 'black';
+            e.target.parent.draw();
+        }
+        stage.add(back);
+        stage.add(sprite);
+        stage.draw();
+    }
+};
 DisplayObjects.prototype.line = function(c, w, h, params) {
     var stage = new Canvas2d.Stage(c, w, h);
     var sprite = new Canvas2d.Sprite('sprite_0');
@@ -116,149 +812,822 @@ DisplayObjects.prototype.img = function(c, w, h, params) {
     }
     stage.draw();
 };
-DisplayObjects.prototype.clip = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('sprite_0');
-    var anim = new Canvas2d.Sprite('anim');
-    var obj = [], cuty = 0, cutx = 0;
-    var label = new Canvas2d.DisplayObjects('label_0');
-    label.text('Press Left - Right to move the figure.', 0, 0, 'normal', 16, 'Tahoma', 'gray', null, 'start', 'top');
-    label.x = label.y = 25;
-    sprite.add(label);
-    var labelLeft = new Canvas2d.DisplayObjects('left');
-    labelLeft.text('Left', 0, 0, 'normal', 16, 'Tahoma', 'gray', null, 'start', 'top');
-    labelLeft.x = stage.width / 2 - 120;
-    labelLeft.y = stage.height - 30;
-    labelLeft.addEvent('mouseover', mOver);
-    labelLeft.addEvent('mouseout', mOut);
-    labelLeft.addEvent('mousedown', mDown);
-    labelLeft.addEvent('mouseup', mUp);
-    sprite.add(labelLeft);
-    var labelRight = new Canvas2d.DisplayObjects('right');
-    labelRight.text('Right', 0, 0, 'normal', 16, 'Tahoma', 'gray', null, 'end', 'top');
-    labelRight.x = stage.width / 2 + 120;
-    labelRight.y = stage.height - 30;
-    labelRight.addEvent('mouseover', mOver);
-    labelRight.addEvent('mouseout', mOut);
-    labelRight.addEvent('mousedown', mDown);
-    labelRight.addEvent('mouseup', mUp);
-    labelRight.paddingLeft = labelLeft.paddingLeft = 15;
-    labelRight.paddingTop = labelLeft.paddingTop = 14;
-    sprite.add(labelRight);
-    for (var i = 0; i < 20; i++) {
-        if (i === 10) {
-            cuty = 100;
-            cutx = 0;
+DisplayObjects.prototype.clip = {
+    clipAnimation: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('sprite_0');
+        var anim = new Canvas2d.Sprite('anim');
+        var obj = [], cuty = 0, cutx = 0;
+        var label = new Canvas2d.DisplayObjects('label_0');
+        label.text('Press Left - Right to move the figure.', 0, 0, 'normal', 16, 'Tahoma', 'gray', null, 'start', 'top');
+        label.x = label.y = 25;
+        sprite.add(label);
+        var labelLeft = new Canvas2d.DisplayObjects('left');
+        labelLeft.text('Left', 0, 0, 'normal', 16, 'Tahoma', 'gray', null, 'start', 'top');
+        labelLeft.x = stage.width / 2 - 120;
+        labelLeft.y = stage.height - 30;
+        labelLeft.addEvent('mouseover', mOver);
+        labelLeft.addEvent('mouseout', mOut);
+        labelLeft.addEvent('mousedown', mDown);
+        labelLeft.addEvent('mouseup', mUp);
+        sprite.add(labelLeft);
+        var labelRight = new Canvas2d.DisplayObjects('right');
+        labelRight.text('Right', 0, 0, 'normal', 16, 'Tahoma', 'gray', null, 'end', 'top');
+        labelRight.x = stage.width / 2 + 120;
+        labelRight.y = stage.height - 30;
+        labelRight.addEvent('mouseover', mOver);
+        labelRight.addEvent('mouseout', mOut);
+        labelRight.addEvent('mousedown', mDown);
+        labelRight.addEvent('mouseup', mUp);
+        labelRight.paddingLeft = labelLeft.paddingLeft = 15;
+        labelRight.paddingTop = labelLeft.paddingTop = 14;
+        sprite.add(labelRight);
+        for (var i = 0; i < 20; i++) {
+            if (i === 10) {
+                cuty = 100;
+                cutx = 0;
+            }
+            obj.push({'x': 0, 'y': 0, 'map': {'x': 63 * cutx, 'y': cuty, 'width': 63, 'height': 100}});
+            cutx++;
         }
-        obj.push({'x': 0, 'y': 0, 'map': {'x': 63 * cutx, 'y': cuty, 'width': 63, 'height': 100}});
-        cutx++;
-    }
-    obj.reverse();
-    var clip = new Canvas2d.DisplayObjects('clip_0');
-    clip.clip(0, 0, params[0] ? 'img/walk.png' : 'http://www.somethinglikethis.it/img/hosted/walk.png', obj, false);
-    clip.loadImage(null, prog, onComplete, false);
-    anim.add(clip);
-    stage.add(anim);
-    stage.add(sprite);
-    function prog(e) {
+        obj.reverse();
+        var clip = new Canvas2d.DisplayObjects('clip_0');
+        clip.clip(0, 0, params[0] ? 'img/walk.png' : 'http://www.somethinglikethis.it/img/hosted/walk.png', obj, false);
+        clip.loadImage(null, prog, onComplete, false);
+        anim.add(clip);
+        stage.add(anim);
+        stage.add(sprite);
+        function prog(e) {
 
-    }
-    function onComplete() {
-        clip.x = stage.width / 2 - clip.width / 2;
-        clip.y = stage.height / 2 - clip.height / 2;
-        stage.draw();
-        window.onkeydown = walk;
-    }
-    var left = 9;
-    var right = 0;
-    function walk(e) {
-        stepUp(e.keyCode);
-    }
-    function stepUp(e) {
-        switch (e) {
-            case 39:
-                right++;
-                if (right > 9) {
-                    right = 0;
-                }
-                clip.currentFrame = right;
-                if (clip.x + clip.width < stage.width) {
-                    clip.x += 5;
-                }
-                anim.draw();
-                break;
-            case 37:
-                left++;
-                if (left > 19) {
-                    left = 10;
-                }
-                clip.currentFrame = left;
-                if (clip.x > 1) {
-                    clip.x -= 5;
-                }
-                anim.draw();
-                break;
-            default:
-                break;
         }
-    }
-    function mOver(e) {
-        stage.container.style.cursor = 'pointer';
-        e.target.backGround = {'color': 'lightblue'};
-        sprite.draw();
-    }
-    function mOut(e) {
-        stage.container.style.cursor = 'default';
-        e.target.backGround = null;
-        sprite.draw();
-    }
-    function mDown(e) {
-        e.target.backGround = {'color': 'lightblue'};
-        sprite.draw();
-        var frame = e.target.name === 'left' ? 37 : 39;
-        stepUp(frame);
-    }
-    function mUp(e) {
-        e.target.backGround = null;
-        sprite.draw();
+        function onComplete() {
+            clip.x = stage.width / 2 - clip.width / 2;
+            clip.y = stage.height / 2 - clip.height / 2;
+            stage.draw();
+            window.onkeydown = walk;
+        }
+        var left = 9;
+        var right = 0;
+        function walk(e) {
+            stepUp(e.keyCode);
+        }
+        function stepUp(e) {
+            switch (e) {
+                case 39:
+                    right++;
+                    if (right > 9) {
+                        right = 0;
+                    }
+                    clip.currentFrame = right;
+                    if (clip.x + clip.width < stage.width) {
+                        clip.x += 5;
+                    }
+                    anim.draw();
+                    break;
+                case 37:
+                    left++;
+                    if (left > 19) {
+                        left = 10;
+                    }
+                    clip.currentFrame = left;
+                    if (clip.x > 1) {
+                        clip.x -= 5;
+                    }
+                    anim.draw();
+                    break;
+                default:
+                    break;
+            }
+        }
+        function mOver(e) {
+            stage.container.style.cursor = 'pointer';
+            e.target.backGround = {'color': 'lightblue'};
+            sprite.draw();
+        }
+        function mOut(e) {
+            stage.container.style.cursor = 'default';
+            e.target.backGround = null;
+            sprite.draw();
+        }
+        function mDown(e) {
+            e.target.backGround = {'color': 'lightblue'};
+            sprite.draw();
+            var frame = e.target.name === 'left' ? 37 : 39;
+            stepUp(frame);
+        }
+        function mUp(e) {
+            e.target.backGround = null;
+            sprite.draw();
+        }
+    },
+    clipTest: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var anim = new Canvas2d.Sprite('sprite_0');
+        var imageToClip = new Canvas2d.Sprite('sprite_0');
+        var obj = [], cuty = 0, cutx = 0;
+        for (var i = 0; i < 20; i++) {
+            if (i === 10) {
+                cuty = 100;
+                cutx = 0;
+            }
+            obj.push({'x': 0, 'y': 0, 'map': {'x': 63 * cutx, 'y': cuty, 'width': 63, 'height': 100}});
+            cutx++;
+        }
+        obj.reverse();
+        var clip = new Canvas2d.DisplayObjects('clip_0');
+        clip.clip(0, 0, 'img/walk.png', obj, false, false);
+        clip.loadImage(null, null, onComplete, false);
+        //Image Sample
+        var img = new Canvas2d.DisplayObjects('img_sample');
+        img.img(0, 0, null, false, null, 5, 5);
+        //Clipping Image Sample
+        var rect = new Canvas2d.DisplayObjects();
+        rect.rect(0, 0, 63, 100, null, 'red', 2);
+        imageToClip.add(img);
+        imageToClip.add(rect);
+        anim.add(clip);
+        stage.add(anim);
+        stage.add(imageToClip);
+        function onComplete() {
+            clip.x = stage.width / 2 - clip.width / 2;
+            clip.y = 40;
+            img.loadImage(clip.image, null, onCompleteImg, false);
+            anim.draw();
+
+        }
+        function onCompleteImg() {
+            rect.x = clip.frameList[0].map.x + img.paddingLeft;
+            rect.y = clip.frameList[0].map.y + img.paddingTop;
+            clipHolder();
+            imageToClip.scaleX = imageToClip.scaleY = 0.6;
+            imageToClip.x = (stage.width / 2) - ((img.width / 2) * 0.6);
+            imageToClip.y = (stage.height) - ((img.height + 20) * 0.6);
+            imageToClip.draw();
+            window.onkeydown = walk;
+        }
+        function clipHolder() {
+            for (var i = 0; i < clip.frameList.length; i++) {
+                var r = new Canvas2d.DisplayObjects();
+                r.rect(0, 0, clip.frameList[i].map.width, clip.frameList[i].map.height);
+                r.x = clip.frameList[i].map.x + img.paddingLeft;
+                r.y = clip.frameList[i].map.y + img.paddingTop;
+                r.data = {'direction': i < 10 ? 'right' : 'left', 'cFrame': i};
+                r.addEvent('mouseover', mOver);
+                r.addEvent('mouseout', mOut);
+                r.addEvent('mousemove', mMove);
+                imageToClip.add(r);
+            }
+        }
+        var left = 9;
+        var right = 0;
+        function walk(e) {
+            stepUp(e.keyCode);
+        }
+        function stepUp(e) {
+            switch (e) {
+                case 39:
+                    right++;
+                    if (right > 9) {
+                        right = 0;
+                    }
+                    clip.currentFrame = right;
+                    rect.x = clip.frameList[right].map.x + img.paddingLeft;
+                    rect.y = clip.frameList[right].map.y + img.paddingTop;
+                    if (clip.x + clip.width < stage.width) {
+                        clip.x += 5;
+                    }
+                    stage.draw();
+                    break;
+                case 37:
+                    left++;
+                    if (left > 19) {
+                        left = 10;
+                    }
+                    clip.currentFrame = left;
+                    rect.x = clip.frameList[left].map.x + img.paddingLeft;
+                    rect.y = clip.frameList[left].map.y + img.paddingTop;
+                    if (clip.x > 1) {
+                        clip.x -= 5;
+                    }
+                    stage.draw();
+                    break;
+                default:
+                    break;
+            }
+        }
+        function mOver() {
+            stage.container.style.cursor = 'pointer';
+        }
+        function mOut() {
+            stage.container.style.cursor = 'default';
+        }
+        function mMove(e) {
+            left = e.target.data.direction === 'left' ? e.target.data.cFrame : left;
+            right = e.target.data.direction === 'right' ? e.target.data.cFrame : right;
+            clip.currentFrame = e.target.data.cFrame;
+            rect.x = clip.frameList[e.target.data.cFrame].map.x + img.paddingLeft;
+            rect.y = clip.frameList[e.target.data.cFrame].map.y + img.paddingTop;
+            stage.draw();
+        }
     }
 };
-DisplayObjects.prototype.mask = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('txt_container');
-    var mask = new Canvas2d.DisplayObjects();
-    mask.circle(0, 0, 50, 0, Math.PI * 2);
-    mask.x = 150;
-    mask.y = 150;
-    mask.mask = true;
-    sprite.add(mask);
-    var q0 = new Canvas2d.DisplayObjects();
-    q0.rect(0, 0, 100, 100, 'red', 'yellow', 2);
-    sprite.add(q0);
-    var q1 = q0.clone();
-    var q2 = q0.clone();
-    var q3 = q0.clone();
-    sprite.add(q1);
-    sprite.add(q2);
-    sprite.add(q3);
-    q0.x = 100;
-    q0.y = 100;
-    q1.x = 150;
-    q1.y = 100;
-    q1.color = 'green';
-    q2.x = 50;
-    q2.y = 150;
-    q2.color = 'blue';
-    q3.x = 150;
-    q3.y = 150;
-    q3.color = 'purple';
+DisplayObjects.prototype.filter = {
+    grayscale: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sp = new Canvas2d.Sprite();
+        var bt = new Canvas2d.Sprite();
 
-    var copy = sprite.clone();
-    copy.x = 200;
-    copy.children[0].visible = false;
-    stage.add(copy);
-    stage.add(sprite);
+        var btn = new Canvas2d.DisplayObjects();
+        btn.rectRound(-(140 / 4), -(30 / 4), 140, 30, 8, 'lightseagreen');
+        bt.addEvent('mousedown', pixelated);
+        var tx = new Canvas2d.DisplayObjects();
+        tx.text('Non Grayscale', 0, 0, 'normal', 20, 'Calibri',
+                'whitesmoke', null, 'center', 'middle');
+        bt.add(btn);
+        bt.add(tx);
+        bt.x = 90;
+        bt.y = 35;
+
+        var im = new Canvas2d.DisplayObjects();
+        var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
+        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+        im.x = 180;
+        im.y = 20;
+        im.loadImage(im.source, null, complete);
+        function complete(e) {
+            e.setCrop(crop);
+            e.parent.draw();
+        }
+        sp.add(im);
+        stage.add(sp);
+        stage.add(bt);
+        stage.draw();
+        function pixelated(e) {
+            if (im.currentFilter === 'grayscale') {
+                im.restore();
+                tx.txt = 'Non Grayscale';
+            } else {
+                im.filter('grayscale');
+                tx.txt = 'Grayscale';
+            }
+            stage.draw();
+        }
+    },
+    pixelated: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sp = new Canvas2d.Sprite();
+        var bt = new Canvas2d.Sprite();
+
+        var btn = new Canvas2d.DisplayObjects();
+        btn.rectRound(-(140 / 4), -(30 / 4), 140, 30, 8, 'lightseagreen');
+        bt.addEvent('mousedown', pixelated);
+        var tx = new Canvas2d.DisplayObjects();
+        tx.text('Non Pixelated', 0, 0, 'normal', 20, 'Calibri',
+                'whitesmoke', null, 'center', 'middle');
+        bt.add(btn);
+        bt.add(tx);
+        bt.x = 90;
+        bt.y = 35;
+
+        var im = new Canvas2d.DisplayObjects();
+        var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
+        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+        im.x = 180;
+        im.y = 20;
+        im.loadImage(im.source, null, complete);
+        function complete(e) {
+            e.setCrop(crop);
+            e.parent.draw();
+        }
+        sp.add(im);
+        stage.add(sp);
+        stage.add(bt);
+        stage.draw();
+        function pixelated(e) {
+            if (im.currentFilter === 'pixelated') {
+                im.restore();
+                tx.txt = 'Non Pixelated';
+            } else {
+                im.filter('pixelated', [12]);
+                tx.txt = 'Pixelated';
+            }
+            stage.draw();
+        }
+    },
+    hsl: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sp = new Canvas2d.Sprite();
+        var slide = new Canvas2d.Sprite();
+        slide.x = slide.y = 10;
+
+        var slideObj = [{'moveTo': [-4, 3]}, {'quadraticCurveTo': [-4, 0, -1, 0]},
+            {'lineTo': [9, 0]}, {'quadraticCurveTo': [11, 1, 13, 2]},
+            {'lineTo': [16, 5]}, {'quadraticCurveTo': [17, 7, 16, 9]},
+            {'lineTo': [13, 12]}, {'quadraticCurveTo': [11, 13, 9, 14]},
+            {'lineTo': [-1, 14]}, {'quadraticCurveTo': [-4, 14, -4, 11]},
+            {'lineTo': [-4, 3]}];
+
+        var sl = new Canvas2d.DisplayObjects('h');
+        sl.shape(-2, -7, slideObj, 'lightgrey', 'slategrey', 2);
+
+        var sl2 = sl.clone('s');
+        var sl3 = sl.clone('l');
+        sl.x = 15;
+        sl2.x = 45;
+        sl3.x = 75;
+        sl3.y = sl2.y = sl.y = 50;
+
+        sl.addEvent('drag', onDragHandler);
+        sl2.addEvent('drag', onDragHandler);
+        sl3.addEvent('drag', onDragHandler);
+
+        var lmax = 101, lmin = -1, rate = 50, h = 0, s = 0, l = 0;
+
+        function onDragHandler(e) {
+            if (e.mouse.oy >= lmax) {
+                rate = 100;
+            } else if (e.mouse.oy <= lmin) {
+                rate = 0;
+            } else if (e.mouse.oy < lmax && e.target.y > lmin) {
+                rate = e.mouse.oy;
+            }
+            e.target.y = rate;
+            e.target.parent.draw();
+            switch (e.target.name) {
+                case 'h':
+                    h = rate - 50;
+                    break;
+                case 's':
+                    s = rate - 50;
+                    break;
+                case 'l':
+                    l = rate - 50;
+                    break;
+                default:
+                    break;
+            }
+            im.filter('hsl', [h, s, l]);
+        }
+        var g = {color: ['red', 'yellow', 'green', 'rgb(0,255,255)', 'blue'],
+            offset: [0, 0.25, 0.5, 0.75, 1],
+            coord: {x0: 0, y0: 0, x1: 0, y1: 100}, type: 'linear'};
+        var g1 = {color: ['gray', 'violet'],
+            offset: [0, 1], coord: {x0: 0, y0: 0, x1: 0, y1: 100}, type: 'linear'};
+        var g2 = {color: ['black', 'white'],
+            offset: [0, 1], coord: {x0: 0, y0: 0, x1: 0, y1: 100}, type: 'linear'};
+        var r = new Canvas2d.DisplayObjects();
+        r.rect(0, 0, 5, 100, 'red');
+        var r1 = r.clone();
+        var r2 = r.clone();
+        r.x = sl.x;
+        r1.x = sl2.x;
+        r2.x = sl3.x;
+        r1.color = 'green';
+        r2.color = 'blue';
+        r.gradient = g;
+        r1.gradient = g1;
+        r2.gradient = g2;
+
+        var im = new Canvas2d.DisplayObjects();
+        var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
+        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+        im.x = 150;
+        im.y = 20;
+        im.loadImage(im.source, null, complete);
+        function complete(e) {
+            e.setCrop(crop);
+            e.parent.draw();
+        }
+
+        slide.add(r);
+        slide.add(r1);
+        slide.add(r2);
+        slide.add(sl);
+        slide.add(sl2);
+        slide.add(sl3);
+        sp.add(im);
+        stage.add(sp);
+        stage.add(slide);
+        stage.draw();
+    },
+    invert: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sp = new Canvas2d.Sprite();
+        var bt = new Canvas2d.Sprite();
+
+        var btn = new Canvas2d.DisplayObjects();
+        btn.rectRound(-(140 / 4), -(30 / 4), 140, 30, 8, 'lightseagreen');
+        bt.addEvent('mousedown', pixelated);
+        var tx = new Canvas2d.DisplayObjects();
+        tx.text('Non Invert', 0, 0, 'normal', 20, 'Calibri',
+                'whitesmoke', null, 'center', 'middle');
+        bt.add(btn);
+        bt.add(tx);
+        bt.x = 90;
+        bt.y = 35;
+
+        var im = new Canvas2d.DisplayObjects();
+        var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
+        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+        im.x = 180;
+        im.y = 20;
+        im.loadImage(im.source, null, complete);
+        function complete(e) {
+            e.setCrop(crop);
+            e.parent.draw();
+        }
+        sp.add(im);
+        stage.add(sp);
+        stage.add(bt);
+        stage.draw();
+        function pixelated(e) {
+            if (im.currentFilter === 'invert') {
+                im.restore();
+                tx.txt = 'Non Invert';
+            } else {
+                im.filter('invert');
+                tx.txt = 'Invert';
+            }
+            stage.draw();
+        }
+    }
+};
+DisplayObjects.prototype.setCrop = function(c, w, h, params) {
+    var stage = new Canvas2d.Stage(c, w, h);
+    var sp = new Canvas2d.Sprite();
+    var im = new Canvas2d.DisplayObjects();
+    var crop = {dx: 0, dy: 0, dw: w, dh: h};
+    im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false);
+    im.loadImage(im.source, null, complete);
+    function complete(e) {
+        e.parent.draw();
+    }
+    sp.add(im);
+    stage.add(sp);
     stage.draw();
+    stage.addEvent('mousemove', mMove);
+    function mMove(e) {
+        var x = e.mouse.x;
+        x = x + crop.dw > im.image.width ? im.image.width - crop.dw - 1 : x;
+        var y = e.mouse.y;
+        y = y + crop.dh > im.image.height ? im.image.height - crop.dh - 1 : y;
+        crop.dx = Math.max(0, x);
+        crop.dy = Math.max(0, y);
+        im.setCrop(crop);
+        sp.draw();
+    }
+
+};
+DisplayObjects.prototype.examples = {
+    mask: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var shapes = new Canvas2d.Sprite('shapes_container');
+        var mask = new Canvas2d.DisplayObjects('circle');
+        var rect = new Canvas2d.DisplayObjects('rect');
+        var element, sprite, stepw = 0, steph = 0;
+        mask.circle(0, 0, 100, 0, Math.PI * 2);
+        mask.x = 150;
+        mask.y = 100;
+        mask.mask = true;
+        rect.rect(0, 0, 100, 100, Colors.RandomRgb());
+        for (var i = 0; i < 6; i++) {
+            element = rect.clone('rect' + i);
+            element.color = Colors.RandomRgb();
+            element.x = (rect.width * stepw);
+            element.y = (rect.height * steph);
+            element.alpha = 0.5;
+            shapes.add(element);
+            stepw++;
+            stepw = stepw === 3 ? 0 : stepw;
+            steph = i === 2 ? 1 : steph;
+        }
+        stage.add(shapes);
+        sprite = shapes.clone('mask_shapes');
+        sprite.y = stage.height / 4;
+        sprite.x = 100;
+        shapes.y = sprite.y;
+        shapes.x = stage.width / 1.5;
+        sprite.add(mask);
+        mask.zOrder('bottom');
+        stage.add(sprite);
+        stage.draw();
+
+    },
+    shadow: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('sprite_0');
+        var rectFill = new Canvas2d.DisplayObjects();
+        var rectLine = new Canvas2d.DisplayObjects();
+        var circFill = new Canvas2d.DisplayObjects();
+        var circLine = new Canvas2d.DisplayObjects();
+        var rectFillLine = new Canvas2d.DisplayObjects();
+        rectFill.rect(-50, -50, 100, 100, 'lightblue');
+        rectLine.rect(-50, -50, 100, 100, null, 'lightblue', 4);
+        circFill.circle(0, 0, 50, 0, Math.PI * 2, 'lightseagreen');
+        circLine.circle(0, 0, 50, 0, Math.PI * 2, null, 'lightseagreen', 4);
+        rectFill.shadow = circFill.shadow = {'color': 'grey', 'offsetX': 10, 'offsetY': 10, 'blur': 10};
+        rectLine.lineShadow = circLine.lineShadow = {'color': 'grey', 'offsetX': 10, 'offsetY': 10, 'blur': 10};
+        rectFillLine.rect(-50, -50, 100, 100, 'lightseagreen', 'lightblue', 4);
+        rectFillLine.shadow = {'color': 'dimgray', 'offsetX': 10, 'offsetY': 10, 'blur': 10};
+        rectFillLine.lineShadow = {'color': 'grey', 'offsetX': 10, 'offsetY': 10, 'blur': 10};
+        sprite.add(rectFillLine);
+        sprite.add(rectFill);
+        sprite.add(rectLine);
+        sprite.add(circFill);
+        sprite.add(circLine);
+        for (var i = 0; i < sprite.children.length; i++) {
+            sprite.children[i].x = ((stage.width / sprite.children.length) * i) + 100;
+            sprite.children[i].y = stage.height / 2;
+        }
+        stage.add(sprite);
+        stage.draw();
+    },
+    shadowAnim: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h), r, a;
+        var sprite = new Canvas2d.Sprite('sprite_0', false);
+        var circFill = new Canvas2d.DisplayObjects();
+        circFill.circle(0, 0, 50, 0, Math.PI * 2, 'lightseagreen');
+        circFill.shadow = {'color': 'grey', 'offsetX': 0, 'offsetY': 0, 'blur': 0};
+        circFill.x = stage.width / 2;
+        circFill.y = stage.height / 2;
+        sprite.add(circFill);
+        stage.add(sprite);
+        stage.draw();
+        stage.addEvent('mousemove', mMove);
+        function mMove(e) {
+            r = Math.sqrt(Math.pow(e.mouse.y - circFill.y, 2) + Math.pow(e.mouse.x - circFill.x, 2));
+            a = Math.atan2(e.mouse.y - circFill.y, e.mouse.x - circFill.x);
+            circFill.shadow.offsetX = (Math.cos(a) * ((r / (stage.width / 2)) * 300));
+            circFill.shadow.offsetY = (Math.sin(a) * ((r / (stage.height / 2)) * 300));
+            circFill.shadow.blur = (r / (stage.width / 2)) * 80;
+            circFill.radius = Math.max(50, (r / (stage.width / 2)) * 200);
+            sprite.draw();
+        }
+    },
+    gradient: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('sprite_0');
+        var w = 100, h = 100, rect;
+        var gradObj_0 = {'color': ['blue', 'green'],
+            'offset': [0, 1],
+            'coord': {'x0': 0, 'y0': 0, 'x1': w, 'y1': 0}, 'type': 'linear'};
+        var gradObj_1 = {'color': ['blue', 'green', 'red'],
+            'offset': [0, 0.5, 1],
+            'coord': {'x0': 0, 'y0': 0, 'x1': w, 'y1': 0}, 'type': 'linear'};
+        var gradObj_2 = {'color': ['hsla(0,100%,50%,1)', 'hsla(0,100%,50%,0)'],
+            'offset': [0, 1],
+            'coord': {'x0': 0, 'y0': 0, 'x1': w, 'y1': 0}, 'type': 'linear'};
+        var gradObj_3 = {'color': ['hsla(0,100%,50%,1)', 'hsla(0,100%,50%,0)',
+                'hsla(0,100%,50%,1)'],
+            'offset': [0, 0.5, 1],
+            'coord': {'x0': 0, 'y0': 0, 'x1': w, 'y1': 0}, 'type': 'linear'};
+        var gradLinearArray = [gradObj_0, gradObj_1, gradObj_2, gradObj_3];
+        for (var i = 0; i < gradLinearArray.length; i++) {
+            rect = new Canvas2d.DisplayObjects();
+            rect.rect(0, 0, w, h);
+            rect.gradient = gradLinearArray[i];
+            rect.x = 50 + (100 * i) + (20 * i);
+            rect.y = 50;
+            sprite.add(rect);
+        }
+        var gradObj_4 = {'color': ['blue', 'green'],
+            'offset': [0, 1],
+            'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': w},
+            'type': 'radial'};
+        var gradObj_5 = {'color': ['blue', 'green', 'red'],
+            'offset': [0, 0.5, 1],
+            'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': w},
+            'type': 'radial'};
+        var gradObj_6 = {'color': ['hsla(0,100%,50%,1)', 'hsla(0,100%,50%,0)'],
+            'offset': [0, 1],
+            'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': w},
+            'type': 'radial'};
+        var gradObj_7 = {'color': ['hsla(0,100%,50%,1)', 'hsla(0,100%,50%,0)',
+                'hsla(0,100%,50%,1)'],
+            'offset': [0, 0.5, 1],
+            'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': w},
+            'type': 'radial'};
+        var gradRadialArray = [gradObj_4, gradObj_5, gradObj_6, gradObj_7];
+        for (var i = 0; i < gradRadialArray.length; i++) {
+            rect = new Canvas2d.DisplayObjects();
+            rect.rect(0, 0, w, h);
+            rect.gradient = gradRadialArray[i];
+            rect.x = 50 + (100 * i) + (20 * i);
+            rect.y = 170;
+            sprite.add(rect);
+        }
+        stage.add(sprite);
+        stage.draw();
+    },
+    gradientChart: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('sprite_0');
+        var panel = new Canvas2d.Sprite('panel');
+        var backPanel = new Canvas2d.Sprite('back_panel');
+        var piker = new Canvas2d.Sprite('piker');
+        var label, rect, arLabel = [], r = 100, limit, level, len = r * 2,
+                offx = stage.width - 40 - (r * 2), i = 0;
+        arCoord = ['x0', 'y0', 'r0', 'x1', 'y1', 'r1'], rt = 2;
+        var stopC = ['red', 'yellow', 'green', 'cyan', 'blue', 'purple'];
+        var circle = new Canvas2d.DisplayObjects();
+        var grdObj = {'color': ['red', 'purple'], 'offset': [0, 1],
+            'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': r},
+            'type': 'radial'};
+        circle.rect(-(r * rt) / 2, -(r * rt) / 2, r * rt, r * rt);
+        circle.x = offx / 2;
+        circle.y = stage.height / 2;
+        circle.gradient = grdObj;
+        sprite.add(circle);
+        var labList = ['Radial', 'Linear', 'Circle', 'Rectangle'];
+        for (i = 0; i < 4; i++) {
+            label = new Canvas2d.DisplayObjects(labList[i]);
+            label.text(labList[i], 0, 0, 'normal', 16, 'Tahoma',
+                    'black', null, 'start', 'bottom');
+            label.x = i === 0 || i === 2 ? offx / 2 - r : offx / 2 + r - label.width;
+            label.y = i < 2 ? stage.height - 20 : 40;
+            label.addEvent('click', changeType);
+            label.addEvent('mouseover', overHandler);
+            label.addEvent('mouseout', outHandler);
+            backPanel.add(label);
+        }
+        for (i = 0; i < 6; i++) {
+            var s = new Canvas2d.DisplayObjects(i.toString());
+            var slideObj = [{'moveTo': [-4, 3]}, {'quadraticCurveTo': [-4, 0, -1, 0]},
+                {'lineTo': [9, 0]}, {'quadraticCurveTo': [11, 1, 13, 2]},
+                {'lineTo': [16, 5]}, {'quadraticCurveTo': [17, 7, 16, 9]},
+                {'lineTo': [13, 12]}, {'quadraticCurveTo': [11, 13, 9, 14]},
+                {'lineTo': [-1, 14]}, {'quadraticCurveTo': [-4, 14, -4, 11]},
+                {'lineTo': [-4, 3]}];
+            s.shape(-2, -7, slideObj, 'lightsteelblue', 'grey', 2);
+            s.shadow = {'color': 'hsla(0,0%,0%,0.6)', 'blur': 8, 'offsetX': 2,
+                'offsetY': 2};
+            s.addEvent('drag', dragHandler);
+            s.addEvent('mouseover', overHandler);
+            s.addEvent('mouseout', outHandler);
+            var firstPos = i === 2 ? 0 : i === 5 ? r : r;
+            s.x = firstPos + offx;
+            s.y = 40 + (40 * i);
+            s.rotation = -Math.PI / 2;
+            panel.add(s);
+            rect = new Canvas2d.DisplayObjects();
+            rect.rect(0, -6, r * 2, 6, null, 'lightgrey', 2);
+            rect.x = offx;
+            rect.y = s.y;
+            rect.lineShadow = {'color': 'black', 'offsetX': 1,
+                'offsetY': 1, 'blur': 3};
+            backPanel.add(rect);
+            var nPos = i === 2 || i === 5 ? ['0', r.toString(),
+                (r * 2).toString()] : [('-' + r.toString()), '0', r.toString()];
+            for (var l = 0; l < nPos.length; l++) {
+                label = new Canvas2d.DisplayObjects();
+                label.text(nPos[l], 0, 0, 'lighter', 10, 'Tahoma',
+                        'black', null, 'center', 'bottom');
+                label.x = offx + (r * l);
+                label.y = s.y - 18;
+                backPanel.add(label);
+            }
+            var n = i === 5 ? r : 0;
+            label = new Canvas2d.DisplayObjects(i.toString());
+            label.text(n.toString(), 0, -3, 'normal', 14, 'Tahoma',
+                    'black', null, 'end', 'middle');
+            label.x = offx - 15;
+            label.y = s.y;
+            arLabel.push(label);
+            panel.add(label);
+            label = new Canvas2d.DisplayObjects(i.toString());
+            label.text(arCoord[i], 0, -3, 'normal', 14, 'Tahoma',
+                    'rgb(69,116,158)', null, 'center', 'middle');
+            label.x = stage.width - 20;
+            label.y = s.y;
+            panel.add(label);
+            rect = new Canvas2d.DisplayObjects();
+            rect.rect(0, 0, r / 4, 25, stopC[i], 'lightgrey', 2);
+            rect.x = offx + (rect.width * i) + ((((r * 2) - (rect.width * 6)) / 5) * i);
+            rect.y = (40 * 6) + 20;
+            rect.addEvent('mousedown', addStopDw);
+            rect.addEvent('mouseup', addStopUp);
+            rect.addEvent('mouseover', overHandler);
+            rect.addEvent('mouseout', outHandler);
+            piker.add(rect);
+        }
+        stage.add(sprite);
+        stage.add(backPanel);
+        stage.add(panel);
+        stage.add(piker);
+        stage.draw();
+
+
+        function dragHandler(e) {
+            limit = e.mouse.x - offx;
+            level = e.mouse.x;
+            if (limit >= 0 && limit <= len) {
+                level = e.mouse.x;
+            } else {
+                if (limit <= 0) {
+                    level = offx;
+                } else {
+                    level = offx + len;
+                }
+            }
+            e.target.x = level;
+            panel.draw();
+            limit = limit < 0 ? 0 : limit > len ? len : limit;
+            var circ = grdObj.coord;
+            switch (e.target.name) {
+                case '0':
+                    circ.x0 = limit - r;
+                    arLabel[parseInt(e.target.name)].txt = (circ.x0).toString();
+                    break;
+                case '1':
+                    circ.y0 = limit - r;
+                    arLabel[parseInt(e.target.name)].txt = (circ.y0).toString();
+                    break;
+                case '2':
+                    circ.r0 = limit;
+                    arLabel[parseInt(e.target.name)].txt = (circ.r0).toString();
+                    break;
+                case '3':
+                    circ.x1 = limit - r;
+                    arLabel[parseInt(e.target.name)].txt = (circ.x1).toString();
+                    break;
+                case '4':
+                    circ.y1 = limit - r;
+                    arLabel[parseInt(e.target.name)].txt = (circ.y1).toString();
+                    break;
+                case '5':
+                    circ.r1 = limit;
+                    arLabel[parseInt(e.target.name)].txt = (circ.r1).toString();
+                    break;
+                    default :
+                            break;
+            }
+            sprite.draw();
+        }
+        function addStopDw(e) {
+            var obj = circle.gradient, i, u;
+            if (!e.target.selected) {
+                obj.color.push(e.target.color);
+                obj.offset.push(1);
+                for (i = 0; i < obj.offset.length; i++) {
+                    obj.offset[i] = i / (obj.offset.length - 1);
+                }
+                e.target.lineColor = 'black';
+                e.target.selected = true;
+            } else {
+                for (i = 0; i < obj.color.length; i++) {
+                    if (e.target.color === obj.color[i]) {
+                        u = i;
+                        e.target.selected = false;
+                        break;
+                    }
+                }
+                obj.color.splice(u, 1);
+                obj.offset.splice(u, 1);
+                for (i = 0; i < obj.offset.length; i++) {
+                    obj.offset[i] = i / (obj.offset.length - 1);
+                }
+                e.target.lineColor = 'lightgrey';
+            }
+            sprite.draw();
+            e.target.lineWidth = 5;
+            piker.draw();
+        }
+        function addStopUp(e) {
+            e.target.lineWidth = 2;
+            piker.draw();
+        }
+        function changeType(e) {
+            switch (e.target.name) {
+                case 'Linear':
+                    grdObj.type = 'linear';
+                    break;
+                case 'Radial':
+                    grdObj.type = 'radial';
+                    break;
+                case 'Circle':
+                    circle.circle(0, 0, r, 0, Math.PI * 2);
+                    circle.x = offx / 2;
+                    circle.y = stage.height / 2;
+                    circle.gradient = grdObj;
+                    break;
+                case 'Rectangle':
+                    circle.rect(-(r * rt) / 2, -(r * rt) / 2, r * rt, r * rt);
+                    circle.x = offx / 2;
+                    circle.y = stage.height / 2;
+                    circle.gradient = grdObj;
+                    break;
+                default:
+                    break;
+            }
+            sprite.draw();
+        }
+        function overHandler() {
+            stage.container.style.cursor = 'pointer';
+        }
+        function outHandler() {
+            stage.container.style.cursor = 'default';
+        }
+    }
 };
 Examples.prototype.mastermind = function(c, w, h, params) {
     function init(img) {
@@ -566,16 +1935,11 @@ Examples.prototype.mastermind = function(c, w, h, params) {
     };
     img.src = params[0] ? 'img/retina_wood.png' : 'http://www.somethinglikethis.it/img/hosted/retina_wood.png';
 };
-Examples.prototype.stars = function(c, w, h, params) {
-    function init(img) {
+Stage.prototype.examples = {
+    stars: function(c, w, h, params) {
         var stage = new Canvas2d.Stage(c, w, h);
         var sprite = new Canvas2d.Sprite('txt_container');
         var sr = new Canvas2d.Sprite('');
-        var p = sr.ctx.createPattern(img, 'repeat');
-        var pattern = new Canvas2d.DisplayObjects('pattern');
-        pattern.rect(0, 0, stage.width, stage.height);
-        pattern.color = p;
-        sr.add(pattern);
         var twe = new Canvas2d.Tweener();
         var star = new Canvas2d.DisplayObjects('star_0');
         var points = [], g = 10, r1 = 18, r2 = 32;
@@ -599,6 +1963,8 @@ Examples.prototype.stars = function(c, w, h, params) {
         star.addEvent('dragstart', dStart);
         star.addEvent('drag', dDrag);
         star.addEvent('dragstop', dStop);
+        star.addEvent('mouseover', mOver);
+        star.addEvent('mouseout', mOut);
         function dStart(e) {
             drag = false;
             e.target.zOrder('top');
@@ -623,6 +1989,12 @@ Examples.prototype.stars = function(c, w, h, params) {
                 scaleX: 1, scaleY: 1, rotation: 0,
                 duration: 800, ease: 'easeOutElastic'});
         }
+        function mOver(e) {
+            stage.container.style.cursor = 'pointer';
+        }
+        function mOut(e) {
+            stage.container.style.cursor = 'default';
+        }
         for (i = 0; i < 11; i++) {
             var s = star.clone('star_' + i);
             sprite.add(s);
@@ -645,261 +2017,7 @@ Examples.prototype.stars = function(c, w, h, params) {
             twe.addTweener(sprite.children[i], {x: xd, y: yd,
                 ease: 'easeOutBounce', delay: 100 * i, duration: 1000});
         }
-    }
-    var img = new Image();
-    img.onload = function() {
-        init(img);
-    };
-    img.src = params[0] ? 'img/ice_age.png' : 'http://www.somethinglikethis.it/img/hosted/ice_age.png';
-};
-DisplayObjects.prototype.setCrop = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sp = new Canvas2d.Sprite();
-    var im = new Canvas2d.DisplayObjects();
-    var crop = {dx: 0, dy: 0, dw: w, dh: h};
-    im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false);
-    im.loadImage(im.source, null, complete);
-    function complete(e) {
-        e.parent.draw();
-    }
-    sp.add(im);
-    stage.add(sp);
-    stage.draw();
-    stage.addEvent('mousemove', mMove);
-    function mMove(e) {
-        var x = e.mouse.x;
-        x = x + crop.dw > im.image.width ? im.image.width - crop.dw - 1 : x;
-        var y = e.mouse.y;
-        y = y + crop.dh > im.image.height ? im.image.height - crop.dh - 1 : y;
-        crop.dx = Math.max(0, x);
-        crop.dy = Math.max(0, y);
-        im.setCrop(crop);
-        sp.draw();
-    }
-
-};
-DisplayObjects.prototype.filter = {
-    grayscale: function(c, w, h, params) {
-        var stage = new Canvas2d.Stage(c, w, h);
-        var sp = new Canvas2d.Sprite();
-        var bt = new Canvas2d.Sprite();
-
-        var btn = new Canvas2d.DisplayObjects();
-        btn.rectRound(-(140 / 4), -(30 / 4), 140, 30, 8, 'lightseagreen');
-        bt.addEvent('mousedown', pixelated);
-        var tx = new Canvas2d.DisplayObjects();
-        tx.text('Non Grayscale', 0, 0, 'normal', 20, 'Calibri',
-                'whitesmoke', null, 'center', 'middle');
-        bt.add(btn);
-        bt.add(tx);
-        bt.x = 90;
-        bt.y = 35;
-
-        var im = new Canvas2d.DisplayObjects();
-        var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
-        im.x = 180;
-        im.y = 20;
-        im.loadImage(im.source, null, complete);
-        function complete(e) {
-            e.setCrop(crop);
-            e.parent.draw();
-        }
-        sp.add(im);
-        stage.add(sp);
-        stage.add(bt);
-        stage.draw();
-        function pixelated(e) {
-            if (im.currentFilter === 'grayscale') {
-                im.restore();
-                tx.txt = 'Non Grayscale';
-            } else {
-                im.filter('grayscale');
-                tx.txt = 'Grayscale';
-            }
-            stage.draw();
-        }
     },
-    pixelated: function(c, w, h, params) {
-        var stage = new Canvas2d.Stage(c, w, h);
-        var sp = new Canvas2d.Sprite();
-        var bt = new Canvas2d.Sprite();
-
-        var btn = new Canvas2d.DisplayObjects();
-        btn.rectRound(-(140 / 4), -(30 / 4), 140, 30, 8, 'lightseagreen');
-        bt.addEvent('mousedown', pixelated);
-        var tx = new Canvas2d.DisplayObjects();
-        tx.text('Non Pixelated', 0, 0, 'normal', 20, 'Calibri',
-                'whitesmoke', null, 'center', 'middle');
-        bt.add(btn);
-        bt.add(tx);
-        bt.x = 90;
-        bt.y = 35;
-
-        var im = new Canvas2d.DisplayObjects();
-        var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
-        im.x = 180;
-        im.y = 20;
-        im.loadImage(im.source, null, complete);
-        function complete(e) {
-            e.setCrop(crop);
-            e.parent.draw();
-        }
-        sp.add(im);
-        stage.add(sp);
-        stage.add(bt);
-        stage.draw();
-        function pixelated(e) {
-            if (im.currentFilter === 'pixelated') {
-                im.restore();
-                tx.txt = 'Non Pixelated';
-            } else {
-                im.filter('pixelated', [12]);
-                tx.txt = 'Pixelated';
-            }
-            stage.draw();
-        }
-    },
-    hsl: function(c, w, h, params) {
-        var stage = new Canvas2d.Stage(c, w, h);
-        var sp = new Canvas2d.Sprite();
-        var slide = new Canvas2d.Sprite();
-        slide.x = slide.y = 10;
-
-        var slideObj = [{'moveTo': [-4, 3]}, {'quadraticCurveTo': [-4, 0, -1, 0]},
-            {'lineTo': [9, 0]}, {'quadraticCurveTo': [11, 1, 13, 2]},
-            {'lineTo': [16, 5]}, {'quadraticCurveTo': [17, 7, 16, 9]},
-            {'lineTo': [13, 12]}, {'quadraticCurveTo': [11, 13, 9, 14]},
-            {'lineTo': [-1, 14]}, {'quadraticCurveTo': [-4, 14, -4, 11]},
-            {'lineTo': [-4, 3]}];
-
-        var sl = new Canvas2d.DisplayObjects('h');
-        sl.shape(-2, -7, slideObj, 'lightgrey', 'slategrey', 2);
-
-        var sl2 = sl.clone('s');
-        var sl3 = sl.clone('l');
-        sl.x = 15;
-        sl2.x = 45;
-        sl3.x = 75;
-        sl3.y = sl2.y = sl.y = 50;
-
-        sl.addEvent('drag', onDragHandler);
-        sl2.addEvent('drag', onDragHandler);
-        sl3.addEvent('drag', onDragHandler);
-
-        var lmax = 101, lmin = -1, rate = 50, h = 0, s = 0, l = 0;
-
-        function onDragHandler(e) {
-            if (e.mouse.oy >= lmax) {
-                rate = 100;
-            } else if (e.mouse.oy <= lmin) {
-                rate = 0;
-            } else if (e.mouse.oy < lmax && e.target.y > lmin) {
-                rate = e.mouse.oy;
-            }
-            e.target.y = rate;
-            e.target.parent.draw();
-            switch (e.target.name) {
-                case 'h':
-                    h = rate - 50;
-                    break;
-                case 's':
-                    s = rate - 50;
-                    break;
-                case 'l':
-                    l = rate - 50;
-                    break;
-                default:
-                    break;
-            }
-            im.filter('hsl', [h, s, l]);
-        }
-        var g = {color: ['red', 'yellow', 'green', 'rgb(0,255,255)', 'blue'],
-            offset: [0, 0.25, 0.5, 0.75, 1],
-            coord: {x0: 0, y0: 0, x1: 0, y1: 100}, type: 'linear'};
-        var g1 = {color: ['gray', 'violet'],
-            offset: [0, 1], coord: {x0: 0, y0: 0, x1: 0, y1: 100}, type: 'linear'};
-        var g2 = {color: ['black', 'white'],
-            offset: [0, 1], coord: {x0: 0, y0: 0, x1: 0, y1: 100}, type: 'linear'};
-        var r = new Canvas2d.DisplayObjects();
-        r.rect(0, 0, 5, 100, 'red');
-        var r1 = r.clone();
-        var r2 = r.clone();
-        r.x = sl.x;
-        r1.x = sl2.x;
-        r2.x = sl3.x;
-        r1.color = 'green';
-        r2.color = 'blue';
-        r.gradient = g;
-        r1.gradient = g1;
-        r2.gradient = g2;
-
-        var im = new Canvas2d.DisplayObjects();
-        var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
-        im.x = 150;
-        im.y = 20;
-        im.loadImage(im.source, null, complete);
-        function complete(e) {
-            e.setCrop(crop);
-            e.parent.draw();
-        }
-
-        slide.add(r);
-        slide.add(r1);
-        slide.add(r2);
-        slide.add(sl);
-        slide.add(sl2);
-        slide.add(sl3);
-        sp.add(im);
-        stage.add(sp);
-        stage.add(slide);
-        stage.draw();
-    },
-    invert: function(c, w, h, params) {
-        var stage = new Canvas2d.Stage(c, w, h);
-        var sp = new Canvas2d.Sprite();
-        var bt = new Canvas2d.Sprite();
-
-        var btn = new Canvas2d.DisplayObjects();
-        btn.rectRound(-(140 / 4), -(30 / 4), 140, 30, 8, 'lightseagreen');
-        bt.addEvent('mousedown', pixelated);
-        var tx = new Canvas2d.DisplayObjects();
-        tx.text('Non Invert', 0, 0, 'normal', 20, 'Calibri',
-                'whitesmoke', null, 'center', 'middle');
-        bt.add(btn);
-        bt.add(tx);
-        bt.x = 90;
-        bt.y = 35;
-
-        var im = new Canvas2d.DisplayObjects();
-        var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-        im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
-        im.x = 180;
-        im.y = 20;
-        im.loadImage(im.source, null, complete);
-        function complete(e) {
-            e.setCrop(crop);
-            e.parent.draw();
-        }
-        sp.add(im);
-        stage.add(sp);
-        stage.add(bt);
-        stage.draw();
-        function pixelated(e) {
-            if (im.currentFilter === 'invert') {
-                im.restore();
-                tx.txt = 'Non Invert';
-            } else {
-                im.filter('invert');
-                tx.txt = 'Invert';
-            }
-            stage.draw();
-        }
-    }
-};
-Stage.prototype.examples = {
     intro: function(c, w, h, params) {
         var stage = new Canvas2d.Stage(c, w, h);
         var sprite = new Canvas2d.Sprite('sprite_0');
@@ -911,95 +2029,73 @@ Stage.prototype.examples = {
         stage.add(sprite);
         stage.draw();
     },
-    multy: function(c, w, h, params) {
-        var stage = new Canvas2d.Stage(c, w, h);
+    multyAnimation: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h, false);
         var sprite = new Canvas2d.Sprite('sprite_0');
+        var label = new Canvas2d.DisplayObjects('label1'), lb;
+        label.text('STAGE 1', 0, 0, 'bold', 120, 'Helvetica', 'lightblue', null, 'center', 'middle');
+        label.x = stage.width / 2;
+        label.y = stage.height / 2;
+        lb = label.clone('label2');
+        lb.txt = 'STAGE 2';
+        var background = new Canvas2d.DisplayObjects('back'), bg;
+        background.rect(0, 0, w, h, 'lightsteelblue');
+        background.alpha = 0.6;
+        bg = background.clone('back2');
         var rect = new Canvas2d.DisplayObjects('rect_0');
-        rect.rect(0, 0, 100, 100, 'lightseagreen', 'lightblue', 4);
-        rect.x = stage.width / 2 - rect.width / 2;
-        rect.y = stage.height / 2 - rect.height / 2;
-        sprite.add(rect);
-        stage.add(sprite);
-        stage.draw();
-        //same process different container - div id=container, div id=container2
-        var stage2 = new Canvas2d.Stage(c, w, h);
-        var sprite2 = new Canvas2d.Sprite('sprite_2');
-        var rect2 = new Canvas2d.DisplayObjects('rect_2');
-        rect2.rect(0, 0, 100, 100, 'lightseagreen', 'lightblue', 4);
-        rect2.x = stage2.width / 2 - rect2.width / 2;
-        rect2.y = stage2.height / 2 - rect2.height / 2;
-        sprite2.add(rect2);
-        stage2.add(sprite2);
-        stage2.draw();
-    },
-    multy1: function(c, w, h, params) {
-        var stage = new Canvas2d.Stage(c, w, h);
-        var sprite = new Canvas2d.Sprite('sprite_0');
-        var label = new Canvas2d.DisplayObjects('label_0');
-        label.text('FPS : 0', 0, 0, 'normal', 20, 'Verdana',
-                'black', null, 'start', 'top');
-        label.x = label.y = 10;
+        rect.rect(0, 0, 40, 40, 'lightseagreen');
+        rect.x = Math.random() * stage.width;
+        rect.y = Math.random() * stage.height;
+        sprite.add(background);
         sprite.add(label);
-        var rect = new Canvas2d.DisplayObjects('rect_0');
-        rect.rect(0, 0, 40, 40, 'lightseagreen', 'lightblue', 4);
-        rect.x = stage.width / 2 - rect.width / 2;
-        rect.y = stage.height / 2 - rect.height / 2;
         sprite.add(rect);
         stage.add(sprite);
         stage.draw();
         //same process different container 
         //div id=container,div id=container2
-        var stage2 = new Canvas2d.Stage(c, w, h);
+        var container = document.createElement('div');
+        container.id = 'examples2';
+        container.style.left = w + 60 + 'px';
+        stage.container.parentNode.appendChild(container);
+        var stage2 = new Canvas2d.Stage('examples2', w, h, false);
         var sprite2 = new Canvas2d.Sprite('sprite_2');
+        sprite2.add(bg);
+        sprite2.add(lb);
         stage2.add(sprite2);
+        stage2.draw();
         var offset1 = stage.container.offsetTop + stage.height;
         var offset2 = stage2.container.offsetTop;
         var gap = offset2 - offset1;
-        var step = 4, direction = step;
-        var stepx = 4, directionx = stepx;
+        var step = Math.random() * 8 + 4, x = step;
+        var stepx = Math.random() * 8 + 4, y = stepx;
         function loop() {
-            if (rect.parent === sprite) {
-                if (rect.y > stage.height) {
-                    sprite.remove(rect);
-                    sprite2.add(rect);
-                    rect.y = -gap;
-                    direction = step;
-                } else if (rect.y < 1) {
-                    direction = step;
-                }
-            } else {
-                if (rect.y + rect.height >= stage2.height) {
-                    direction = -step;
-                } else if (rect.y < -gap && direction === -step) {
-                    sprite2.remove(rect);
-                    sprite2.draw();
-                    sprite.add(rect);
-                    rect.y = stage2.height;
-                    direction = -step;
-                }
+            if (rect.x > stage.width && sprite2.children.length === 2 && x > 0) {
+                sprite.remove(rect);
+                sprite.draw();
+                sprite2.add(rect);
+                rect.x = -rect.width;
+                x = step;
+            } else if (rect.x + rect.width > stage.width && sprite2.children.length > 2) {
+                x = -step;
+            } else if (rect.x + rect.width < 1 && sprite2.children.length > 2 && x < 0) {
+                sprite2.remove(rect);
+                sprite2.draw();
+                sprite.add(rect);
+                rect.x = stage.width + 60;
+                x = -step;
+            } else if (rect.x < 1 && sprite.children.length > 2) {
+                x = step;
             }
-            if (rect.x + rect.width > stage.width) {
-                directionx = -stepx;
-            } else if (rect.x < 1) {
-                directionx = stepx;
+            if (rect.y + rect.height > stage.height) {
+                y = -step;
+            } else if (rect.y < 1) {
+                y = step;
             }
-            rect.x += directionx;
-            rect.y += direction;
+            rect.x += x;
+            rect.y += y;
             rect.parent.draw();
         }
         stage.addLoop(rect, loop);
-        var frame = stage.getTimeInterval(), interval = frame;
-        function monitorFps(e) {
-            interval += stage.getTimeInterval();
-            if (interval / 12 >= (1000 / 12)) {
-                interval = 0;
-                e.txt = 'FPS : ' + Math.round(stage2.getFps());
-                if (e.parent !== rect.parent) {
-                    e.parent.draw();
-                }
-            }
-        }
-        stage2.addLoop(label, monitorFps);
     },
     mobile: function(c, w, h, params) {
         var stage = new Canvas2d.Stage(c, w, h);
@@ -1020,510 +2116,8 @@ Stage.prototype.examples = {
         }
     }
 };
-DisplayObjects.prototype.txt = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('sprite_0');
-    var lineO = new Canvas2d.DisplayObjects('line_orizzontal');
-    lineO.line(0, 0, 0, 0, stage.width, 0, 'lightblue', 1);
-    lineO.y = stage.height / 2;
-    var lineV = new Canvas2d.DisplayObjects('line_vertical');
-    lineV.line(0, 0, 0, 0, 0, stage.height, 'lightseagreen', 1);
-    lineV.x = 420;
-    var vertical = ['start', 'end', 'left', 'right', 'center'];
-    var orizzontal = ['top', 'hanging', 'middle',
-        'alphabetic', 'ideographic', 'bottom'];
-    var type = ['normal', 'italic', 'bold', 'bold italic', 'oblique'];
-    var gap = 0;
-    for (var i = 0; i < orizzontal.length; i++) {
-        var label = new Canvas2d.DisplayObjects('label_0');
-        label.text(orizzontal[i], 0, 0, 'normal', 18, 'Verdana', 'white',
-                {'color': 'black'}, 'start', orizzontal[i]);
-        label.x = gap;
-        gap += label.width + 10;
-        label.y = stage.height / 2;
-        sprite.add(label);
-    }
-    for (i = 0; i < vertical.length; i++) {
-        label = new Canvas2d.DisplayObjects('label_0');
-        label.text(vertical[i], 0, 0, 'normal', 18, 'Verdana', 'white',
-                {'color': 'black'}, vertical[i], 'hanging');
-        label.x = 420;
-        label.y = stage.height / 2 + (25 * i);
-        sprite.add(label);
-    }
-    gap = 40;
-    for (i = 0; i < type.length; i++) {
-        label = new Canvas2d.DisplayObjects('label_0');
-        label.text(type[i], 0, 0, type[i], 18, 'Verdana', 'black',
-                null, 'start', 'middle');
-        label.x = gap;
-        gap += label.width + 10;
-        label.y = 40;
-        ;
-        sprite.add(label);
-    }
-    gap = 40;
-    for (i = 0; i < type.length; i++) {
-        label = new Canvas2d.DisplayObjects('label_0');
-        label.text(type[i], 0, 0, type[i], 18, 'Verdana', null,
-                null, 'start', 'middle');
-        label.lineColor = 'black';
-        label.x = gap;
-        gap += label.width + 10;
-        label.y = 80;
-        ;
-        sprite.add(label);
-    }
-    sprite.add(lineO);
-    sprite.add(lineV);
-    stage.add(sprite);
-    stage.draw();
-};
-DisplayObjects.prototype.text = {
-    text0: function(c, w, h, params) {
-        var stage = new Canvas2d.Stage(c, w, h);
-        var sprite = new Canvas2d.Sprite('sprite_0');
-        var lineO = new Canvas2d.DisplayObjects('line_orizzontal');
-        lineO.line(0, 0, 0, 0, stage.width, 0, 'lightblue', 1);
-        lineO.y = stage.height / 2;
-        var lineV = new Canvas2d.DisplayObjects('line_vertical');
-        lineV.line(0, 0, 0, 0, 0, stage.height, 'lightseagreen', 1);
-        lineV.x = 420;
-        var vertical = ['start', 'end', 'left', 'right', 'center'];
-        var orizzontal = ['top', 'hanging', 'middle',
-            'alphabetic', 'ideographic', 'bottom'];
-        var type = ['normal', 'italic', 'bold', 'bold italic', 'oblique'];
-        var gap = 0;
-        for (var i = 0; i < orizzontal.length; i++) {
-            var label = new Canvas2d.DisplayObjects('label_0');
-            label.text(orizzontal[i], 0, 0, 'normal', 18, 'Verdana', 'white',
-                    {'color': 'black'}, 'start', orizzontal[i]);
-            label.x = gap;
-            gap += label.width + 10;
-            label.y = stage.height / 2;
-            sprite.add(label);
-        }
-        for (i = 0; i < vertical.length; i++) {
-            label = new Canvas2d.DisplayObjects('label_0');
-            label.text(vertical[i], 0, 0, 'normal', 18, 'Verdana', 'white',
-                    {'color': 'black'}, vertical[i], 'hanging');
-            label.x = 420;
-            label.y = stage.height / 2 + (25 * i);
-            sprite.add(label);
-        }
-        gap = 40;
-        for (i = 0; i < type.length; i++) {
-            label = new Canvas2d.DisplayObjects('label_0');
-            label.text(type[i], 0, 0, type[i], 18, 'Verdana', 'black',
-                    null, 'start', 'middle');
-            label.x = gap;
-            gap += label.width + 10;
-            label.y = 40;
-            ;
-            sprite.add(label);
-        }
-        gap = 40;
-        for (i = 0; i < type.length; i++) {
-            label = new Canvas2d.DisplayObjects('label_0');
-            label.text(type[i], 0, 0, type[i], 18, 'Verdana', null,
-                    null, 'start', 'middle');
-            label.lineColor = 'black';
-            label.x = gap;
-            gap += label.width + 10;
-            label.y = 80;
-            ;
-            sprite.add(label);
-        }
-        sprite.add(lineO);
-        sprite.add(lineV);
-        stage.add(sprite);
-        stage.draw();
-    },
-    text1: function(c, w, h, params) {
-        var stage = new Canvas2d.Stage(c, w, h);
-        var sprite = new Canvas2d.Sprite('txt_container');
-        var back = new Canvas2d.Sprite('misc_container');
-        var align = ['left', 'right', 'center', 'start', 'end'];
-        var baseline = ['top', 'hanging', 'middle', 'alphabetic',
-            'ideographic', 'bottom'];
-        var fontWeigth = ['bold italic', 'normal', 'italic', 'bold'];
-        var font = ['Verdana', 'Georgia', 'Times', 'Arial', 'Fantasy', 'Impact'];
-        var propList = [], gap = 15;
-        var vertical = new Canvas2d.DisplayObjects('line_v');
-        var orizontal = new Canvas2d.DisplayObjects('line_o');
-        vertical.line(0, 0, 0, -100, 0, 100, 'pink', 2);
-        orizontal.line(0, 0, -100, 0, 100, 0, 'pink', 2);
-        vertical.x = orizontal.x = stage.width / 2;
-        orizontal.y = vertical.y = stage.height / 2;
-        back.add(vertical);
-        back.add(orizontal);
-        var t = new Canvas2d.DisplayObjects('font');
-        t.text(font[0], 0, 0, 'normal', 16, font[0], 'black',
-                {color: 'lightseagreen'}, 'start');
-        t.paddingLeft = t.paddingTop = 5;
-        var indexFont = 0;
-        t.y = 90;
-        t.x = 10;
-        back.add(t);
-        t.addEvent('mouseover', mOver);
-        t.addEvent('mouseout', mOut);
-        t.addEvent('click', changeFont);
-        function changeFont(e) {
-            indexFont = indexFont < font.length - 1 ? indexFont + 1 : 0;
-            text.fontType = font[indexFont];
-            text.parent.draw();
-            e.target.txt = font[indexFont];
-            e.target.fontType = font[indexFont];
-            label.txt = text.fontStyle;
-            e.target.parent.draw();
-        }
 
-        for (var i = 0; i < align.length; i++) {
-            t = new Canvas2d.DisplayObjects('align_' + i);
-            t.text(align[i], 0, 0, 'normal', 14, 'Verdana', 'gray',
-                    {color: 'lightseagreen'}, 'right');
-            t.paddingLeft = t.paddingTop = 5;
-            t.data = {prop: 'align', value: align[i]};
-            t.y = 25 + stage.height / 2 + (10 * i) + gap * i;
-            t.x = stage.width - 10;
-            back.add(t);
-            propList.push(t);
-        }
-        for (var i = 0; i < baseline.length; i++) {
-            t = new Canvas2d.DisplayObjects('baseline_' + i);
-            t.text(baseline[i], 0, 0, 'normal', 14, 'Verdana', 'gray',
-                    {color: 'lightseagreen'}, 'left');
-            t.paddingLeft = t.paddingTop = 5;
-            t.data = {prop: 'baseLine', value: baseline[i]};
-            t.y = 150 + (10 * i) + gap * i;
-            t.x = 10;
-            back.add(t);
-            propList.push(t);
-        }
-        for (var i = 0; i < fontWeigth.length; i++) {
-            t = new Canvas2d.DisplayObjects('fontWeigth_' + i);
-            t.text(fontWeigth[i], 0, 0, 'normal', 14, 'Verdana', 'gray',
-                    {color: 'lightseagreen'}, 'right');
-            t.paddingLeft = t.paddingTop = 5;
-            t.data = {prop: 'fontWeigth', value: fontWeigth[i]};
-            t.y = 35 + (10 * i) + gap * i;
-            t.x = stage.width - 10;
-            back.add(t);
-            propList.push(t);
-        }
-        for (i = 0; i < propList.length; i++) {
-            propList[i].addEvent('mouseover', mOver);
-            propList[i].addEvent('mouseout', mOut);
-            propList[i].addEvent('click', changeProp);
-        }
-        function mOver(e) {
-            e.target.backGround.color = 'lightblue';
-            stage.container.style.cursor = 'pointer';
-            e.target.parent.draw();
-        }
-        function mOut(e) {
-            e.target.backGround.color = 'lightseagreen';
-            stage.container.style.cursor = 'default';
-            e.target.parent.draw();
-        }
-        function changeProp(e) {
-            text[e.target.data.prop] = e.target.data.value;
-            text.parent.draw();
-            label.txt = text.fontStyle;
-            label2.txt = text.align + ' ' + text.baseLine;
-            for (var i = 0; i < propList.length; i++) {
-                propList[i].color = 'gray';
-            }
-            e.target.color = 'black';
-            e.target.parent.draw();
-        }
-        var text = new Canvas2d.DisplayObjects();
-        text.text('Hello World!', 0, 0, 'normal', 18, 'Verdana', 'black',
-                null, 'center', 'middle');
-        text.paddingLeft = text.paddingTop = 5;
-        text.x = stage.width / 2;
-        text.y = stage.height / 2;
 
-        var label = new Canvas2d.DisplayObjects('label_0');
-        label.text(text.fontStyle, 0, 0, 'italic', 18, 'Verdana', 'black',
-                null, 'left');
-        label.paddingLeft = label.paddingTop = 5;
-        label.y = 35;
-        label.x = 15;
-        var label2 = new Canvas2d.DisplayObjects('label_2');
-        label2.text(text.align + ' ' + text.baseLine, 0, 0, 'bold', 16, 'Verdana',
-                'black', null, 'left');
-        label2.paddingLeft = label2.paddingTop = 5;
-        label2.y = 55;
-        label2.x = 15;
-        back.add(label);
-        back.add(label2);
-
-        sprite.add(text);
-        stage.add(back);
-        stage.add(sprite);
-        stage.draw();
-    }
-};
-Examples.prototype.clip2 = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('sprite_0');
-    var anim = new Canvas2d.Sprite('anim');
-    var obj = [], cuty = 0, cutx = 0;
-    var label = new Canvas2d.DisplayObjects('label_0');
-    label.text('Press Left - Right to move the figure.', 0, 0,
-            'normal', 16, 'Tahoma', 'gray', null, 'start', 'top');
-    label.x = 25;
-    label.y = 25;
-    sprite.add(label);
-    var labelLeft = new Canvas2d.DisplayObjects('left');
-    labelLeft.text('Left', 0, 0,
-            'normal', 16, 'Tahoma', 'gray', null, 'start', 'top');
-    labelLeft.x = stage.width / 2 - 120;
-    labelLeft.y = stage.height - 30;
-    labelLeft.addEvent('mouseover', mOver);
-    labelLeft.addEvent('mouseout', mOut);
-    labelLeft.addEvent('mousedown', mDown);
-    labelLeft.addEvent('mouseup', mUp);
-    sprite.add(labelLeft);
-    var labelRight = new Canvas2d.DisplayObjects('right');
-    labelRight.text('Right', 0, 0,
-            'normal', 16, 'Tahoma', 'gray', null, 'end', 'top');
-    labelRight.x = stage.width / 2 + 120;
-    labelRight.y = stage.height - 30;
-    labelRight.addEvent('mouseover', mOver);
-    labelRight.addEvent('mouseout', mOut);
-    labelRight.addEvent('mousedown', mDown);
-    labelRight.addEvent('mouseup', mUp);
-    labelRight.paddingLeft = labelLeft.paddingLeft = 15;
-    labelRight.paddingTop = labelLeft.paddingTop = 14;
-    sprite.add(labelRight);
-    for (var i = 0; i < 20; i++) {
-        if (i === 10) {
-            cuty = 100;
-            cutx = 0;
-        }
-        obj.push({'x': 0, 'y': 0,
-            'map': {'x': 63 * cutx, 'y': cuty, 'width': 63, 'height': 100}});
-        cutx++;
-    }
-    obj.reverse();
-    var clip = new Canvas2d.DisplayObjects('clip_0');
-    clip.clip(0, 0, params[0] ? 'img/walk.png' : 'http://www.somethinglikethis.it/img/hosted/walk.png', obj, false, false);
-    clip.loadImage(null, null, onComplete, false);
-    anim.add(clip);
-    stage.add(anim);
-    stage.add(sprite);
-    function onComplete() {
-        clip.x = stage.width / 2 - clip.width / 2;
-        clip.y = stage.height / 2 - clip.height / 2;
-        stage.draw();
-        window.onkeydown = walk;
-    }
-    var left = 9;
-    var right = 0;
-    function walk(e) {
-        stepUp(e.keyCode);
-    }
-    function stepUp(e) {
-        switch (e) {
-            case 39:
-                right++;
-                if (right > 9) {
-                    right = 0;
-                }
-                clip.currentFrame = right;
-                if (clip.x + clip.width < stage.width) {
-                    clip.x += 5;
-                }
-                anim.draw();
-                break;
-            case 37:
-                left++;
-                if (left > 19) {
-                    left = 10;
-                }
-                clip.currentFrame = left;
-                if (clip.x > 1) {
-                    clip.x -= 5;
-                }
-                anim.draw();
-                break;
-            default:
-                break;
-        }
-    }
-    function mOver(e) {
-        stage.container.style.cursor = 'pointer';
-        e.target.backGround = {'color': 'lightblue'};
-        sprite.draw();
-    }
-    function mOut(e) {
-        stage.container.style.cursor = 'default';
-        e.target.backGround = null;
-        sprite.draw();
-    }
-    function mDown(e) {
-        e.target.backGround = {'color': 'lightblue'};
-        sprite.draw();
-        var frame = e.target.name === 'left' ? 37 : 39;
-        stepUp(frame);
-    }
-    function mUp(e) {
-        e.target.backGround = null;
-        sprite.draw();
-    }
-};
-Examples.prototype.events = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('sprite_0');
-    var label = new Canvas2d.DisplayObjects('label_0');
-    label.text('', 0, 0, 'normal', 14, 'Helvetica',
-            'black', null, 'start', 'middle');
-    var labelg = new Canvas2d.DisplayObjects('label_0');
-    labelg.text('Global Coord', 0, -1, 'normal', 16, 'Tahoma',
-            'gray', null, 'start', 'top');
-    var row = 0;
-    var col = 0;
-    for (var i = 0; i < 20; i++) {
-        var rect = new Canvas2d.DisplayObjects('rect_0');
-        rect.rect(0, 0, 50, 50, 'lightseagreen', 'lightblue', 4);
-        rect.x = 50 * row + (row * rect.width) + 50;
-        rect.y = 20 * col + (col * rect.height) + 20;
-        row++;
-        if (row === 5) {
-            row = 0;
-            col++;
-        }
-        rect.addEvent('mousedown', mDown);
-        rect.addEvent('mouseup', mUp);
-        rect.addEvent('click', clicked);
-        rect.addEvent('mouseover', mOver);
-        rect.addEvent('mouseout', mOut);
-        rect.addEvent('mousemove', mMove);
-        sprite.add(rect);
-    }
-    function provastart(e) {
-        e.target.lineWidth = 8;
-        e.target.parent.draw();
-    }
-    function provaend(e) {
-        e.target.lineWidth = 4;
-        e.target.parent.draw();
-    }
-    function provamove(e) {
-        labelg.txt = 'Global Coord x: ' + (e.mouse.x).toString() +
-                ' y: ' + (e.mouse.y).toString();
-        label.txt = 'Local Coord x: ' +
-                Math.round(e.mouse.ox - e.target.x).toString() +
-                ' y: ' + Math.round(e.mouse.oy - e.target.y).toString();
-        label.x = e.target.x + e.target.width / 2 - label.width / 2;
-        label.y = e.target.y + e.target.height + 8;
-        sprite.draw();
-    }
-    function mDown(e) {
-        e.target.lineWidth = 8;
-        e.target.parent.draw();
-    }
-    function mUp(e) {
-        e.target.lineWidth = 4;
-        e.target.parent.draw();
-    }
-    function clicked(e) {
-        var color = e.target.getColor('name') === 'lightseagreen' ?
-                'deepskyblue' : 'lightseagreen';
-        e.target.color = color;
-        e.target.parent.draw();
-    }
-    function mOver(e) {
-        stage.container.style.cursor = 'pointer';
-    }
-    function mOut(e) {
-        stage.container.style.cursor = 'default';
-    }
-    function mMove(e) {
-        labelg.txt = 'Global Coord x: ' + (e.mouse.x).toString() +
-                ' y: ' + (e.mouse.y).toString();
-        label.txt = 'Local Coord x: ' +
-                Math.round(e.mouse.ox - e.target.x).toString() +
-                ' y: ' + Math.round(e.mouse.oy - e.target.y).toString();
-        label.x = e.target.x + e.target.width / 2 - label.width / 2;
-        label.y = e.target.y + e.target.height + 8;
-        sprite.draw();
-    }
-    sprite.add(labelg);
-    sprite.add(label);
-    stage.add(sprite);
-    stage.draw();
-};
-Common.prototype.method = {
-    addEvent: function(c, w, h, params) {
-
-    },
-    removeEvent: function(c, w, h, params) {
-
-    },
-    add: function(c, w, h, params) {
-
-    },
-    remove: function(c, w, h, params) {
-
-    },
-    zOrder: function(c, w, h, params) {
-
-    },
-    clear: function(c, w, h, params) {
-
-    },
-    draw: function(c, w, h, params) {
-
-    }
-};
-Examples.prototype.dragdrop = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('sprite_0');
-    var row = 0;
-    var col = 0;
-    for (var i = 0; i < 20; i++) {
-        var rect = new Canvas2d.DisplayObjects('rect_0');
-        rect.rect(0, 0, 50, 50, 'lightseagreen', 'lightblue', 4);
-        rect.x = 50 * row + (row * rect.width) + 50;
-        rect.y = 20 * col + (col * rect.height) + 20;
-        row++;
-        if (row === 5) {
-            row = 0;
-            col++;
-        }
-        rect.addEvent('dragstart', dStart);
-        rect.addEvent('drag', dDrag);
-        rect.addEvent('dragstop', dStop);
-        rect.addEvent('mouseover', mOver);
-        rect.addEvent('mouseout', mOut);
-        sprite.add(rect);
-    }
-    function dStart(e) {
-        e.target.zOrder('top');
-        e.target.lineWidth = 8;
-        e.target.parent.draw();
-    }
-    function dDrag(e) {
-        e.target.x = e.mouse.ox;
-        e.target.y = e.mouse.oy;
-        e.target.parent.draw();
-    }
-    function dStop(e) {
-        e.target.lineWidth = 4;
-        e.target.parent.draw();
-    }
-    function mOver() {
-        stage.container.style.cursor = 'pointer';
-    }
-    function mOut() {
-        stage.container.style.cursor = 'default';
-    }
-    stage.add(sprite);
-    stage.draw();
-};
 Colors.prototype.colors = function(c, w, h, params) {
     var stage = new Canvas2d.Stage(c, w, h);
     var sprite = new Canvas2d.Sprite('sprite_0');
@@ -1749,359 +2343,7 @@ Colors.prototype.colors2 = function(c, w, h, params) {
         stage.container.style.cursor = 'default';
     }
 };
-Examples.prototype.shadow = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('sprite_0');
-    var rectFill = new Canvas2d.DisplayObjects();
-    var rectLine = new Canvas2d.DisplayObjects();
-    var circFill = new Canvas2d.DisplayObjects();
-    var circLine = new Canvas2d.DisplayObjects();
-    rectFill.rect(0, 0, 100, 100, 'lightblue');
-    rectLine.rect(0, 0, 100, 100, null, 'lightblue', 4);
-    circFill.circle(0, 0, 50, 0, Math.PI * 2, 'lightseagreen');
-    circLine.circle(0, 0, 50, 0, Math.PI * 2, null, 'lightseagreen', 4);
-    rectFill.shadow = circFill.shadow = {'color': 'grey', 'offsetX': 10,
-        'offsetY': 10, 'blur': 10};
-    rectLine.lineShadow = circLine.lineShadow = {'color': 'grey', 'offsetX': 10,
-        'offsetY': 10, 'blur': 10};
-    var rectFillLine = new Canvas2d.DisplayObjects();
-    rectFillLine.rect(0, 0, 100, 100, 'lightseagreen', 'lightblue', 4);
-    rectFillLine.shadow = {'color': 'dimgray', 'offsetX': 10,
-        'offsetY': 10, 'blur': 10};
-    rectFillLine.lineShadow = {'color': 'grey', 'offsetX': 10,
-        'offsetY': 10, 'blur': 10};
-    rectFill.x = rectLine.x = 70;
-    circFill.x = circLine.x = rectFill.x + rectFill.width + circFill.width;
-    rectFill.y = 30;
-    rectLine.y = rectFill.y + rectFill.height + 20;
-    circLine.y = rectLine.y + circLine.radius;
-    circFill.y = rectFill.y + circFill.radius;
-    rectFillLine.x = circFill.x + circFill.width;
-    rectFillLine.y = stage.height / 2 - rectFillLine.height / 2;
-    sprite.add(rectFillLine);
-    sprite.add(rectFill);
-    sprite.add(rectLine);
-    sprite.add(circFill);
-    sprite.add(circLine);
-    stage.add(sprite);
-    stage.draw();
-};
-Examples.prototype.gradient = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('sprite_0');
-    var w = 100;
-    var h = 100;
-    var rect;
-    var gradObj_0 = {'color': ['blue', 'green'],
-        'offset': [0, 1],
-        'coord': {'x0': 0, 'y0': 0, 'x1': w, 'y1': 0}, 'type': 'linear'};
-    var gradObj_1 = {'color': ['blue', 'green', 'red'],
-        'offset': [0, 0.5, 1],
-        'coord': {'x0': 0, 'y0': 0, 'x1': w, 'y1': 0}, 'type': 'linear'};
-    var gradObj_2 = {'color': ['hsla(0,100%,50%,1)', 'hsla(0,100%,50%,0)'],
-        'offset': [0, 1],
-        'coord': {'x0': 0, 'y0': 0, 'x1': w, 'y1': 0}, 'type': 'linear'};
-    var gradObj_3 = {'color': ['hsla(0,100%,50%,1)', 'hsla(0,100%,50%,0)',
-            'hsla(0,100%,50%,1)'],
-        'offset': [0, 0.5, 1],
-        'coord': {'x0': 0, 'y0': 0, 'x1': w, 'y1': 0}, 'type': 'linear'};
-    var gradLinearArray = [gradObj_0, gradObj_1, gradObj_2, gradObj_3];
-    for (var i = 0; i < gradLinearArray.length; i++) {
-        rect = new Canvas2d.DisplayObjects();
-        rect.rect(0, 0, w, h);
-        rect.gradient = gradLinearArray[i];
-        rect.x = 50 + (100 * i) + (20 * i);
-        rect.y = 50;
-        sprite.add(rect);
-    }
-    var gradObj_4 = {'color': ['blue', 'green'],
-        'offset': [0, 1],
-        'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': w},
-        'type': 'radial'};
-    var gradObj_5 = {'color': ['blue', 'green', 'red'],
-        'offset': [0, 0.5, 1],
-        'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': w},
-        'type': 'radial'};
-    var gradObj_6 = {'color': ['hsla(0,100%,50%,1)', 'hsla(0,100%,50%,0)'],
-        'offset': [0, 1],
-        'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': w},
-        'type': 'radial'};
-    var gradObj_7 = {'color': ['hsla(0,100%,50%,1)', 'hsla(0,100%,50%,0)',
-            'hsla(0,100%,50%,1)'],
-        'offset': [0, 0.5, 1],
-        'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': w},
-        'type': 'radial'};
-    var gradRadialArray = [gradObj_4, gradObj_5, gradObj_6, gradObj_7];
-    for (var i = 0; i < gradRadialArray.length; i++) {
-        rect = new Canvas2d.DisplayObjects();
-        rect.rect(0, 0, w, h);
-        rect.gradient = gradRadialArray[i];
-        rect.x = 50 + (100 * i) + (20 * i);
-        rect.y = 170;
-        sprite.add(rect);
-    }
-    stage.add(sprite);
-    stage.draw();
-};
-Examples.prototype.gradient2 = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('sprite_0');
-    function setGradients(coord, offY, type) {
-        for (var i = 0; i < 4; i++) {
-            circle = new Canvas2d.DisplayObjects();
-            circle.circle(0, 0, r, 0, Math.PI * 2);
-            circle.gradient = {'color': color, 'offset': [0, 1],
-                'coord': {'x0': coord[i][0], 'y0': coord[i][1],
-                    'r0': coord[i][2],
-                    'x1': coord[i][3], 'y1': coord[i][4], 'r1': coord[i][5]},
-                'type': type};
-            circle.x = 60 + (100 * i) + (45 * i);
-            circle.y = offY;
-            sprite.add(circle);
-            line = new Canvas2d.DisplayObjects();
-            line.line(0, 0, coord[i][0], coord[i][1], coord[i][2],
-                    coord[i][3], 'slategrey');
-            line.x = circle.x;
-            line.y = circle.y;
-            sprite.add(line);
-            for (var s = 0; s < coordL.length; s++) {
-                label = new Canvas2d.DisplayObjects();
-                bl = ((s / 2) === parseInt(s / 2)) ? 'top' : 'bottom';
-                al = ((s / 2) === parseInt(s / 2)) ? 'end' : 'start';
-                label.text(coordL[s], 0, 0, 'normal', 10, 'Tahoma',
-                        'green', null, al, bl);
-                if (s < 2) {
-                    label.color = 'blue';
-                    label.x = circle.x + coord[i][0];
-                    label.y = circle.y + coord[i][1];
-                } else {
-                    label.x = circle.x + coord[i][2];
-                    label.y = circle.y + coord[i][3];
-                }
-                sprite.add(label);
-            }
-        }
-    }
-    var w = 100, h = 100, r = w / 2, label, circle, line, color, al, bl, coords;
-    var coordL = ['x0', 'y0', 'x1', 'y1'];
-    color = ['hsla(0,100%,50%,1)', 'hsla(0,100%,50%,0)'];
-    coords = [[0, 0, 0, r, 0, 0], [r, r, 0, -r, 0, 0], [-r, r, 0, r, 0, 0], [-r, -r, 0, r, 0, 0]];
-    setGradients(coords, 60, 'linear');
-    coords = [[0, 0, 0, 0, 0, r], [-r, -r, 0, 0, 0, r], [0, r, 0, 0, 0, r], [r, 0, 0, 0, 0, r]];
-    setGradients(coords, 220, 'radial');
-    stage.add(sprite);
-    stage.draw();
-};
-Examples.prototype.gradient3 = function(c, w, h, params) {
-    var stage = new Canvas2d.Stage(c, w, h);
-    var sprite = new Canvas2d.Sprite('sprite_0');
-    var panel = new Canvas2d.Sprite('panel');
-    var backPanel = new Canvas2d.Sprite('back_panel');
-    var piker = new Canvas2d.Sprite('piker');
-    var label, rect, arLabel = [], r = 100, limit, level, len = r * 2,
-            offx = stage.width - 40 - (r * 2), i = 0;
-    arCoord = ['x0', 'y0', 'r0', 'x1', 'y1', 'r1'], rt = 2;
-    var stopC = ['red', 'yellow', 'green', 'cyan', 'blue', 'purple'];
-    var circle = new Canvas2d.DisplayObjects();
-    var grdObj = {'color': ['red', 'purple'], 'offset': [0, 1],
-        'coord': {'x0': 0, 'y0': 0, 'r0': 0, 'x1': 0, 'y1': 0, 'r1': r},
-        'type': 'radial'};
-    circle.rect(-(r * rt) / 2, -(r * rt) / 2, r * rt, r * rt);
-    circle.x = offx / 2;
-    circle.y = stage.height / 2;
-    circle.gradient = grdObj;
-    sprite.add(circle);
-    var labList = ['Radial', 'Linear', 'Circle', 'Rectangle'];
-    for (i = 0; i < 4; i++) {
-        label = new Canvas2d.DisplayObjects(labList[i]);
-        label.text(labList[i], 0, 0, 'normal', 16, 'Tahoma',
-                'black', null, 'start', 'bottom');
-        label.x = i === 0 || i === 2 ? offx / 2 - r : offx / 2 + r - label.width;
-        label.y = i < 2 ? stage.height - 20 : 40;
-        label.addEvent('click', changeType);
-        label.addEvent('mouseover', overHandler);
-        label.addEvent('mouseout', outHandler);
-        backPanel.add(label);
-    }
-    for (i = 0; i < 6; i++) {
-        var s = new Canvas2d.DisplayObjects(i.toString());
-        var slideObj = [{'moveTo': [-4, 3]}, {'quadraticCurveTo': [-4, 0, -1, 0]},
-            {'lineTo': [9, 0]}, {'quadraticCurveTo': [11, 1, 13, 2]},
-            {'lineTo': [16, 5]}, {'quadraticCurveTo': [17, 7, 16, 9]},
-            {'lineTo': [13, 12]}, {'quadraticCurveTo': [11, 13, 9, 14]},
-            {'lineTo': [-1, 14]}, {'quadraticCurveTo': [-4, 14, -4, 11]},
-            {'lineTo': [-4, 3]}];
-        s.shape(-2, -7, slideObj, 'lightsteelblue', 'grey', 2);
-        s.shadow = {'color': 'hsla(0,0%,0%,0.6)', 'blur': 8, 'offsetX': 2,
-            'offsetY': 2};
-        s.addEvent('drag', dragHandler);
-        s.addEvent('mouseover', overHandler);
-        s.addEvent('mouseout', outHandler);
-        var firstPos = i === 2 ? 0 : i === 5 ? r : r;
-        s.x = firstPos + offx;
-        s.y = 40 + (40 * i);
-        s.rotation = -Math.PI / 2;
-        panel.add(s);
-        rect = new Canvas2d.DisplayObjects();
-        rect.rect(0, -6, r * 2, 6, null, 'lightgrey', 2);
-        rect.x = offx;
-        rect.y = s.y;
-        rect.lineShadow = {'color': 'black', 'offsetX': 1,
-            'offsetY': 1, 'blur': 3};
-        backPanel.add(rect);
-        var nPos = i === 2 || i === 5 ? ['0', r.toString(),
-            (r * 2).toString()] : [('-' + r.toString()), '0', r.toString()];
-        for (var l = 0; l < nPos.length; l++) {
-            label = new Canvas2d.DisplayObjects();
-            label.text(nPos[l], 0, 0, 'lighter', 10, 'Tahoma',
-                    'black', null, 'center', 'bottom');
-            label.x = offx + (r * l);
-            label.y = s.y - 18;
-            backPanel.add(label);
-        }
-        var n = i === 5 ? r : 0;
-        label = new Canvas2d.DisplayObjects(i.toString());
-        label.text(n.toString(), 0, -3, 'normal', 14, 'Tahoma',
-                'black', null, 'end', 'middle');
-        label.x = offx - 15;
-        label.y = s.y;
-        arLabel.push(label);
-        panel.add(label);
-        label = new Canvas2d.DisplayObjects(i.toString());
-        label.text(arCoord[i], 0, -3, 'normal', 14, 'Tahoma',
-                'rgb(69,116,158)', null, 'center', 'middle');
-        label.x = stage.width - 20;
-        label.y = s.y;
-        panel.add(label);
-        rect = new Canvas2d.DisplayObjects();
-        rect.rect(0, 0, r / 4, 25, stopC[i], 'lightgrey', 2);
-        rect.x = offx + (rect.width * i) + ((((r * 2) - (rect.width * 6)) / 5) * i);
-        rect.y = (40 * 6) + 20;
-        rect.addEvent('mousedown', addStopDw);
-        rect.addEvent('mouseup', addStopUp);
-        rect.addEvent('mouseover', overHandler);
-        rect.addEvent('mouseout', outHandler);
-        piker.add(rect);
-    }
-    stage.add(sprite);
-    stage.add(backPanel);
-    stage.add(panel);
-    stage.add(piker);
-    stage.draw();
-
-
-    function dragHandler(e) {
-        limit = e.mouse.x - offx;
-        level = e.mouse.x;
-        if (limit >= 0 && limit <= len) {
-            level = e.mouse.x;
-        } else {
-            if (limit <= 0) {
-                level = offx;
-            } else {
-                level = offx + len;
-            }
-        }
-        e.target.x = level;
-        panel.draw();
-        limit = limit < 0 ? 0 : limit > len ? len : limit;
-        var circ = grdObj.coord;
-        switch (e.target.name) {
-            case '0':
-                circ.x0 = limit - r;
-                arLabel[parseInt(e.target.name)].txt = (circ.x0).toString();
-                break;
-            case '1':
-                circ.y0 = limit - r;
-                arLabel[parseInt(e.target.name)].txt = (circ.y0).toString();
-                break;
-            case '2':
-                circ.r0 = limit;
-                arLabel[parseInt(e.target.name)].txt = (circ.r0).toString();
-                break;
-            case '3':
-                circ.x1 = limit - r;
-                arLabel[parseInt(e.target.name)].txt = (circ.x1).toString();
-                break;
-            case '4':
-                circ.y1 = limit - r;
-                arLabel[parseInt(e.target.name)].txt = (circ.y1).toString();
-                break;
-            case '5':
-                circ.r1 = limit;
-                arLabel[parseInt(e.target.name)].txt = (circ.r1).toString();
-                break;
-                deafault :
-                        break;
-        }
-        sprite.draw();
-    }
-    function addStopDw(e) {
-        var obj = circle.gradient, i, u;
-        if (!e.target.selected) {
-            obj.color.push(e.target.color);
-            obj.offset.push(1);
-            for (i = 0; i < obj.offset.length; i++) {
-                obj.offset[i] = i / (obj.offset.length - 1);
-            }
-            e.target.lineColor = 'black';
-            e.target.selected = true;
-        } else {
-            for (i = 0; i < obj.color.length; i++) {
-                if (e.target.color === obj.color[i]) {
-                    u = i;
-                    e.target.selected = false;
-                    break;
-                }
-            }
-            obj.color.splice(u, 1);
-            obj.offset.splice(u, 1);
-            for (i = 0; i < obj.offset.length; i++) {
-                obj.offset[i] = i / (obj.offset.length - 1);
-            }
-            e.target.lineColor = 'lightgrey';
-        }
-        sprite.draw();
-        e.target.lineWidth = 5;
-        piker.draw();
-    }
-    function addStopUp(e) {
-        e.target.lineWidth = 2;
-        piker.draw();
-    }
-    function changeType(e) {
-        switch (e.target.name) {
-            case 'Linear':
-                grdObj.type = 'linear';
-                break;
-            case 'Radial':
-                grdObj.type = 'radial';
-                break;
-            case 'Circle':
-                circle.circle(0, 0, r, 0, Math.PI * 2);
-                circle.x = offx / 2;
-                circle.y = stage.height / 2;
-                circle.gradient = grdObj;
-                break;
-            case 'Rectangle':
-                circle.rect(-(r * rt) / 2, -(r * rt) / 2, r * rt, r * rt);
-                circle.x = offx / 2;
-                circle.y = stage.height / 2;
-                circle.gradient = grdObj;
-                break;
-            default:
-                break;
-        }
-        sprite.draw();
-    }
-    function overHandler() {
-        stage.container.style.cursor = 'pointer';
-    }
-    function outHandler() {
-        stage.container.style.cursor = 'default';
-    }
-};
-Tweener.prototype.addremove = function(c, w, h, params) {
+Tweener.prototype.addTweener = function(c, w, h, params) {
     var stage = new Canvas2d.Stage(c, w, h);
     var sprite = new Canvas2d.Sprite('sprite_0');
     var spriteLabel = new Canvas2d.Sprite('sprite_label');
@@ -2285,44 +2527,57 @@ Tweener.prototype.ease = function(c, w, h, params) {
     var sprite = new Canvas2d.Sprite('sprite_0');
     var spriteLabel = new Canvas2d.Sprite('sprite_label');
     var tween = new Canvas2d.Tweener();
-    var grid, graph, rect, label, left, right=new Canvas2d.DisplayObjects('text_right'), x, ct=0, color=360/1000;
+    var grid, graph, rect, label, left, right = new Canvas2d.DisplayObjects('text_right'), x, ct = 0, color = 360 / 1000;
     right.text('Right', 0, 0, 'normal', 20, 'Helvetica', 'black', null, 'start', 'top');
-    right.y=30;right.x=100;right.paddingLeft=right.paddingTop=8;
-    right.addEvent('mouseover',mOver);
-    right.addEvent('mouseout',mOut);
-    left=right.clone('text_left');left.txt='Left';left.x=20;
-    label=right.clone('text_label');label.txt=params[1];label.x=w-250;
-    right.addEvent('click',startStop);
-    left.addEvent('click',startStop);
-    grid=new Canvas2d.DisplayObjects('grid',false);
-    grid.polygon(0, 0, [[0,0],[w-80,0],[w-80,h-160],[0,h-160]], null, 'lightgray', 2, true);
-    grid.x=40;grid.y=80;grid.lineAlpha=0.3;
-    graph=new Canvas2d.DisplayObjects('graph',false);
-    graph.polygon(0, 0, [[0,0],[0,0]], null, 'blue', 2, false);
-    graph.x=40;graph.y=h-80;graph.lineAlpha=0.5;
-    rect=new Canvas2d.DisplayObjects('rect',false);
+    right.y = 30;
+    right.x = 100;
+    right.paddingLeft = right.paddingTop = 8;
+    right.addEvent('mouseover', mOver);
+    right.addEvent('mouseout', mOut);
+    left = right.clone('text_left');
+    left.txt = 'Left';
+    left.x = 20;
+    label = right.clone('text_label');
+    label.txt = params[1];
+    label.x = w - 250;
+    right.addEvent('click', startStop);
+    left.addEvent('click', startStop);
+    grid = new Canvas2d.DisplayObjects('grid', false);
+    grid.polygon(0, 0, [[0, 0], [w - 80, 0], [w - 80, h - 160], [0, h - 160]], null, 'lightgray', 2, true);
+    grid.x = 40;
+    grid.y = 80;
+    grid.lineAlpha = 0.3;
+    graph = new Canvas2d.DisplayObjects('graph', false);
+    graph.polygon(0, 0, [[0, 0], [0, 0]], null, 'blue', 2, false);
+    graph.x = 40;
+    graph.y = h - 80;
+    graph.lineAlpha = 0.5;
+    rect = new Canvas2d.DisplayObjects('rect', false);
     rect.rect(0, 0, 50, 50, 'lightseagreen', 'lightblue', 4);
-    rect.x=10;rect.y=h/2-rect.height/2;
-    function startStop(e){
-        x=e.target.name==='text_right'?w-10-rect.width:10;
-        graph.points=[[0,0],[0,0]];ct=0;
-        tween.addTweener(rect,{x:x,duration:1000,ease:params[1],onTween:loop});
+    rect.x = 10;
+    rect.y = h / 2 - rect.height / 2;
+    function startStop(e) {
+        x = e.target.name === 'text_right' ? w - 10 - rect.width : 10;
+        graph.points = [[0, 0], [0, 0]];
+        ct = 0;
+        tween.addTweener(rect, {x: x, duration: 1000, ease: params[1], onTween: loop});
     }
-    function mOver(e){
-        if(e.target.name==='text_label') return;
-        stage.container.style.cursor='pointer';
-        e.target.backGround={color:'lightgray'};
+    function mOver(e) {
+        if (e.target.name === 'text_label')
+            return;
+        stage.container.style.cursor = 'pointer';
+        e.target.backGround = {color: 'lightgray'};
         e.target.parent.draw();
     }
-    function mOut(e){
-        stage.container.style.cursor='default';
-        e.target.backGround=null;
+    function mOut(e) {
+        stage.container.style.cursor = 'default';
+        e.target.backGround = null;
         e.target.parent.draw();
     }
-    function loop(e){
-        graph.points.push([(w-80)*(ct/994),-tween[params[1]](ct,0,h-160,994)]);
-        graph.lineColor='hsl('+(color*ct)+',100%,50%)';
-        ct+=stage.getTimeInterval();
+    function loop(e) {
+        graph.points.push([(w - 80) * (ct / 994), -tween[params[1]](ct, 0, h - 160, 994)]);
+        graph.lineColor = 'hsl(' + (color * ct) + ',100%,50%)';
+        ct += stage.getTimeInterval();
     }
     sprite.add(grid);
     sprite.add(graph);
@@ -2439,5 +2694,134 @@ Tweener.prototype.delay = function(c, w, h, params) {
         e.target.backGround = null;
         e.target.color = 'black';
         spriteLabel.draw();
+    }
+};
+Sprite.prototype.examples = {
+    dragDrop: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('sprite_0');
+        var row = 0;
+        var col = 0;
+        for (var i = 0; i < 20; i++) {
+            var rect = new Canvas2d.DisplayObjects('rect_0');
+            rect.rect(0, 0, 50, 50, 'lightseagreen', 'lightblue', 4);
+            rect.x = 50 * row + (row * rect.width) + 50;
+            rect.y = 20 * col + (col * rect.height) + 20;
+            row++;
+            if (row === 5) {
+                row = 0;
+                col++;
+            }
+            rect.addEvent('dragstart', dStart);
+            rect.addEvent('drag', dDrag);
+            rect.addEvent('dragstop', dStop);
+            rect.addEvent('mouseover', mOver);
+            rect.addEvent('mouseout', mOut);
+            sprite.add(rect);
+        }
+        function dStart(e) {
+            e.target.zOrder('top');
+            e.target.lineWidth = 8;
+            e.target.parent.draw();
+        }
+        function dDrag(e) {
+            e.target.x = e.mouse.ox;
+            e.target.y = e.mouse.oy;
+            e.target.parent.draw();
+        }
+        function dStop(e) {
+            e.target.lineWidth = 4;
+            e.target.parent.draw();
+        }
+        function mOver() {
+            stage.container.style.cursor = 'pointer';
+        }
+        function mOut() {
+            stage.container.style.cursor = 'default';
+        }
+        stage.add(sprite);
+        stage.draw();
+    },
+    events: function(c, w, h, params) {
+        var stage = new Canvas2d.Stage(c, w, h);
+        var sprite = new Canvas2d.Sprite('sprite_0');
+        var label = new Canvas2d.DisplayObjects('label_0');
+        label.text('', 0, 0, 'normal', 14, 'Helvetica',
+                'black', null, 'start', 'middle');
+        var labelg = new Canvas2d.DisplayObjects('label_0');
+        labelg.text('Global Coord', 0, -1, 'normal', 16, 'Tahoma',
+                'gray', null, 'start', 'top');
+        var row = 0;
+        var col = 0;
+        for (var i = 0; i < 20; i++) {
+            var rect = new Canvas2d.DisplayObjects('rect_0');
+            rect.rect(0, 0, 50, 50, 'lightseagreen', 'lightblue', 4);
+            rect.x = 50 * row + (row * rect.width) + 50;
+            rect.y = 20 * col + (col * rect.height) + 20;
+            row++;
+            if (row === 5) {
+                row = 0;
+                col++;
+            }
+            rect.addEvent('mousedown', mDown);
+            rect.addEvent('mouseup', mUp);
+            rect.addEvent('click', clicked);
+            rect.addEvent('mouseover', mOver);
+            rect.addEvent('mouseout', mOut);
+            rect.addEvent('mousemove', mMove);
+            sprite.add(rect);
+        }
+        function provastart(e) {
+            e.target.lineWidth = 8;
+            e.target.parent.draw();
+        }
+        function provaend(e) {
+            e.target.lineWidth = 4;
+            e.target.parent.draw();
+        }
+        function provamove(e) {
+            labelg.txt = 'Global Coord x: ' + (e.mouse.x).toString() +
+                    ' y: ' + (e.mouse.y).toString();
+            label.txt = 'Local Coord x: ' +
+                    Math.round(e.mouse.ox - e.target.x).toString() +
+                    ' y: ' + Math.round(e.mouse.oy - e.target.y).toString();
+            label.x = e.target.x + e.target.width / 2 - label.width / 2;
+            label.y = e.target.y + e.target.height + 8;
+            sprite.draw();
+        }
+        function mDown(e) {
+            e.target.lineWidth = 8;
+            e.target.parent.draw();
+        }
+        function mUp(e) {
+            e.target.lineWidth = 4;
+            e.target.parent.draw();
+        }
+        function clicked(e) {
+            var color = e.target.getColor('name') === 'lightseagreen' ?
+                    'deepskyblue' : 'lightseagreen';
+            e.target.color = color;
+            e.target.parent.draw();
+        }
+        function mOver(e) {
+            stage.container.style.cursor = 'pointer';
+        }
+        function mOut(e) {
+            stage.container.style.cursor = 'default';
+        }
+        function mMove(e) {
+            labelg.txt = 'Global Coord x: ' + (e.mouse.x).toString() +
+                    ' y: ' + (e.mouse.y).toString();
+            label.txt = 'Local Coord x: ' +
+                    Math.round(e.mouse.ox - e.target.x).toString() +
+                    ' y: ' + Math.round(e.mouse.oy - e.target.y).toString();
+            label.x = e.target.x + e.target.width / 2 - label.width / 2;
+            label.y = e.target.y + e.target.height + 8;
+            sprite.draw();
+        }
+        sprite.add(labelg);
+        sprite.add(label);
+        stage.add(sprite);
+        stage.draw();
     }
 };
