@@ -893,6 +893,7 @@ Canvas2d.Stage.prototype = {
                 mouse.dragstop = true;
                 mouse.drag = false;
                 dstop = false;
+                mouse.click = false;
             }
             if (_testdrag(e) || _testdragP(e)) {
                 for (var o in mouse) {
@@ -1516,7 +1517,7 @@ Canvas2d.DisplayObjects.prototype = {
      * @description remove a preexistence event from the listening cicle
      * @param {event string} type event listener type
      * @param {type} func function to be remove
-     * @example myObject.removeEvent('click');
+     * @example myObject.removeEvent('click', myFunc);
      * @returns {undefined} none none
      *@see text
      *@link text
@@ -1528,6 +1529,9 @@ Canvas2d.DisplayObjects.prototype = {
                     this.evtListeners[type].func.splice(i, 1);
                     break;
                 }
+            }
+            if (this.evtListeners[type].func.length === 0) {
+                delete this.evtListeners[type];
             }
         }
     },
