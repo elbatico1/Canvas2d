@@ -131,6 +131,12 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             animating: false,
             loop: [],
             prId: 0,
+            whipe: function() {
+                this.loop=[];
+            },
+            getLoop: function() {
+                return this.loop;
+            },
             getTime: function() {
                 return this.time;
             },
@@ -152,7 +158,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
                     this.timeInterval = thisTime - this.lastTime;
                     this.time += this.timeInterval;
                     this.lastTime = thisTime;
-                    for (var i = 0; i < that.loop.length; i++) {
+                    for (var i = 0; i < this.loop.length; i++) {
                         var illo = this.loop[i];
                         illo.func.apply(illo.target, [illo.target]);
                     }
@@ -184,10 +190,10 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
                 this.animating = false;
             },
             addLoop: function(target, func) {
-                this.prId++;
                 if (!this.isChild(target)) {
-                    this.start();
-                    this.loop.push({'target': target, 'func': func, 'id': this.prId});
+                    this.prId++;
+                    this.start();target.PRID=this.prId;
+                    this.loop.push({target: target, func: func, id: this.prId});
                 }
                 return this.prId;
             },
@@ -204,7 +210,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             removeLoop: function(target) {
                 var id = -1;
                 for (var i = 0; i < this.loop.length; i++) {
-                    if (this.loop[i].target === target) {
+                    if (this.loop[i].id === target.PRID) {
                         id = i;
                         break;
                     }
@@ -276,6 +282,12 @@ Canvas2d.Stage.prototype = {
             }
             this.enabledEvent = false;
         }
+    },
+    whipe: function() {
+        window.rqanim.whipe();
+    },
+    getLoop: function() {
+        window.rqanim.getLoop();
     },
     /**
      * addLoop - Stage - set the main function for animation.
@@ -3230,7 +3242,7 @@ Canvas2d.Tweener.prototype = {
         }
         var twnobj = {};
         var properties = ['x', 'y', 'width', 'height', 'rotation', 'scaleX', 'scaleY', 'lineWidth', 'fontSize', 'radius','startAngle','endAngle'];
-        var x, colorReq, r, g, b, rqAlpha, rqlineAlpha, alpha, lineAlpha, colorSrc, data = args['data'] ? args['data'] : null;
+        var x, colorReq, r, g, b, rqAlpha, rqlineAlpha, alpha, lineAlpha, colorSrc, data = args.data ? args.data : null;
         var delay = args['delay'] ? args['delay'] : 0;
         var ease = args['ease'] ? args['ease'] : 'easeNone';
         var duration = args['duration'] ? args['duration'] : 1000;
@@ -3407,7 +3419,7 @@ Canvas2d.Tweener.prototype = {
         return array;
     },
     _callTween: function(that) {
-        var tree = {}, n = -1;
+        var tree = {}, n, obj;
         for (var o in that.children) {
             if (that.children[o].state.start) {
                 that._states(that.children[o].state);
@@ -3415,16 +3427,12 @@ Canvas2d.Tweener.prototype = {
             } else {
                 if (that.children[o].state.end) {
                     that.children[o].state.tweening = false;
-                    var obj = that.children[o].state;
+                    obj = that.children[o].state;
                     delete that.children[o];
-                    for (var nn in that.children) {
-                        n++;
-                    }
-                    if (n === -1) {
-                        window.rqanim.removeLoop(that);
-                    }
+                    
                     that._states(obj);
-
+                    for (n in that.children) {}
+                    if (!that.children[o]&&!that.children[n]) {window.rqanim.removeLoop(that);}
                     continue;
                 } else {
                     that.children[o].state.tweening = true;
@@ -3547,6 +3555,30 @@ Canvas2d.Tweener.prototype = {
                 break;
         }
         
+    },
+    _states: function(ctrl) {
+        for (var o in ctrl) {
+            switch (o) {
+                case 'start':
+                    if (ctrl[o] === true && ctrl['onStart']) {
+                        ctrl['onStart'].apply(ctrl['target'], [ctrl]);
+                    }
+                    break;
+                case 'tweening':
+                    if (ctrl[o] === true && ctrl['onTween']) {
+                        ctrl['onTween'].apply(ctrl['target'], [ctrl]);
+                    }
+                    break;
+                case 'end':
+                    if (ctrl[o] === true && ctrl['onEnd']) {
+                        ctrl['onEnd'].apply(ctrl['target'], [ctrl]);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
     },
 //////////////////////////////////////////////
 //Equations - From Caurina Tweener
@@ -4334,30 +4366,6 @@ Canvas2d.Tweener.prototype = {
         if (t < d / 2)
             return this.easeOutBounce(t * 2, b, c / 2, d, p_params);
         return this.easeInBounce((t * 2) - d, b + c / 2, c / 2, d, p_params);
-    },
-    _states: function(ctrl) {
-        for (var o in ctrl) {
-            switch (o) {
-                case 'start':
-                    if (ctrl[o] === true && ctrl['onStart']) {
-                        ctrl['onStart'].apply(ctrl['target'], [ctrl]);
-                    }
-                    break;
-                case 'tweening':
-                    if (ctrl[o] === true && ctrl['onTween']) {
-                        ctrl['onTween'].apply(ctrl['target'], [ctrl]);
-                    }
-                    break;
-                case 'end':
-                    if (ctrl[o] === true && ctrl['onEnd']) {
-                        ctrl['onEnd'].apply(ctrl['target'], [ctrl]);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-
     }
 };
 /**
