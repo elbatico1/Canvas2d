@@ -1,65 +1,53 @@
 function startCanvas(l){
     var codePre=document.getElementById('codecode'),examples=document.getElementById('example'),location=l.indexOf('localhost')>-1?true:false;
-    codePre.innerHTML='<div class="tempmessage"><h1>CODE</h1></div>';
-    examples.innerHTML='<div id="examples"><div class="tempmessage1"><h1>EXAMPLE</h1></div></div>';
-    var methodsList={addEvent:'addEvent',removeEvent:'removeEvent',add:'add',remove:'remove',zOrder:'zOrder',clear:'clear',draw:'draw'};
+    //codePre.innerHTML='<div class="tempmessage"><h1>CODE</h1></div>';
+    //examples.innerHTML='<div id="examples"><div class="tempmessage1"><h1>EXAMPLE</h1></div></div>';
+    var methodsList={addEvent:'addEvent',removeEvent:'removeEvent',add:'add',remove:'remove',zOrder:'zOrder',clear:'clear',draw:'draw',getFrame:'getFrame',getTime:'getTime',getFps:'getFps',getTimeInterval:'getTimeInterval'};
     //stage elements
-    var width='innerWidth' in window?window.innerWidth:document.documentElement.clientWidth;
+    var width='innerWidth' in window?window.innerWidth:document.documentElement.clientWidth;width=1200;
     var height='innerHeight' in window?window.innerHeight:document.documentElment.clientHeight,h=300;
     var mainDocs=new Canvas2d.Stage('maindocs',width,h);
     var refDocs=new Canvas2d.Stage('referense',width,h);
     var badgeDw=new Canvas2d.Stage('badgedw',160,h);
+    var trans=new Transition();
     //set variables
-    var response,code,i,o,ii=-1,ia,a=[],b=[],c,d,filter,ja=false,ne=false,xqr;
+    var response,code,i,o,ii=-1,ia,a=[],b=[],c,d,filter,ja=false,ne=false,xqr,xp,multyOpen=false;;
     var refList={Stage:'Stage',Sprite:'Sprite',DisplayObjects:'DisplayObjects',Tweener:'Tweener',Colors:'Colors'};
     var proList=['Stage','Sprite','DisplayObjects','Tweener','Colors'],numList=[],ease='easeOutExpo';
     //set regular expression
-    var ATX=/\*/g,PRM=/(@\w+)/g,END=/\n\r?/,TYP=/(\w+?\s?\w+)\s(\w+)/,DSC=/(.*)/,PAR=/\{(\w+?\s?\w+)\}\s(\w*)\s(.*)/,EXA=/(.*)/,RTR=/\{(\w+?\s?\w+)\}\s(\w+)\s(.*)/,LNK=/(.*)/,SEE=/(.*)/,PRP=/\{(\w+?\s?\w+)\}\s(\w*)\s(.*)/;
+    var ATX=/\*/g,PRM=/(@\w+)/g,END=/\n\r?/,TYP=/(\w+?\s?\w+)\s(\w+)/,DSC=/(.*)/,PAR=/\{(\w+?\s?\w+)\}\s(\w*)\s(.*)/;
+    var EXA=/(.*)/,RTR=/\{(\w+?\s?\w+)\}\s(\w+)\s(.*)/,LNK=/(.*)/,SEE=/(.*)/,PRP=/\{(\w+?\s?\w+)\}\s(\w*)\s(.*)/;
+    var CLOJ=/^\s{8}(\w+)\:\sfunction\(c\,\sw\,\sh\,?\s?params?\)\s\{/;
+    var TRIM=/var\sCode\s\=\s\{/,TREN=/^\}\;/,CLSJ=/\s{4}(Stage|Sprite|DisplayObjects|Tweener|Colors|Common)\:\s\{/,CLSJEND=/^\s{4}\}\,?/;
+    var FUNEND=/^\s{8}\}\,?/,FUN=/^\s{8}(\w+)\:\sfunction\(c\,\sw\,\sh\,\sparams\)\s\{/,OBJ=/^\s{8}(\w+)\:\s\{/;
+    var SOBJ=/^\s{12}(\w+\d?)\:\sfunction\(c\,\sw\,\sh\,\sparams\)\s\{/,SOBCJ=/^\s{12}\}\,?/;
     //collect data from canvas2d Examples as text
     xqr=new XMLHttpRequest();
     xqr.onload=function(){code=xqr.responseText.replace(END,'\n').split('\n');};
     xqr.open('get',location?'js/exampledocs.js':'https://rawgithub.com/elbatico1/Canvas2d/master/examples/js/exampledocs.js',false);
     xqr.send();
     //parse data Examples
-    var CLO=/^\s{4}(\w+)\:\sfunction\(c\,\sw\,\sh\,?\s?params?\)\s\{/,CLS=/^(Stage|Sprite|DisplayObjects|Tweener|Colors|Common)\.prototype\.(\w+)\s\=?\s(function\(c\,\sw\,\sh\,?\s?params?\)\s\{)?/,VF=/^\}\;/,UF=/^\s{4}\},?/,codeObj={Stage:{},Sprite:{},DisplayObjects:{},Tweener:{},Colors:{},Common:{}}; 
+    var codeObj={Stage:{},Sprite:{},DisplayObjects:{},Tweener:{},Colors:{},Common:{}},codeIsOpen=false,multyIsOpen=false;; 
+    var oc=false,ock=false,obc=false,obck=false,obf=false,obfk=false,oso=false,osok=false,osf=false,osfk=false,oty,pro,spro;
     for(var i=0;i<code.length;i++){
-        c=CLS.exec(code[i]);
-        if(ja){
-            d=VF.exec(code[i]);
-            if(d===null){
-                codeObj[o][ia]+=code[i]+'\n';
-            }else{
-                if(ne){
-                    ne=false;
-                    a.push([o,ia,codeObj[o][ia].replace(END,'\n').split('\n')]);
+        if(oc && !ock){
+            if(CLSJ.test(code[i])){oty=CLSJ.exec(code[i])[1];obc=true;obck=false;
+            }
+            if(CLSJEND.test(code[i])){obck=true;obc=false;}
+            if(obc && !obck){
+                if(FUNEND.test(code[i])){obf=false;obfk=true;oso=false;osok=true;}
+                if(obf && !obfk){codeObj[oty][pro]+=code[i]+'\n';}
+                if(oso && !osok){
+                    if(SOBCJ.test(code[i])){osf=false;osfk=true;}
+                    if(osf && !osfk){codeObj[oty][pro][spro]+=code[i]+'\n';}
+                    if(SOBJ.test(code[i])){spro=SOBJ.exec(code[i])[1];codeObj[oty][pro][spro]='';osf=true;osfk=false;}
                 }
-                ja=false;
+                if(OBJ.test(code[i])){pro=OBJ.exec(code[i])[1];codeObj[oty][pro]={};oso=true;osok=false;}
+                if(CLOJ.test(code[i])){pro=FUN.exec(code[i])[1];codeObj[oty][pro]='';obf=true;obfk=false;}
             }
         }
-        if(c!==null){
-            o=c[1];ia=c[2];
-            codeObj[o][ia]='';
-            ja=true;
-            ne=!c[3]?true:false;
-        }
-    }
-    for(i=0;i<a.length;i++){
-        codeObj[a[i][0]][a[i][1]]={};
-        for(ii=0;ii<a[i][2].length;ii++){
-            c=CLO.exec(a[i][2][ii]);
-            if(ja){
-                d=UF.exec(a[i][2][ii]);
-                if(d===null){
-                    codeObj[a[i][0]][a[i][1]][o]+=a[i][2][ii]+'\n';
-                }else{
-                    ja=false;
-                }
-            }
-            if(c!==null){
-                o=c[1];ja=true;
-                codeObj[a[i][0]][a[i][1]][o]='';
-            }
-        }
+        if(TRIM.test(code[i])){oc=true;}
+        if(oc && TREN.test(code[i])){ock=true;oc=false;}
     }
     ja=false;ne=true;a=[];ii=-1;
     //collect data from canvas2d as text
@@ -78,10 +66,7 @@ function startCanvas(l){
             a[ii]+=response[i];
         }else if(ne){
             a[ii]=a[ii].substr(4,a[ii].length);filter=/\w+/.exec(a[ii]);
-            if(filter[0].indexOf('_')<0){
-                c={};
-                c[filter]=a[ii];b.push(c);
-            }
+            if(filter[0].indexOf('_')<0){c={};c[filter]=a[ii];b.push(c);}
             ne=false;
         }
     }
@@ -89,15 +74,9 @@ function startCanvas(l){
     for(i=0;i<b.length;i++){
         for(o in b[i]){
             if(o in refList){
-                ja=true;d=o;
-                a[d]={};
-                a[d][o]=b[i][o];
-                numList.push(0);ii++;
+                ja=true;d=o;a[d]={};a[d][o]=b[i][o];numList.push(0);ii++;
             }else{
-                if(ja){
-                    a[d][o]=b[i][o];
-                    numList[ii]+=1;
-                }
+                if(ja){a[d][o]=b[i][o];numList[ii]+=1;}
             }
         }
     }b=[];
@@ -173,7 +152,8 @@ function startCanvas(l){
     //set background's element for badgeDw
     var bLayerDw,bLayerDwS,bBackDw;
     bLayerDw=new Canvas2d.Sprite('badgelayerup');bLayerDwS=new Canvas2d.Sprite('badgelayerups');bBackDw=new Canvas2d.DisplayObjects('badgupbackground');
-    bBackDw.shape(0,0,[{moveTo:[10,0]},{lineTo:[130,0]},{quadraticCurveTo:[138,2,140,10]},{lineTo:[140,300]},{lineTo:[0,300]},{lineTo:[0,10]},{quadraticCurveTo:[2,2,10,0]}],'white');bBackDw.y=h-40;bBackDw.x=10;bBackDw.shadow={color:'#CCCCCC',offsetX:0,offsetY:0,blur:10};
+    bBackDw.shape(0,0,[{moveTo:[10,0]},{lineTo:[130,0]},{quadraticCurveTo:[138,2,140,10]},{lineTo:[140,300]},{lineTo:[0,300]},{lineTo:[0,10]},{quadraticCurveTo:[2,2,10,0]}],'white');
+    bBackDw.y=h-40;bBackDw.x=10;bBackDw.shadow={color:'#CCCCCC',offsetX:0,offsetY:0,blur:10};
     bLayerDwS.add(bBackDw);
     badgeDw.add(bLayerDwS);badgeDw.add(bLayerDw);badgeDw.draw();
     //setting object based on parsed data text
@@ -183,7 +163,7 @@ function startCanvas(l){
         ii=a[proList[i]];
         dClass=new Canvas2d.DisplayObjects(proList[i]);
         dClass.text(proList[i],0,0,'bold',26,font,'#999999',null,'center','middle');dClass.paddingLeft=dClass.paddingTop=5;
-        b.push(dClass);wS=i===0?b[0].width:b[i-1].width;wSum+=wS;dClass.x=wSum+(dClass.width/2)+(30*i)+50;dClass.y=20;
+        b.push(dClass);wS=i===0?b[0].width:b[i-1].width;wSum+=wS;dClass.x=wSum+(dClass.width/2)+(50*i)+50;dClass.y=20;
         c=360/numList[i];ia=0;dClass.addEvent('click',classOpen);dClass.addEvent('mouseover',dcOver);dClass.addEvent('mouseout',dcOut);
         sConstr=new Canvas2d.Sprite('sub_'+proList[i]);sConstrh=new Canvas2d.Sprite('subh_'+proList[i],false);
         for(o in ii){
@@ -203,20 +183,21 @@ function startCanvas(l){
     }
     //add everithings into mainDocs 'main stage'
     sConstr=new Canvas2d.Sprite('backgroundmenulayer',false);
-    menuBadge=new Canvas2d.DisplayObjects('backgroundmenumoving',false);menuBadge.rectRound(0,-(dClass.height/2),dClass.width+10,36,18,'#dddddd');sConstr.add(menuBadge);menuBadge.x=dClass.x-(dClass.width/2)-5;menuBadge.y=dClass.y-3;menuBadge.alpha=0.5;
+    menuBadge=new Canvas2d.DisplayObjects('backgroundmenumoving',false);menuBadge.rectRound(0,-(dClass.height/2),dClass.width+10,36,20,'#dddddd');
+    sConstr.add(menuBadge);menuBadge.x=dClass.x-(dClass.width/2)-5;menuBadge.y=dClass.y-3;menuBadge.alpha=0.5;
     mainDocs.add(sConstr);mainDocs.add(sClass);mainDocs.draw();
     //initialize Tweener
     var tween=new Canvas2d.Tweener(),currS=null,currC=null,togo=false,aEle,bEle;
     //function classes constructors
     function classOpen(e){
-        aEle=e.target.content.dc.children;bEle=e.target.content.dch.children;a=150;b=30;c=0;currC=null;cleanLayer(refLayerHolder,tween);refDocs.draw();
+        aEle=e.target.content.dc.children;bEle=e.target.content.dch.children;a=150;b=30;c=0;currC=null;
         if(!e.target.content.isopen){
             if(currS!==e&&currS!==null){
                 if(currS.target.id!==e.target.id){
-                    togo=e;classOpen(currS);
-                    return;
+                    togo=e;classOpen(currS);return;
                 }
             }
+            //clearStart();
             e.target.content.isopen=true;tween.addTweener(infoLabel,{txt:'cutBack',alpha:0,duration:400,onEnd:info,data:{txt:e.target.txt,color:rowColor},onTween:null,onStart:labelStart});
             for(i=0;i<aEle.length;i++){
                 if(!aEle[i].origin.set){
@@ -231,7 +212,7 @@ function startCanvas(l){
                 }
                 bEle[i].lineAlpha=0.3;bEle[i].lineWidth=1.2;aEle[i].color='black';
                 tween.addTweener(aEle[i],{x:x,y:y,duration:1000,ease:ease,alpha:1,delay:10*i,onStart:i===0?isVisible:null,data:{visible:true,e:e,togo:togo}});
-                tween.addTweener(bEle[i],{obj:{'1':{quadraticCurveTo:[x/2,y+100,x,y]}},duration:1000,ease:ease,delay:10*i});
+                tween.addTweener(bEle[i],{obj:{'1':{quadraticCurveTo:[x/4,y+120,x,y]}},duration:1000,ease:ease,delay:10*i});
                 if(!aEle[i].origin.set){
                     if(b>(h/2)){
                         c=0;a+=140;
@@ -240,7 +221,7 @@ function startCanvas(l){
                 }
             }
         }else{
-            currS=e.target.id===togo.target.id?null:togo;
+            currS=e.target.id===togo.target.id?null:togo;closeAll();
             e.target.content.isopen=false;tween.addTweener(infoLabel,{txt:'cutBack',alpha:0,duration:400,onEnd:info,data:{txt:'open class',color:rowColor},onTween:null,onStart:labelStart});
             for(i=0;i<aEle.length;i++){
                 if(aEle[i].ref.isopen){
@@ -262,10 +243,10 @@ function startCanvas(l){
             }
         }
         if(!e.target.ref.isopen){
-            e.target.ref.isopen=true;x=e.target.ref.x;y=e.target.ref.y;currC=e;pushExample(e.target.origin.parent.txt,e.target.txt);pushDescription(e.target.ref.result);
+            e.target.ref.isopen=true;x=e.target.ref.x;y=e.target.ref.y;currC=e;closeAll();
             tween.addTweener(infoLabel,{txt:'cutBack',alpha:0,duration:400,onEnd:info,data:{txt:e.target.txt,color:e.target.content.lineColor},onTween:null,onStart:labelStart});
             tween.addTweener(e.target,{scaleX:2,scaleY:2,x:x,y:y,duration:1000,ease:ease,data:true});
-            tween.addTweener(e.target.content,{obj:{'1':{quadraticCurveTo:[x+250,y,x,y]}},lineWidth:2,lineAlpha:1,duration:1000,ease:ease});
+            tween.addTweener(e.target.content,{obj:{'1':{quadraticCurveTo:[x+250,y,x,y]}},lineWidth:2,lineAlpha:1,duration:1000,ease:ease,onEnd:constrEnd,data:{target:e.target}});
 
         }else{
             e.target.ref.isopen=false;x=e.target.dest.x;y=e.target.dest.y;currC=null;
@@ -290,7 +271,6 @@ function startCanvas(l){
     function info(e){
         infoLabel.txt=e.data.txt;
         tween.addTweener(infoLabel,{txt:'cutFwd',alpha:1,duration:400,onEnd:backEnd,data:{color:e.data.color}});
-        
     }
     function backEnd(e){
         tween.addTweener(infoRow,{lineColor:e.data.color,x:(e.target.x+e.target.width+10),scaleX:1,duration:300,ease:'easeOutBack'});
@@ -301,28 +281,61 @@ function startCanvas(l){
     function labelStart(e){
         tween.addTweener(infoRow,{lineColor:e.data.color,x:e.target.x-10,scaleX:-1,duration:400,ease:ease});
     }
-    var xx,yy,t,z,tempExp,idx=0,refElement,refField,pColors={r:"rgb(128,128,128)",type:"rgb(100,80,240)",class:"violet",description:"rgb(100,100,100)",name:"black",example:"rgb(200,50,50)",url:"slateblue",target:"gray"};
+    function constrEnd(e){
+        pushDescription(e.data.target.ref.result,e.data.target);
+    }
+    var z,idx=0,refField,pColors={r:"rgb(128,128,128)",type:"rgb(100,80,240)",class:"violet",description:"rgb(100,100,100)",name:"black",example:"rgb(200,50,50)",url:"slateblue",target:"gray"},fontWeight={name:'bold',type:'italic',class:'bold'};
+    function pushDescription(c,t){
+        a=parseResult(c);refLayerHolder.y=0;cleanLayer(refLayerHolder,tween);refDocs.draw();
+        for(i=0;i<a.length;i++){
+            idx=0;b=[];wS=0;wSum=0;
+            for(o in a[i]){
+                refField=new Canvas2d.DisplayObjects('para_'+o+'_'+a[i][o],false);
+                refField.text(a[i][o],0,0,o in fontWeight?fontWeight[o]:'lighter',16,font,pColors[o],null,'left','hang');
+                b.push(refField);wS=idx===0?25:b[idx-1].width;wSum+=wS;refField.x=wSum+(25*idx);refField.y=(20*i)+30;
+                if(o==='url'){
+                    refField.enabledEvent=true;
+                    refField.addEvent('click',goToLink);
+                }
+                refLayerHolder.add(refField);refField.alpha=0;idx++;
+            }
+        }
+        for( i=0;i<refLayerHolder.children.length;i++){
+            tween.addTweener(refLayerHolder.children[i],{txt:'matrix',alpha:1,duration:300,ease:'easeInQuad',delay:5*i,onEnd:i===refLayerHolder.children.length-1?scrollVisible:null,data:{target:t}});
+        }
+    }
+    function scrollVisible(e){
+        pushExample(e.data.target.origin.parent.txt,e.data.target.txt);
+        idx=refLayerHolder.getBound();
+        if(idx.height>refDocs.height){
+            refLayerScroll.visible=true;
+            hook.height=h*(h/(idx.height+(idx.height-h)));
+            tween.addTweener(hook,{color:'black',duration:700,ease:'easeSine'});
+        }
+    }
     function pushExample(c,o){
-        examples.innerHTML='<div id="examples"><div class="tempmessage1"><h1>EXAMPLE</h1></div></div>';codePre.innerHTML='<div class="tempmessage"><h1>CODE</h1></div>';cleanLayer(bLayerDw,tween);scaleMultyOptions(h-40);removeMultyStage();
         if(c in codeObj){
             if(o in codeObj[c]){
                 if(typeof codeObj[c][o]==='string'){
-                    tempExp=eval(c);tempExp=new tempExp();tempExp[o]('examples',width,300,[location]);
-                    codePre.innerHTML=codeObj[c][o];
-                    hljs.highlightBlock(codePre);
+                    //Code[c][o]('examples',width,300,[location]);
+                    //codePre.innerHTML=codeObj[c][o];
+                    //hljs.highlightBlock(codePre);
+                    openNoOp([c,o],width,300,[location]);multyOpen=true;
                 }else{
                     pushMultyOptions(c,o);
                 }
             }else if(o.indexOf('ease')>-1){
-                tempExp=eval(c);tempExp=new tempExp();tempExp.ease('examples',width,300,[location,o]);
-                codePre.innerHTML=codeObj[c].ease;
-                hljs.highlightBlock(codePre);
+                //Code[c].ease('examples',width,300,[location,o]);
+                //codePre.innerHTML=codeObj[c].ease;
+                //hljs.highlightBlock(codePre);
+                openNoOp([c,'ease'],width,300,[location,o]);multyOpen=true;
             }else if(c===o){
                 pushMultyOptions(c,'examples');
             }else if(o in methodsList){
-                tempExp=new Common();tempExp.method[o]('examples',width,300,[location,o]);
-                codePre.innerHTML=codeObj.Common.method[o];
-                hljs.highlightBlock(codePre);
+                //Code.Common.method[o]('examples',width,300,[location,o]);console.log(o,c,codeObj,codeObj.Common);
+                //codePre.innerHTML=codeObj.Common.method[o];
+                //hljs.highlightBlock(codePre);
+                openNoOp(['Common','method',o],width,300,[location,o]);multyOpen=true;
             }
         }
     }
@@ -338,7 +351,7 @@ function startCanvas(l){
             refField.text(z,0,0,'lighter',16,font,'black',null,'left','hang');
             refField.y=(20*idx)+30;
             refField.x=20;refField.addEvent('click',pushMultyExample);
-            refField.content={c:c,o:o,z:z};
+            refField.content={c:c,o:o,z:z,b:true};
             refField.addEvent('mouseover',bwOver);
             refField.addEvent('mouseout',bwOut);
             idx++;
@@ -348,45 +361,16 @@ function startCanvas(l){
         scaleMultyOptions(h-parseInt(bLayerDw.getBound().height)-40);bLayerDw.draw();
     }
     function scaleMultyOptions(h){
-        //if(h===bBackDw.y) return;
         tween.addTweener(bBackDw,{y:h,duratione:1000,ease:'easeOutQuint'});
         tween.addTweener(bLayerDw,{y:h+20,duratione:1000,ease:'easeOutQuint'});
     }
     function pushMultyExample(e){
-        examples.innerHTML='<div id="examples"><div class="tempmessage1"><h1>EXAMPLE</h1></div></div>';codePre.innerHTML='<div class="tempmessage"><h1>CODE</h1></div>';removeMultyStage();
-        tempExp=eval(e.target.content.c);tempExp=new tempExp();tempExp[e.target.content.o][e.target.content.z]('examples',e.target.content.z.indexOf('multy')>-1?(width/2)-40:width,300,[location]);
-        codePre.innerHTML=codeObj[e.target.content.c][e.target.content.o][e.target.content.z];
-        hljs.highlightBlock(codePre);
+        closeAll(true,e.target);
+        
     }
-    var fontWeight={name:'bold',type:'italic',class:'bold'};
-    function pushDescription(c){
-        cleanLayer(refLayerHolder,tween);refDocs.draw();
-        a=parseResult(c);refLayerHolder.y=0;
-        for(i=0;i<a.length;i++){
-            idx=0;b=[];wS=0;wSum=0;
-            for(o in a[i]){
-                refField=new Canvas2d.DisplayObjects('para_'+o+'_'+a[i][o],false);
-                refField.text(a[i][o],0,0,o in fontWeight?fontWeight[o]:'lighter',16,font,pColors[o],null,'left','hang');
-                b.push(refField);wS=idx===0?25:b[idx-1].width;wSum+=wS;refField.x=wSum+(25*idx);refField.y=(20*i)+30;
-                if(o==='url'){
-                    refField.enabledEvent=true;
-                    refField.addEvent('click',goToLink);
-                }
-                refLayerHolder.add(refField);refField.alpha=0;idx++;
-            }
-        }
-        for( i=0;i<refLayerHolder.children.length;i++){
-            tween.addTweener(refLayerHolder.children[i],{txt:'matrix',alpha:1,duration:300,ease:'easeInQuad',delay:5*i,onEnd:i===refLayerHolder.children.length-1?scrollVisible:null});
-        }
-    }
-    function scrollVisible(e){
-        idx=refLayerHolder.getBound();
-        if(idx.height>refDocs.height){
-            refLayerScroll.visible=true;
-            hook.height=h*(h/(idx.height+(idx.height-h)));
-            tween.addTweener(hook,{color:'black',duration:700,ease:'easeSine'});
-        }
-    }
+    
+    
+    
     function scrollRefs(e){
         idx=refLayerHolder.getBound();
     }
@@ -413,15 +397,6 @@ function startCanvas(l){
     }
     function goToLink(e){
         window.open(e.target.txt,'_blank');
-    }
-    function removeMultyStage(e){
-        try{
-            var el=document.getElementById('examples2');
-            var le = el.parentNode.removeChild(el);
-            console.log(le);
-        }catch(error){
-            
-        }
     }
     function dcOver(e){
         mainDocs.container.style.cursor='pointer';
@@ -454,9 +429,42 @@ function startCanvas(l){
         e.target.color='black';
         e.target.parent.draw();
     }
-    function test(e){
-        for(var o in e){
-            console.log(o,e[o]);
+    function closeAll(bol,e){window.rqanim.loop=[];
+        if(e === undefined){cleanLayer(bLayerDw,tween);scaleMultyOptions(h-40);};
+        xp=document.getElementById('examples');
+        trans.addTweener(codePre,{opacity:0,duration:200,onEnd:codeToZero,data:{go:bol,target:e}});
+        trans.addTweener(xp,{opacity:0,duration:300});
+    }
+    function codeToZero(e){
+        examples.innerHTML='<div id="examples" style="opacity:0;"></div><div class="tempmessage1"><h1>EXAMPLE</h1></div>';
+        if(e.data.go){
+            window.rqanim.loop=[];
+            codePre.innerHTML=codeObj[e.data.target.content.c][e.data.target.content.o][e.data.target.content.z];
+            Code[e.data.target.content.c][e.data.target.content.o][e.data.target.content.z]('examples',e.data.target.content.z.indexOf('multy')>-1?(width/2)-40:width,300,[location]);
+            hljs.highlightBlock(codePre);
+            xp=document.getElementById('examples');
+            trans.addTweener(codePre,{opacity:1,duration:300});
+            trans.addTweener(xp,{opacity:1,duration:200});
+        }else{
+            cleanLayer(refLayerHolder,tween);refDocs.draw();
         }
+    }
+    function codeToOne(){
+        cleanLayer(refLayerHolder,tween);refDocs.draw();
+    }
+    var codeToPush;
+    function openNoOp(args,width,height,params){
+        xp=document.getElementById('examples');
+        if(args.length===3){
+            Code[args[0]][args[1]][args[2]]('examples',width,height,params);
+            codeToPush=codeObj[args[0]][args[1]][args[2]];
+        }else{
+            Code[args[0]][args[1]]('examples',width,height,params);
+            codeToPush=codeObj[args[0]][args[1]];
+        }
+        codePre.innerHTML=codeToPush;
+        hljs.highlightBlock(codePre);
+        trans.addTweener(codePre,{opacity:1,duration:300});
+        trans.addTweener(xp,{opacity:1,duration:200});
     }
 }

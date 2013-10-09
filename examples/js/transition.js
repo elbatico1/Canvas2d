@@ -77,10 +77,10 @@ function getLength(n,p){
                         case "%":
                             l=(parseFloat(n)/100)*t;
                             break;
-                        case "px":
+                        case px:
                             l=parseFloat(n);
                             break;
-                        case "em":
+                        case em:
                             l=(parseFloat(n))*t;
                             break;
                         default:
@@ -105,7 +105,7 @@ var Transition=function(){
     var brw=system_host.exec(this.agent);
     this.browser='none';
     this.version=0;
-    this.device=mobile.exec(this.agent)?'mobile':'desktop';
+    this.device=mobile.exec(this.agent)?mobile:'desktop';
     var okvers;
 if(brw){
     this.browser=brw[1];
@@ -196,7 +196,7 @@ console.log(this.version,this.browser,this.device);
             addLoop:function(target,func){
                 this.prId++;
                 if(!this.isChild(target)){
-                    this.loop.push({'target':target,'func':func,'id':this.prId});
+                    this.loop.push({target:target,func:func,id:this.prId});
                     this.start();
                 }
                 
@@ -278,29 +278,29 @@ Transition.prototype={
         //if(o.parent === null || o.parent === undefined){console.log(typeof o.parent, 'provide a nested object');return;}
         var twnobj={};
         var properties=['top','left','right','bottom','paddingTop','paddingLeft','paddingRight','paddingBottom','marginTop','marginLeft','marginRight','marginBottom','x','y','width','height','fontSize'];
-        var propstyles={'top':'top','left':'left','right':'right','bottom':'bottom','paddingTop':'padding-top','paddingLeft':'padding-left','paddingRight':'padding-right','paddingBottom':'padding-bottom','marginTop':'margin-top','marginLeft':'margin-left','marginRight':'margin-right','marginBottom':'margin-bottom','x':'y','y':'y','width':'width','height':'height','fontSize':'font-size'};
+        var propstyles={top:'top',left:'left',right:'right',bottom:'bottom',paddingTop:'padding-top',paddingLeft:'padding-left',paddingRight:'padding-right',paddingBottom:'padding-bottom',marginTop:'margin-top',marginLeft:'margin-left',marginRight:'margin-right',marginBottom:'margin-bottom',x:'y',y:'y',width:'width',height:'height',fontSize:'font-size'};
         var x,colorReq,r,g,b,rqAlpha,to,opacity,colorSrc,prop;
-        var delay=args['delay']?args['delay']:0;
-        var ease=args['ease']?args['ease']:'easeNone';
-        var duration=args['duration']?args['duration']:1000;
+        var delay=args.delay?args.delay:0;
+        var ease=args.ease?args.ease:'easeNone';
+        var duration=args.duration?args.duration:1000;
         for(var i in args){
             for(var n =0;n<properties.length;n++){
                 if(i === properties[n]){
                     prop=o['style'][i];if(!prop){o['style'][i]=this.browser === 'msie'?o.currentStyle[i]:document.defaultView.getComputedStyle(o, null).getPropertyValue(propstyles[i]);prop=o['style'][i];}
                     to=parseFloat(prop);
                     x=(parseFloat(args[i]) > to)? parseFloat(args[i])-to : -(to-parseFloat(args[i]));
-                    twnobj[i]={'ease':ease,'to':x,'ct':0,'d':duration,'from':to,'prop':i,'request':args[i],'target':o};
+                    twnobj[i]={ease:ease,to:x,ct:0,d:duration,from:to,prop:i,request:args[i],target:o};
                 }
             }
         }
-        if(args['scroll']){
-            var argX=args['scroll'][0],argY=args['scroll'][1];
+        if('scroll' in args){
+            var argX=args.scroll[0],argY=args.scroll[1];
             var fromx=(this.browser==='msie'&&this.version<9)?document.documentElement.scrollLeft:window.scrollX,fromy=(this.browser==='msie'&&this.version<9)?document.documentElement.scrollTop:window.scrollY;
             var tox=(argX > fromx)? argX-fromx : -(fromx-argX);
             var toy=(argY > fromy)? argY-fromy : -(fromy-argY);
-            twnobj['scroll']={'ease':ease,'tox':tox,'toy':toy,'ct':0,'d':duration,'fromx':fromx,'fromy':fromy,'prop':'scroll','request':'scroll','target':o};
+            twnobj['scroll']={ease:ease,tox:tox,toy:toy,ct:0,d:duration,fromx:fromx,fromy:fromy,prop:'scroll',request:'scroll',target:o};
         }
-        if(args['transform']){
+        if('transform' in args){
         var getkit,setkit,defaultkit="translate(0px,0px) scale(1,1) rotate(0deg) skew(0deg,0deg)";
 		var ki={safari:["-webkit-transform","webkitTransform"],chrome:["-webkit-transform","webkitTransform"],
 			opera:["-o-transform","OTransform"],camino:["-moz-transform-","MozTransform"],
@@ -345,26 +345,26 @@ Transition.prototype={
         		}
         	}
         }
-        if(args['backgroundColor']){
+        if('backgroundColor' in args){
             if(!o.style.backgroundColor){o.style.backgroundColor=this.browser === 'msie'?o.currentStyle['background-color']:document.defaultView.getComputedStyle(o, null).getPropertyValue('background-color');}
-            colorReq=Colors.ParseColor(args['backgroundColor']);
+            colorReq=Colors.ParseColor(args.backgroundColor);
             colorSrc=Colors.ParseColor(o.style.backgroundColor);
             r=colorReq[0]-colorSrc[0];
             g=colorReq[1]-colorSrc[1];
             b=colorReq[2]-colorSrc[2];
-            twnobj['rgbb']={'ease':ease,"tor":r,"tog":g,"tob":b,"ct":0,"d":duration,"fromr":colorSrc[0],"fromg":colorSrc[1],"fromb":colorSrc[2],"prop":'backgroundColor',"request":colorReq,'target':o};
+            twnobj['rgbb']={ease:ease,tor:r,tog:g,tob:b,ct:0,d:duration,fromr:colorSrc[0],fromg:colorSrc[1],fromb:colorSrc[2],prop:'backgroundColor',request:colorReq,target:o};
         }
-        if(args['color']){
+        if('color' in args){
             if(!o.style.color){o.style.color=this.browser === 'msie'?o.currentStyle['color']:document.defaultView.getComputedStyle(o, null).getPropertyValue('color');}
-            colorReq=Colors.ParseColor(args['color']);
+            colorReq=Colors.ParseColor(args.color);
             colorSrc=Colors.ParseColor(o.style.color);
             r=colorReq[0]-colorSrc[0];
             g=colorReq[1]-colorSrc[1];
             b=colorReq[2]-colorSrc[2];
-            twnobj['rgbt']={'ease':ease,"tor":r,"tog":g,"tob":b,"ct":0,"d":duration,"fromr":colorSrc[0],"fromg":colorSrc[1],"fromb":colorSrc[2],"prop":'color',"request":colorReq,'target':o};
+            twnobj['rgbt']={ease:ease,tor:r,tog:g,tob:b,ct:0,d:duration,fromr:colorSrc[0],fromg:colorSrc[1],fromb:colorSrc[2],prop:'color',request:colorReq,target:o};
         }
-        if(args['opacity']){
-            rqAlpha=args['opacity'];
+        if('opacity' in args){
+            rqAlpha=args.opacity;
             
             if(this.browser==="msie"){
                 if(this.version <8){
@@ -387,14 +387,14 @@ Transition.prototype={
             }
             to=parseFloat(prop);
             opacity=rqAlpha>to?rqAlpha-to:-(to-rqAlpha);
-            twnobj['opacity']={'ease':ease,'to':opacity,'ct':0,'d':duration,'from':to,'prop':'opacity','request':rqAlpha,'target':o};
+            twnobj['opacity']={ease:ease,to:opacity,ct:0,d:duration,from:to,prop:'opacity',request:rqAlpha,target:o};
         }
-        var onStart=args['onStart']?args['onStart']:null;
-        var onTween=args['onTween']?args['onTween']:null;
-        var onEnd=args['onEnd']?args['onEnd']:null;
-        var arguments=args['args']?args['args']:null;
+        var onStart=args.onStart?args.onStart:null;
+        var onTween=args.onTween?args.onTween:null;
+        var onEnd=args.onEnd?args.onEnd:null;
+        var arguments=args.data?args.data:null;
         
-        twnobj['state']={'start':true,'tweening':false,'end':false,'onStart':onStart,'onTween':onTween,'onEnd':onEnd,'target':o,'duration':duration,'delay':delay,'args':arguments};
+        twnobj['state']={start:true,tweening:false,end:false,onStart:onStart,onTween:onTween,onEnd:onEnd,target:o,duration:duration,delay:delay,data:arguments};
         
         if(delay > 0){
             var that=this.children;
@@ -456,12 +456,12 @@ Transition.prototype={
         
     },
     _tweenColor:function(args,ctrl){
-        if((args['ct']/args['d']) >= 1){args['ct']=1;args['d']=1;ctrl.end=true;}
+        if((args.ct/args.d) >= 1){args.ct=1;args.d=1;ctrl.end=true;}
         var r,g,b;
-        r=this[args.ease](args['ct'], args['fromr'], args['tor'], args['d']);
-        g=this[args.ease](args['ct'], args['fromg'], args['tog'], args['d']);
-        b=this[args.ease](args['ct'], args['fromb'], args['tob'], args['d']);
-        args['target']['style'][args['prop']]='rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
+        r=this[args.ease](args.ct, args.fromr, args.tor, args.d);
+        g=this[args.ease](args.ct, args.fromg, args.tog, args.d);
+        b=this[args.ease](args.ct, args.fromb, args.tob, args.d);
+        args.target['style'][args.prop]='rgb('+Math.round(r)+','+Math.round(g)+','+Math.round(b)+')';
     },
     _tweenS:function(args,ctrl){
         var rr="";
@@ -478,13 +478,13 @@ Transition.prototype={
         	}
         }
         args.target.style[this.kit]=rr;
-        if((args['ct']/args['d']) >= 1){args['ct']=1;args['d']=1;ctrl.end=true;}
+        if((args.ct/args.d) >= 1){args.ct=1;args.d=1;ctrl.end=true;}
     },
     _tweenG:function(args,ctrl){
-        if((args['ct']/args['d']) >= 1){args['ct']=1;args['d']=1;ctrl.end=true;}
+        if((args.ct/args.d) >= 1){args.ct=1;args.d=1;ctrl.end=true;}
         var x,y;
-        x=this[args.ease](args['ct'], args['fromx'], args['tox'], args['d']);
-        y=this[args.ease](args['ct'], args['fromy'], args['toy'], args['d']);
+        x=this[args.ease](args.ct, args.fromx, args.tox, args.d);
+        y=this[args.ease](args.ct, args.fromy, args.toy, args.d);
         if(this.browser==='msie'&&this.version<9){
             window.scrollTo(x,y);
         }else{
@@ -493,24 +493,24 @@ Transition.prototype={
         
     },
     _tween:function(args,ctrl){
-        if((args['ct']/args['d']) >= 1){args['ct']=1;args['d']=1;ctrl.end=true;}
+        if((args.ct/args.d) >= 1){args.ct=1;args.d=1;ctrl.end=true;}
         var n;
-        n=this[args.ease](args['ct'], args['from'], args['to'], args['d']);
-        if(args['prop']==='opacity'){
+        n=this[args.ease](args.ct, args.from, args.to, args.d);
+        if('opacity' === args.prop){
             if(this.browser==="msie"){
                 if(this.version <8){
-                    args['target'].filters.item("DXImageTransform.Microsoft.Alpha").opacity=n;
-                    //args['target']['style']['filter']="alpha(opacity="+n+")";
+                    args.target.filters.item("DXImageTransform.Microsoft.Alpha").opacity=n;
+                    //args.target['style']['filter']="alpha(opacity="+n+")";
                 }else if(this.version <9){
-                    args['target']['style']['filter']="alpha(opacity="+n+")";
+                    args.target['style']['filter']="alpha(opacity="+n+")";
                 }else{
-                    args['target']['style'][args['prop']]=n;
+                    args.target['style'][args.prop]=n;
                 }
             }else{
-                args['target']['style'][args['prop']]=n;
+                args.target['style'][args.prop]=n;
             }
         }else{
-            args['target']['style'][args['prop']]=args['prop']==='fontSize'?Math.floor(n)+"px":n+"px";
+            args.target['style'][args.prop]=args.prop==='fontSize'?Math.floor(n)+'px':n+"px";
         }
     },
 //////////////////////////////////////////////
@@ -535,6 +535,22 @@ Transition.prototype={
 */
     easeNone:function(t,b,c,d,p_params){
             return c*t/d + b;
+    },
+    /**
+     * easeSine
+     * @type static method Tweener
+     * @description Easing equation function for a simple sine's curve tweening, with no easing.
+     * @param {number} t Current time (in frames or seconds).
+     * @param {number} b Starting value.
+     * @param {number} c Change needed in value.
+     * @param {number} d Expected easing duration (in frames or seconds).
+     * @param {null} p_params null object
+     * @returns {number} n The correct value.
+     * @see link
+     * @link http://code.google.com/p/tweener/
+     */
+    easeSine: function(t, b, c, d, p_params) {
+        return b+c*(Math.sin((Math.PI/d)*t));
     },
 /**
 * Easing equation function for a quadratic (t^2) easing in: accelerating from zero velocity.
@@ -1134,21 +1150,21 @@ Transition.prototype={
             return this.easeInBounce((t*2)-d, b+c/2, c/2, d, p_params);
     },
     _states:function(ctrl){
-        for(var o in ctrl){
+        for(var o in ctrl){//console.log(o,ctrl);
             switch (o) {
                 case 'start':
                     if(ctrl[o]===true && ctrl['onStart']){
-                        ctrl['onStart'].apply(ctrl['target'], [{target:ctrl['target'],event:"onStart",obj:ctrl,args:ctrl['arguments']}]);
+                        ctrl['onStart'].apply(ctrl['target'], [{target:ctrl['target'],event:"onStart",obj:ctrl,data:ctrl.data}]);
                     }
                     break;
                 case 'tweening':
                     if(ctrl[o]===true && ctrl['onTween']){
-                        ctrl['onTween'].apply(ctrl['target'], [{target:ctrl['target'],event:"onTween",obj:ctrl,args:ctrl['arguments']}]);
+                        ctrl['onTween'].apply(ctrl['target'], [{target:ctrl['target'],event:"onTween",obj:ctrl,data:ctrl.data}]);
                     }
                     break;
                 case 'end':
                     if(ctrl[o]===true && ctrl['onEnd']){
-                        ctrl['onEnd'].apply(ctrl['target'], [{target:ctrl['target'],event:"onEnd",obj:ctrl,args:ctrl['arguments']}]);
+                        ctrl['onEnd'].apply(ctrl['target'], [{target:ctrl['target'],event:"onEnd",obj:ctrl,data:ctrl.data}]);
                     }
                     break;
                 default:
@@ -1165,135 +1181,187 @@ Transition.prototype={
 //RandomRgb - return an array rgb of random value
 //namedColor - an object of 1567 entries of colors by name with a corresponding value rgb and hex
 //////////////////////////////////////////////////////////////
-var Colors={
-/**
-*Rgd - static function
-*@param hex { a string rapresenting an hex color }
-*@return an array length 3 rgb values [255,0,255]
-*/
-    Rgb:function(hex){return [this._toR(hex),this._toG(hex),this._toB(hex)];},
-    _toR:function(h){return parseInt((this._cutHex(h)).substring(0,2),16);},
-    _toG:function(h){return parseInt((this._cutHex(h)).substring(2,4),16);},
-    _toB:function(h){return parseInt((this._cutHex(h)).substring(4,6),16);},
-    _cutHex:function(h){return (h.charAt(0)==="#") ? h.substring(1,7):h;},
-/**
-*Hex - static function
-*@param rgb { an array of length 3 digits }
-*@return a string hex value #FF0FF
-*/
-    Hex:function(rgb){return "#"+this._toHex(rgb[0])+this._toHex(rgb[1])+this._toHex(rgb[2]);},
-    _toHex:function(N){
-        if (N===null) return "00";
-        N=parseInt(N);if (N===0 || isNaN(N)) return "00";
-        N=Math.max(0,N);N=Math.min(N,255);N=Math.round(N);
-        return "0123456789ABCDEF".charAt((N-N%16)/16)+ "0123456789ABCDEF".charAt(N%16);
+var Colors = {
+    /**
+     * Rgb - Colors - return a rgb array value from an hex color format
+     * @type static method Colors
+     * @description return a rgb array value from an hex color format
+     * @param {string} hex the color in hex format
+     * @example var myValue= Colors.Rgb('#FF00FF');
+     * @returns {array} rgb the RGB representation in set [0, 255]; [r, g, b]
+     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
+     * @see text
+     */
+    Rgb: function(hex) {
+        return [this._toR(hex), this._toG(hex), this._toB(hex)];
     },
-/**
-*http://http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-* Converts an RGB color value to HSL.
-* Assumes r, g, and b are contained in the set [0, 255] and
-* returns h, s, and l in the set [0, 1].
-* @param   r { number The red color value }
-* @param   g { number The green color value }
-* @param   b { number The blue color value }
-* @return  Array The HSL representation
-*/
-    RgbToHsl:function(r, g, b){
+    _toR: function(h) {
+        return parseInt((this._cutHex(h)).substring(0, 2), 16);
+    },
+    _toG: function(h) {
+        return parseInt((this._cutHex(h)).substring(2, 4), 16);
+    },
+    _toB: function(h) {
+        return parseInt((this._cutHex(h)).substring(4, 6), 16);
+    },
+    _cutHex: function(h) {
+        return (h.charAt(0) === "#") ? h.substring(1, 7) : h;
+    },
+    /**
+     * Hex - Colors - return a hex string value from an rgb array color format
+     * @type static method Colors
+     * @description return a hex string value from an rgb array color format
+     * @param {array} rgb the color in rgb array format
+     * @example var myValue= Colors.Hex([r, g, b]);
+     * @returns {string} hex the HEX representation in string color format; '#value
+     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
+     * @see text
+     */
+    Hex: function(rgb) {
+        return "#" + this._toHex(rgb[0]) + this._toHex(rgb[1]) + this._toHex(rgb[2]);
+    },
+    _toHex: function(N) {
+        if (N === null)
+            return "00";
+        N = parseInt(N);
+        if (N === 0 || isNaN(N))
+            return "00";
+        N = Math.max(0, N);
+        N = Math.min(N, 255);
+        N = Math.round(N);
+        return "0123456789ABCDEF".charAt((N - N % 16) / 16) + "0123456789ABCDEF".charAt(N % 16);
+    },
+    /**
+     * RgbToHsl - Colors -
+     * @type static method Colors
+     * @description Converts an RGB color value to HSL. Assumes r, g, and b are contained in the set [0, 255] and returns h, s, and l in the set [0, 1].
+     * @param {number} r number The red color value 
+     * @param {number} g number The green color value
+     * @param {number} b number The blue color value
+     * @example var myValue= Colors.RgbToHsl([r, g, b]);
+     * @returns {array} hsl The HSL representation in the set [0, 1]; [ h, s, l]
+     * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+     * @see text
+     */
+    RgbToHsl: function(r, g, b) {
         r /= 255, g /= 255, b /= 255;
         var max = Math.max(r, g, b), min = Math.min(r, g, b);
         var h, s, l = (max + min) / 2;
 
-        if(max === min){
+        if (max === min) {
             h = s = 0; // achromatic
-        }else{
+        } else {
             var d = max - min;
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch(max){
-                case r:h = (g - b) / d + (g < b ? 6 : 0);break;
-                case g:h = (b - r) / d + 2;break;
-                case b:h = (r - g) / d + 4;break;
+            switch (max) {
+                case r:
+                    h = (g - b) / d + (g < b ? 6 : 0);
+                    break;
+                case g:
+                    h = (b - r) / d + 2;
+                    break;
+                case b:
+                    h = (r - g) / d + 4;
+                    break;
             }
             h /= 6;
         }
 
-        return [ h, s, l];
+        return [h, s, l];
     },
-/**
-*http://http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-* Converts an HSL color value to RGB.
-* Assumes h, s, and l are contained in the set [0, 1] and
-* returns r, g, and b in the set [0, 255].
-* @param h { Number The hue }
-* @param s { Number The saturation }
-* @param l { Number The lightness }
-* @return  Array The RGB representation
-*/
-    HslToRgb:function(h, s, l){
+    /**
+     * HslToRgb - Colors -
+     * @type static method Colors
+     * @description Converts an HSL color value to RGB. Assumes h, s, and l are contained in the set [0, 1] and returns r, g, and b in the set [0, 255].
+     * @param {number} h Number The hue 
+     * @param {number} s Number The saturation 
+     * @param {number} l Number The lightness
+     * @example var myValue= Colors.HslToRgb([h, s, l]);
+     * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
+     * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+     * @see text
+     */
+    HslToRgb: function(h, s, l) {
         var r, g, b;
 
-        if(s === 0){
+        if (s === 0) {
             r = g = b = l; // achromatic
-        }else{
-            function hue2rgb(p, q, t){
-                if(t < 0) t += 1;
-                if(t > 1) t -= 1;
-                if(t < 1/6) return p + (q - p) * 6 * t;
-                if(t < 1/2) return q;
-                if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        } else {
+            function hue2rgb(p, q, t) {
+                if (t < 0)
+                    t += 1;
+                if (t > 1)
+                    t -= 1;
+                if (t < 1 / 6)
+                    return p + (q - p) * 6 * t;
+                if (t < 1 / 2)
+                    return q;
+                if (t < 2 / 3)
+                    return p + (q - p) * (2 / 3 - t) * 6;
                 return p;
             }
 
             var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
             var p = 2 * l - q;
-            r = hue2rgb(p, q, h + 1/3);
+            r = hue2rgb(p, q, h + 1 / 3);
             g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1/3);
+            b = hue2rgb(p, q, h - 1 / 3);
         }
 
         return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     },
-/**
-*http://http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-* Converts an RGB color value to HSV.
-* Assumes r, g, and b are contained in the set [0, 255] and
-* returns h, s, and v in the set [0, 1].
-* @param   r { Number The red color value }
-* @param   g { Number The green color value }
-* @param   b { Number The blue color value }
-* @return  Array The HSV representation
-*/
-    RgbToHsv:function(r, g, b){
-        r = r/255, g = g/255, b = b/255;
+    /**
+     * RgbToHsv - Colors -
+     * @type static method Colors
+     * @description Converts an RGB color value to HSV. Assumes r, g, and b are contained in the set [0, 255] and returns h, s, and v in the set [0, 1].
+     * @param {number} r Number The red color value
+     * @param {number} g Number The green color value
+     * @param {number} b Number The blue color value
+     * @example var myValue= Colors.RgbToHsv([r, g, b]);
+     * @returns {array} hsv The HSV representation in the set [0, 1]; [h, s, v]
+     * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+     * @see text
+     */
+    RgbToHsv: function(r, g, b) {
+        r = r / 255, g = g / 255, b = b / 255;
         var max = Math.max(r, g, b), min = Math.min(r, g, b);
         var h, s, v = max;
 
         var d = max - min;
         s = max === 0 ? 0 : d / max;
 
-        if(max === min){
+        if (max === min) {
             h = 0; // achromatic
-        }else{
-            switch(max){
-                case r:h = (g - b) / d + (g < b ? 6 : 0);break;
-                case g:h = (b - r) / d + 2;break;
-                case b:h = (r - g) / d + 4;break;
+        } else {
+            switch (max) {
+                case r:
+                    h = (g - b) / d + (g < b ? 6 : 0);
+                    break;
+                case g:
+                    h = (b - r) / d + 2;
+                    break;
+                case b:
+                    h = (r - g) / d + 4;
+                    break;
             }
             h /= 6;
         }
 
         return [h, s, v];
     },
-/**
-*http://http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-* Converts an HSV color value to RGB.
-* Assumes h, s, and v are contained in the set [0, 1] and
-* returns r, g, and b in the set [0, 255].
-* @param h { Number The hue }
-* @param s { Number The saturation }
-* @param v { Number The value }
-* @return  Array The RGB representation
-*/
-    HsvToRgb:function(h, s, v){
+    /**
+     * HsvToRgb - Colors -
+     * @type static method Colors
+     * @description Converts an HSV color value to RGB. Assumes h, s, and v are contained in the set [0, 1] and returns r, g, and b in the set [0, 255].
+     * @param {number} h Number The hue
+     * @param {number} s Number The saturation
+     * @param {number} v Number The value
+     * @example var myValue= Colors.HsvToRgb([h, s, v]);
+     * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
+     * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+     * @see text
+     */
+    HsvToRgb: function(h, s, v) {
         var r, g, b;
 
         var i = Math.floor(h * 6);
@@ -1302,212 +1370,250 @@ var Colors={
         var q = v * (1 - f * s);
         var t = v * (1 - (1 - f) * s);
 
-        switch(i % 6){
-            case 0:r = v, g = t, b = p;break;
-            case 1:r = q, g = v, b = p;break;
-            case 2:r = p, g = v, b = t;break;
-            case 3:r = p, g = q, b = v;break;
-            case 4:r = t, g = p, b = v;break;
-            case 5:r = v, g = p, b = q;break;
+        switch (i % 6) {
+            case 0:
+                r = v, g = t, b = p;
+                break;
+            case 1:
+                r = q, g = v, b = p;
+                break;
+            case 2:
+                r = p, g = v, b = t;
+                break;
+            case 3:
+                r = p, g = q, b = v;
+                break;
+            case 4:
+                r = t, g = p, b = v;
+                break;
+            case 5:
+                r = v, g = p, b = q;
+                break;
         }
 
         return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     },
-/**
-* Pick a random rgb color
-* @param type { return an array if !type, return a string 'rgb(r,g,b)' if type }
-* @return string 'rgb(255,0,255)' or array [255,0,255]
-*/
-    RandomRgb:function(type){
-        var t=type?type:'string';
-        var r=Math.round(Math.random()*255);
-        var g=Math.round(Math.random()*255);
-        var b=Math.round(Math.random()*255);
-        if(t==='array'){
-            return [Math.round(Math.random()*255),Math.round(Math.random()*255),Math.round(Math.random()*255)];
-        }else{
-            return 'rgb('+r+','+g+','+b+')';
+    /**
+     * RandomRgb - Tweener - return a random rgb array value in range [0,255]
+     * @type static method Colors
+     * @description return a random rgb array value in range [0,255]
+     * @param {string} type string that rapresent the desired returned format value; string or array; default string
+     * @example var myValue= Colors.RandomRgb('array');
+     * @returns {mixed} rgb in string or array format; 'rgb(n, n, n)' or [r, g, b]
+     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
+     * @see text
+     */
+    RandomRgb: function(type) {
+        var t = type ? type : 'string';
+        var r = Math.round(Math.random() * 255);
+        var g = Math.round(Math.random() * 255);
+        var b = Math.round(Math.random() * 255);
+        if (t === 'array') {
+            return [Math.round(Math.random() * 255), Math.round(Math.random() * 255), Math.round(Math.random() * 255)];
+        } else {
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
         }
-        
+
     },
-    ParseColor:function(color){
-       if(!color){console.log(color,' isn\'t a valid value.');return undefined;}
-       if(typeof color === 'string'){
-           var result=color.replace(/\s/g,"").toLowerCase();
-           var re,ar;
-           if(result.indexOf('rgb') > -1){
-               re=/(\d{1,3}),(\d{1,3}),(\d{1,3})/g;
-               ar=re.exec(result);
-               return [parseInt(ar[1]),parseInt(ar[2]),parseInt(ar[3])];
-           }else if(result.indexOf('#') > -1){
-               var hex=Colors.Rgb(result);
-               return hex;
-           }else if(result.indexOf('hsl') > -1){
-               re=/hsl\((.*),(\d{1,3})?%,(\d{1,3})/g;
-               ar=re.exec(result);
-               var hsl=Colors.HslToRgb(parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3]));
-               return hsl;
-           }else if(result.indexOf('hsv') > -1){
-               re=/hsv\((.*),(\d{1,3})?%,(\d{1,3})/g;
-               ar=re.exec(result);
-               var hsv=Colors.HsvToRgb(parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3]));
-               return hsv;
-           }else if(result in Colors.namedColor){
-               ar=Colors.namedColor[result][1];
-               return ar;
-           }else{
-               console.log(color,' isn\'t a valid value.');return [0,0,0];
-           }
-       }else{
-           return color;
-       }
-   },
-    namedColor:{//147 colors
-"aliceblue": ["#f0f8ff", [240,248,255]],
-"antiquewhite": ["#faebd7", [250,235,215]],
-"aqua": ["#00ffff", [0,255,255]],
-"aquamarine": ["#7fffd4", [127,255,212]],
-"azure": ["#f0ffff", [240,255,255]],
-"beige": ["#f5f5dc", [245,245,220]],
-"bisque": ["#ffe4c4", [255,228,196]],
-"black": ["#000000", [0,0,0]],
-"blanchedalmond": ["#ffebcd", [255,235,205]],
-"blue": ["#0000ff", [0,0,255]],
-"blueviolet": ["#8a2be2", [138,43,226]],
-"brown": ["#a52a2a", [165,42,42]],
-"burlywood": ["#deb887", [222,184,135]],
-"cadetblue": ["#5f9ea0", [95,158,160]],
-"chartreuse": ["#7fff00", [127,255,0]],
-"chocolate": ["#d2691e", [210,105,30]],
-"coral": ["#ff7f50", [255,127,80]],
-"cornflowerblue": ["#6495ed", [100,149,237]],
-"cornsilk": ["#fff8dc", [255,248,220]],
-"crimson": ["#dc143c", [220,20,60]],
-"cyan": ["#00ffff", [0,255,255]],
-"darkblue": ["#00008b", [0,0,139]],
-"darkcyan": ["#008b8b", [0,139,139]],
-"darkgoldenrod": ["#b8860b", [184,134,11]],
-"darkgray": ["#a9a9a9", [169,169,169]],
-"darkgreen": ["#006400", [0,100,0]],
-"darkgrey": ["#a9a9a9", [169,169,169]],
-"darkkhaki": ["#bdb76b", [189,183,107]],
-"darkmagenta": ["#8b008b", [139,0,139]],
-"darkolivegreen": ["#556b2f", [85,107,47]],
-"darkorange": ["#ff8c00", [255,140,0]],
-"darkorchid": ["#9932cc", [153,50,204]],
-"darkred": ["#8b0000", [139,0,0]],
-"darksalmon": ["#e9967a", [233,150,122]],
-"darkseagreen": ["#8fbc8f", [143,188,143]],
-"darkslateblue": ["#483d8b", [72,61,139]],
-"darkslategray": ["#2f4f4f", [47,79,79]],
-"darkslategrey": ["#2f4f4f", [47,79,79]],
-"darkturquoise": ["#00ced1", [0,206,209]],
-"darkviolet": ["#9400d3", [148,0,211]],
-"deeppink": ["#ff1493", [255,20,147]],
-"deepskyblue": ["#00bfff", [0,191,255]],
-"dimgray": ["#696969", [105,105,105]],
-"dimgrey": ["#696969", [105,105,105]],
-"dodgerblue": ["#1e90ff", [30,144,255]],
-"firebrick": ["#b22222", [178,34,34]],
-"floralwhite": ["#fffaf0", [255,250,240]],
-"forestgreen": ["#228b22", [34,139,34]],
-"fuchsia": ["#ff00ff", [255,0,255]],
-"gainsboro": ["#dcdcdc", [220,220,220]],
-"ghostwhite": ["#f8f8ff", [248,248,255]],
-"gold": ["#ffd700", [255,215,0]],
-"goldenrod": ["#daa520", [218,165,32]],
-"gray": ["#808080", [128,128,128]],
-"green": ["#008000", [0,128,0]],
-"greenyellow": ["#adff2f", [173,255,47]],
-"grey": ["#808080", [128,128,128]],
-"honeydew": ["#f0fff0", [240,255,240]],
-"hotpink": ["#ff69b4", [255,105,180]],
-"indianred": ["#cd5c5c", [205,92,92]],
-"indigo": ["#4b0082", [75,0,130]],
-"ivory": ["#fffff0", [255,255,240]],
-"khaki": ["#f0e68c", [240,230,140]],
-"lavender": ["#e6e6fa", [230,230,250]],
-"lavenderblush": ["#fff0f5", [255,240,245]],
-"lawngreen": ["#7cfc00", [124,252,0]],
-"lemonchiffon": ["#fffacd", [255,250,205]],
-"lightblue": ["#add8e6", [173,216,230]],
-"lightcoral": ["#f08080", [240,128,128]],
-"lightcyan": ["#e0ffff", [224,255,255]],
-"lightgoldenrodyellow": ["#fafad2", [250,250,210]],
-"lightgray": ["#d3d3d3", [211,211,211]],
-"lightgreen": ["#90ee90", [144,238,144]],
-"lightgrey": ["#d3d3d3", [211,211,211]],
-"lightpink": ["#ffb6c1", [255,182,193]],
-"lightsalmon": ["#ffa07a", [255,160,122]],
-"lightseagreen": ["#20b2aa", [32,178,170]],
-"lightskyblue": ["#87cefa", [135,206,250]],
-"lightslategray": ["#778899", [119,136,153]],
-"lightslategrey": ["#778899", [119,136,153]],
-"lightsteelblue": ["#b0c4de", [176,196,222]],
-"lightyellow": ["#ffffe0", [255,255,224]],
-"lime": ["#00ff00", [0,255,0]],
-"limegreen": ["#32cd32", [50,205,50]],
-"linen": ["#faf0e6", [250,240,230]],
-"magenta": ["#ff00ff", [255,0,255]],
-"maroon": ["#800000", [128,0,0]],
-"mediumaquamarine": ["#66cdaa", [102,205,170]],
-"mediumblue": ["#0000cd", [0,0,205]],
-"mediumorchid": ["#ba55d3", [186,85,211]],
-"mediumpurple": ["#9370db", [147,112,219]],
-"mediumseagreen": ["#3cb371", [60,179,113]],
-"mediumslateblue": ["#7b68ee", [123,104,238]],
-"mediumspringgreen": ["#00fa9a", [0,250,154]],
-"mediumturquoise": ["#48d1cc", [72,209,204]],
-"mediumvioletred": ["#c71585", [199,21,133]],
-"midnightblue": ["#191970", [25,25,112]],
-"mintcream": ["#f5fffa", [245,255,250]],
-"mistyrose": ["#ffe4e1", [255,228,225]],
-"moccasin": ["#ffe4b5", [255,228,181]],
-"navajowhite": ["#ffdead", [255,222,173]],
-"navy": ["#000080", [0,0,128]],
-"oldlace": ["#fdf5e6", [253,245,230]],
-"olive": ["#808000", [128,128,0]],
-"olivedrab": ["#6b8e23", [107,142,35]],
-"orange": ["#ffa500", [255,165,0]],
-"orangered": ["#ff4500", [255,69,0]],
-"orchid": ["#da70d6", [218,112,214]],
-"palegoldenrod": ["#eee8aa", [238,232,170]],
-"palegreen": ["#98fb98", [152,251,152]],
-"paleturquoise": ["#afeeee", [175,238,238]],
-"palevioletred": ["#db7093", [219,112,147]],
-"papayawhip": ["#ffefd5", [255,239,213]],
-"peachpuff": ["#ffdab9", [255,218,185]],
-"peru": ["#cd853f", [205,133,63]],
-"pink": ["#ffc0cb", [255,192,203]],
-"plum": ["#dda0dd", [221,160,221]],
-"powderblue": ["#b0e0e6", [176,224,230]],
-"purple": ["#800080", [128,0,128]],
-"red": ["#ff0000", [255,0,0]],
-"rosybrown": ["#bc8f8f", [188,143,143]],
-"royalblue": ["#4169e1", [65,105,225]],
-"saddlebrown": ["#8b4513", [139,69,19]],
-"salmon": ["#fa8072", [250,128,114]],
-"sandybrown": ["#f4a460", [244,164,96]],
-"seagreen": ["#2e8b57", [46,139,87]],
-"seashell": ["#fff5ee", [255,245,238]],
-"sienna": ["#a0522d", [160,82,45]],
-"silver": ["#c0c0c0", [192,192,192]],
-"skyblue": ["#87ceeb", [135,206,235]],
-"slateblue": ["#6a5acd", [106,90,205]],
-"slategray": ["#708090", [112,128,144]],
-"slategrey": ["#708090", [112,128,144]],
-"snow": ["#fffafa", [255,250,250]],
-"springgreen": ["#00ff7f", [0,255,127]],
-"steelblue": ["#4682b4", [70,130,180]],
-"tan": ["#d2b48c", [210,180,140]],
-"teal": ["#008080", [0,128,128]],
-"thistle": ["#d8bfd8", [216,191,216]],
-"tomato": ["#ff6347", [255,99,71]],
-"turquoise": ["#40e0d0", [64,224,208]],
-"violet": ["#ee82ee", [238,130,238]],
-"wheat": ["#f5deb3", [245,222,179]],
-"white": ["#ffffff", [255,255,255]],
-"whitesmoke": ["#f5f5f5", [245,245,245]],
-"yellow": ["#ffff00", [255,255,0]],
-"yellowgreen": ["#9acd32",[154,205,50]]}
+    /**
+     * PraseColor - Colors - return a rgb array 
+     * @type static method Colors
+     * @description return a rgb array from any kind of accepted color formats
+     * @param {mixed} color any kind of accepted color formats; string, name, hex, array
+     * @example var myValue= Colors.ParseColor(myObject.color);
+     * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
+     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
+     * @see text
+     */
+    ParseColor: function(color) {
+        if (!color) {
+            return [0,0,0];
+        }
+        if (typeof color === 'string') {
+            var result = color.replace(/\s/g, "").toLowerCase();
+            var re, ar;
+            if (result.indexOf('rgb') > -1) {
+                re = /\-?(\d{1,3}),\-?(\d{1,3}),\-?(\d{1,3})/g;
+                ar = re.exec(result);
+                return [parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3])];
+            } else if (result.indexOf('#') > -1) {
+                var hex = this.Rgb(result);
+                return hex;
+            } else if (result.indexOf('hsl') > -1) {
+                re = /hsl\((.*),(\d{1,3})?%,(\d{1,3})/g;
+                ar = re.exec(result);
+                var hsl = this.HslToRgb(ar[1]/360, ar[2]/100, ar[3]/100);
+                return hsl;
+            } else if (result.indexOf('hsv') > -1) {
+                re = /hsv\((.*),(\d{1,3})?%,(\d{1,3})/g;
+                ar = re.exec(result);
+                var hsv = this.HsvToRgb(ar[1]/360, ar[2]/100, ar[3]/100);
+                return hsv;
+            } else if (result in this.namedColor) {
+                ar = this.namedColor[result][1];
+                return ar;
+            } else {
+                return [0, 0, 0];
+            }
+        } else {
+            return color;
+        }
+    },
+    /**
+     * namedColor - Colors -
+     * @type object Colors
+     * @description an object containing all the color's name accordingly to the specification css; name:[hex value, array rgb]
+     * @example var myValue= Colors.namedColor('azure'); resulting in ["#f0ffff", [240, 255, 255]]
+     * @returns {undefined} none none
+     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
+     * @see text
+     */
+    namedColor: {//147 colors
+        "aliceblue": ["#f0f8ff", [240, 248, 255]],
+        "antiquewhite": ["#faebd7", [250, 235, 215]],
+        "aqua": ["#00ffff", [0, 255, 255]],
+        "aquamarine": ["#7fffd4", [127, 255, 212]],
+        "azure": ["#f0ffff", [240, 255, 255]],
+        "beige": ["#f5f5dc", [245, 245, 220]],
+        "bisque": ["#ffe4c4", [255, 228, 196]],
+        "black": ["#000000", [0, 0, 0]],
+        "blanchedalmond": ["#ffebcd", [255, 235, 205]],
+        "blue": ["#0000ff", [0, 0, 255]],
+        "blueviolet": ["#8a2be2", [138, 43, 226]],
+        "brown": ["#a52a2a", [165, 42, 42]],
+        "burlywood": ["#deb887", [222, 184, 135]],
+        "cadetblue": ["#5f9ea0", [95, 158, 160]],
+        "chartreuse": ["#7fff00", [127, 255, 0]],
+        "chocolate": ["#d2691e", [210, 105, 30]],
+        "coral": ["#ff7f50", [255, 127, 80]],
+        "cornflowerblue": ["#6495ed", [100, 149, 237]],
+        "cornsilk": ["#fff8dc", [255, 248, 220]],
+        "crimson": ["#dc143c", [220, 20, 60]],
+        "cyan": ["#00ffff", [0, 255, 255]],
+        "darkblue": ["#00008b", [0, 0, 139]],
+        "darkcyan": ["#008b8b", [0, 139, 139]],
+        "darkgoldenrod": ["#b8860b", [184, 134, 11]],
+        "darkgray": ["#a9a9a9", [169, 169, 169]],
+        "darkgreen": ["#006400", [0, 100, 0]],
+        "darkgrey": ["#a9a9a9", [169, 169, 169]],
+        "darkkhaki": ["#bdb76b", [189, 183, 107]],
+        "darkmagenta": ["#8b008b", [139, 0, 139]],
+        "darkolivegreen": ["#556b2f", [85, 107, 47]],
+        "darkorange": ["#ff8c00", [255, 140, 0]],
+        "darkorchid": ["#9932cc", [153, 50, 204]],
+        "darkred": ["#8b0000", [139, 0, 0]],
+        "darksalmon": ["#e9967a", [233, 150, 122]],
+        "darkseagreen": ["#8fbc8f", [143, 188, 143]],
+        "darkslateblue": ["#483d8b", [72, 61, 139]],
+        "darkslategray": ["#2f4f4f", [47, 79, 79]],
+        "darkslategrey": ["#2f4f4f", [47, 79, 79]],
+        "darkturquoise": ["#00ced1", [0, 206, 209]],
+        "darkviolet": ["#9400d3", [148, 0, 211]],
+        "deeppink": ["#ff1493", [255, 20, 147]],
+        "deepskyblue": ["#00bfff", [0, 191, 255]],
+        "dimgray": ["#696969", [105, 105, 105]],
+        "dimgrey": ["#696969", [105, 105, 105]],
+        "dodgerblue": ["#1e90ff", [30, 144, 255]],
+        "firebrick": ["#b22222", [178, 34, 34]],
+        "floralwhite": ["#fffaf0", [255, 250, 240]],
+        "forestgreen": ["#228b22", [34, 139, 34]],
+        "fuchsia": ["#ff00ff", [255, 0, 255]],
+        "gainsboro": ["#dcdcdc", [220, 220, 220]],
+        "ghostwhite": ["#f8f8ff", [248, 248, 255]],
+        "gold": ["#ffd700", [255, 215, 0]],
+        "goldenrod": ["#daa520", [218, 165, 32]],
+        "gray": ["#808080", [128, 128, 128]],
+        "green": ["#008000", [0, 128, 0]],
+        "greenyellow": ["#adff2f", [173, 255, 47]],
+        "grey": ["#808080", [128, 128, 128]],
+        "honeydew": ["#f0fff0", [240, 255, 240]],
+        "hotpink": ["#ff69b4", [255, 105, 180]],
+        "indianred": ["#cd5c5c", [205, 92, 92]],
+        "indigo": ["#4b0082", [75, 0, 130]],
+        "ivory": ["#fffff0", [255, 255, 240]],
+        "khaki": ["#f0e68c", [240, 230, 140]],
+        "lavender": ["#e6e6fa", [230, 230, 250]],
+        "lavenderblush": ["#fff0f5", [255, 240, 245]],
+        "lawngreen": ["#7cfc00", [124, 252, 0]],
+        "lemonchiffon": ["#fffacd", [255, 250, 205]],
+        "lightblue": ["#add8e6", [173, 216, 230]],
+        "lightcoral": ["#f08080", [240, 128, 128]],
+        "lightcyan": ["#e0ffff", [224, 255, 255]],
+        "lightgoldenrodyellow": ["#fafad2", [250, 250, 210]],
+        "lightgray": ["#d3d3d3", [211, 211, 211]],
+        "lightgreen": ["#90ee90", [144, 238, 144]],
+        "lightgrey": ["#d3d3d3", [211, 211, 211]],
+        "lightpink": ["#ffb6c1", [255, 182, 193]],
+        "lightsalmon": ["#ffa07a", [255, 160, 122]],
+        "lightseagreen": ["#20b2aa", [32, 178, 170]],
+        "lightskyblue": ["#87cefa", [135, 206, 250]],
+        "lightslategray": ["#778899", [119, 136, 153]],
+        "lightslategrey": ["#778899", [119, 136, 153]],
+        "lightsteelblue": ["#b0c4de", [176, 196, 222]],
+        "lightyellow": ["#ffffe0", [255, 255, 224]],
+        "lime": ["#00ff00", [0, 255, 0]],
+        "limegreen": ["#32cd32", [50, 205, 50]],
+        "linen": ["#faf0e6", [250, 240, 230]],
+        "magenta": ["#ff00ff", [255, 0, 255]],
+        "maroon": ["#800000", [128, 0, 0]],
+        "mediumaquamarine": ["#66cdaa", [102, 205, 170]],
+        "mediumblue": ["#0000cd", [0, 0, 205]],
+        "mediumorchid": ["#ba55d3", [186, 85, 211]],
+        "mediumpurple": ["#9370db", [147, 112, 219]],
+        "mediumseagreen": ["#3cb371", [60, 179, 113]],
+        "mediumslateblue": ["#7b68ee", [123, 104, 238]],
+        "mediumspringgreen": ["#00fa9a", [0, 250, 154]],
+        "mediumturquoise": ["#48d1cc", [72, 209, 204]],
+        "mediumvioletred": ["#c71585", [199, 21, 133]],
+        "midnightblue": ["#191970", [25, 25, 112]],
+        "mintcream": ["#f5fffa", [245, 255, 250]],
+        "mistyrose": ["#ffe4e1", [255, 228, 225]],
+        "moccasin": ["#ffe4b5", [255, 228, 181]],
+        "navajowhite": ["#ffdead", [255, 222, 173]],
+        "navy": ["#000080", [0, 0, 128]],
+        "oldlace": ["#fdf5e6", [253, 245, 230]],
+        "olive": ["#808000", [128, 128, 0]],
+        "olivedrab": ["#6b8e23", [107, 142, 35]],
+        "orange": ["#ffa500", [255, 165, 0]],
+        "orangered": ["#ff4500", [255, 69, 0]],
+        "orchid": ["#da70d6", [218, 112, 214]],
+        "palegoldenrod": ["#eee8aa", [238, 232, 170]],
+        "palegreen": ["#98fb98", [152, 251, 152]],
+        "paleturquoise": ["#afeeee", [175, 238, 238]],
+        "palevioletred": ["#db7093", [219, 112, 147]],
+        "papayawhip": ["#ffefd5", [255, 239, 213]],
+        "peachpuff": ["#ffdab9", [255, 218, 185]],
+        "peru": ["#cd853f", [205, 133, 63]],
+        "pink": ["#ffc0cb", [255, 192, 203]],
+        "plum": ["#dda0dd", [221, 160, 221]],
+        "powderblue": ["#b0e0e6", [176, 224, 230]],
+        "purple": ["#800080", [128, 0, 128]],
+        "red": ["#ff0000", [255, 0, 0]],
+        "rosybrown": ["#bc8f8f", [188, 143, 143]],
+        "royalblue": ["#4169e1", [65, 105, 225]],
+        "saddlebrown": ["#8b4513", [139, 69, 19]],
+        "salmon": ["#fa8072", [250, 128, 114]],
+        "sandybrown": ["#f4a460", [244, 164, 96]],
+        "seagreen": ["#2e8b57", [46, 139, 87]],
+        "seashell": ["#fff5ee", [255, 245, 238]],
+        "sienna": ["#a0522d", [160, 82, 45]],
+        "silver": ["#c0c0c0", [192, 192, 192]],
+        "skyblue": ["#87ceeb", [135, 206, 235]],
+        "slateblue": ["#6a5acd", [106, 90, 205]],
+        "slategray": ["#708090", [112, 128, 144]],
+        "slategrey": ["#708090", [112, 128, 144]],
+        "snow": ["#fffafa", [255, 250, 250]],
+        "springgreen": ["#00ff7f", [0, 255, 127]],
+        "steelblue": ["#4682b4", [70, 130, 180]],
+        "tan": ["#d2b48c", [210, 180, 140]],
+        "teal": ["#008080", [0, 128, 128]],
+        "thistle": ["#d8bfd8", [216, 191, 216]],
+        "tomato": ["#ff6347", [255, 99, 71]],
+        "turquoise": ["#40e0d0", [64, 224, 208]],
+        "violet": ["#ee82ee", [238, 130, 238]],
+        "wheat": ["#f5deb3", [245, 222, 179]],
+        "white": ["#ffffff", [255, 255, 255]],
+        "whitesmoke": ["#f5f5f5", [245, 245, 245]],
+        "yellow": ["#ffff00", [255, 255, 0]],
+        "yellowgreen": ["#9acd32", [154, 205, 50]]}
 };

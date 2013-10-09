@@ -9,17 +9,31 @@ root {
     display: block;
 }
 body,#wrap{margin:0 auto 0 auto;padding:0;height:100%;text-align:center;}
+code {font-family: monospace;}
+#wrap{min-width: 1200px;}
+#logoshader{
+    -webkit-transform: rotate(90deg); /* Chrome & Safari */
+    -moz-transform: rotate(90deg); /* Firefox */
+    -ms-transform: rotate(90deg); /* IE 9+ */
+    -o-transform: rotate(90deg); /* Opera */
+    transform: rotate(90deg); /* CSS3 */
+    position:absolute;top:0px;left:0px;
+}
 div,pre,code{margin:0;padding:0;}
 .container{position:relative;min-width:100%;height:300px;}
 #maindocs, #referense, #badgedw, #examples, #code{position:absolute;text-align:left;}
 #code, #referense, #examples{min-width:100%;min-height: 300px;}
-#referense, #codecode{box-shadow:inset 0 0 10px #CCC;}
+#referense, #codecode, #code{box-shadow:inset 0 0 10px #CCC;min-height:290px;background-color: transparent;}
+#codecode{}
 #badgedw{right:30px;bottom:-1px;}
-.tempmessage{margin:0;padding:0;width:100%;height:100%;background-color: lightsteelblue;text-align: center;}
-.tempmessage1{margin:0;padding:0;width:100%;height:100%;background-color: white;text-align: center;}
+.tempmessage{margin:0;padding:0;width:1200px;height:300px;text-align: center;position:absolute;top:0px;left:0px;background-color: #F8FBFD;}
+.tempmessage1{margin:0;padding:0;width:100%;height:100%;background-color: transparent;text-align: center;}
 .tempmessage2{margin:0;padding:0;width:100%;height:100%;background-color: #f7f7f7;text-align: center;}
-.tempmessage3{margin:0;padding:0;width:100%;height:100%;background-color: #ffffff;text-align: center;}
-.tempmessage h1{margin:0;padding:80px;font-size: 70px;font-family: sans-serif;color: lightslategray;text-shadow: 0 1px 0 #e4e7f5;}
+.tempmessage3{margin:0;padding:0;width:100%;height:100%;background-color: transparent;text-align: center;}
+.tempmessage4{margin:0;padding:0;width:100%;height:100%;background-color: transparent;text-align: center;}
+.tempmessage h1{margin:0;padding:10px;font-size: 240px;font-family: sans-serif;color:#ffffff;}
 .tempmessage1 h1{margin:0;padding:10px;font-size: 240px;font-family: sans-serif;color: #fafafa;}
 .tempmessage2 h1{margin:0;padding:50px 0 0 0;font-size: 180px;font-family: sans-serif;color: white;}
-.tempmessage3 h1{margin:0;padding:30px 0 0 0;font-size: 230px;font-family: sans-serif;color: #fafafa;}
+.tempmessage3 h1{margin:0;padding:50px 0 0 0;font-size: 210px;font-family: sans-serif;color: #fafafa;}
+.tempmessage3 h1 span{margin:0;padding:0;font-size: 210px;font-family: sans-serif;color: #eff3f7;}
+.tempmessage4 h1{margin:0;padding:30px 0 0 0;font-size: 230px;font-family: sans-serif;color: #000000;}
