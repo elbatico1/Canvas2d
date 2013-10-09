@@ -243,17 +243,12 @@ Canvas2d.Stage.prototype = {
      *@returns {void} enableEvt none
      */
     enableEvt: function() {
-        if (!this.enabledEvent) {
-            if (this.enabledEvent) {
-                if ("ontouchstart" in window) {
-                    this._functestmobile();
-                } else {
-                    this._functest();
-                }
-            }
-            this.enabledEvent = true;
+        if ("ontouchstart" in window) {
+            this._functestmobile();
+        } else {
+            this._functest();
         }
-
+        this.enabledEvent = true;
     },
     /**
      *disableEvt - Stage - disable detection events in stage.
@@ -265,29 +260,19 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     disableEvt: function() {
-        if (this.enabledEvent) {
-            if (this.enabledEvent) {
-                if ("ontouchstart" in window) {
-                    this.container.removeEventListener('touchmove', this._evtData[0], false);
-                    this.container.removeEventListener('touchstart', this._evtData[0], false);
-                    this.container.removeEventListener('touchend', this._evtData[0], false);
-                } else {
-                    this.container.removeEventListener('mousemove', this._evtData[0], false);
-                    this.container.removeEventListener('mousedown', this._evtData[0], false);
-                    this.container.removeEventListener('mouseup', this._evtData[0], false);
-                    this.container.removeEventListener('click', this._evtData[0], false);
-                    this.container.removeEventListener('mouseover', this._evtData[1], false);
-                    this.container.removeEventListener('mouseout', this._evtData[1], false);
-                }
-            }
-            this.enabledEvent = false;
+        if ("ontouchstart" in window) {
+            this.container.removeEventListener('touchmove', this._evtData[0], false);
+            this.container.removeEventListener('touchstart', this._evtData[0], false);
+            this.container.removeEventListener('touchend', this._evtData[0], false);
+        } else {
+            this.container.removeEventListener('mousemove', this._evtData[0], false);
+            this.container.removeEventListener('mousedown', this._evtData[0], false);
+            this.container.removeEventListener('mouseup', this._evtData[0], false);
+            this.container.removeEventListener('click', this._evtData[0], false);
+            this.container.removeEventListener('mouseover', this._evtData[1], false);
+            this.container.removeEventListener('mouseout', this._evtData[1], false);
         }
-    },
-    whipe: function() {
-        window.rqanim.whipe();
-    },
-    getLoop: function() {
-        window.rqanim.getLoop();
+        this.enabledEvent = false;
     },
     /**
      * addLoop - Stage - set the main function for animation.
@@ -443,7 +428,9 @@ Canvas2d.Stage.prototype = {
         this.fakeCtx.restore();
         var data = this.fakeCanvas.toDataURL(t, q);
         this.fakeCtx.clearRect(0, 0, this.width, this.height);
-        return data;
+        var img = document.createElement('img');
+        img.src = data;
+        return img;
     },
     /**
      * addEvent - Stage - add an event into the listening cicle
