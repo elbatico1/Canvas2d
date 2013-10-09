@@ -553,9 +553,9 @@ var Code = {
                 function loop() {
                     stats.begin();
                     label.txt = 'Current Frame Number: ' + stage.getFrame();
-                    if(rect.x > stage.width - rect.width){
+                    if (rect.x > stage.width - rect.width) {
                         x = -step;
-                    }else if(rect.x < rect.width){
+                    } else if (rect.x < rect.width) {
                         x = step;
                     }
                     rect.x += x;
@@ -588,9 +588,9 @@ var Code = {
                 function loop() {
                     stats.begin();
                     label.txt = 'Current Time Elapsed: ' + stage.getTime() + 'Mls';
-                    if(rect.x > stage.width - rect.width){
+                    if (rect.x > stage.width - rect.width) {
                         x = -step;
-                    }else if(rect.x < rect.width){
+                    } else if (rect.x < rect.width) {
                         x = step;
                     }
                     rect.x += x;
@@ -623,9 +623,9 @@ var Code = {
                 function loop() {
                     stats.begin();
                     label.txt = 'Current Frame Per Second: ' + parseInt(stage.getFps()) + 'Fps';
-                    if(rect.x > stage.width - rect.width){
+                    if (rect.x > stage.width - rect.width) {
                         x = -step;
-                    }else if(rect.x < rect.width){
+                    } else if (rect.x < rect.width) {
                         x = step;
                     }
                     rect.x += x;
@@ -658,9 +658,9 @@ var Code = {
                 function loop() {
                     stats.begin();
                     label.txt = 'Current Interval Time: ' + stage.getTimeInterval() + 'Mls';
-                    if(rect.x > stage.width - rect.width){
+                    if (rect.x > stage.width - rect.width) {
                         x = -step;
-                    }else if(rect.x < rect.width){
+                    } else if (rect.x < rect.width) {
                         x = step;
                     }
                     rect.x += x;
@@ -920,9 +920,9 @@ var Code = {
             stage.draw();
             function loop() {
                 stats.begin();
-                if(rect.x > stage.width - rect.width){
+                if (rect.x > stage.width - rect.width) {
                     x = -step;
-                }else if(rect.x < rect.width){
+                } else if (rect.x < rect.width) {
                     x = step;
                 }
                 rect.x += x;
@@ -930,20 +930,20 @@ var Code = {
                 stats.end();
             }
             stage.addLoop(sprite, loop);
-            function mOver(e){
+            function mOver(e) {
                 stage.container.style.cursor = 'pointer';
                 e.target.color = 'lightsteelblue';
                 e.target.parent.draw();
             }
-            function mOut(e){
+            function mOut(e) {
                 stage.container.style.cursor = 'default';
                 e.target.color = 'black';
                 e.target.parent.draw();
             }
-            function resume(e){
-                if(e.target.name === 'start'){
+            function resume(e) {
+                if (e.target.name === 'start') {
                     stage.start();
-                }else{
+                } else {
                     stage.stop();
                 }
             }
@@ -978,9 +978,9 @@ var Code = {
             stage.draw();
             function loop() {
                 stats.begin();
-                if(rect.x > stage.width - rect.width){
+                if (rect.x > stage.width - rect.width) {
                     x = -step;
-                }else if(rect.x < rect.width){
+                } else if (rect.x < rect.width) {
                     x = step;
                 }
                 rect.x += x;
@@ -988,20 +988,20 @@ var Code = {
                 stats.end();
             }
             stage.addLoop(sprite, loop);
-            function mOver(e){
+            function mOver(e) {
                 stage.container.style.cursor = 'pointer';
                 e.target.color = 'lightsteelblue';
                 e.target.parent.draw();
             }
-            function mOut(e){
+            function mOut(e) {
                 stage.container.style.cursor = 'default';
                 e.target.color = 'black';
                 e.target.parent.draw();
             }
-            function resume(e){
-                if(e.target.name === 'start'){
+            function resume(e) {
+                if (e.target.name === 'start') {
                     stage.start();
-                }else{
+                } else {
                     stage.stop();
                 }
             }
@@ -1051,9 +1051,9 @@ var Code = {
                 stats.begin();
                 frames.txt = 'Current Frame Elapsed: ' + stage.getFrame();
                 times.txt = 'Current Time Elapsed: ' + stage.getTime() + 'Mls';
-                if(rect.x > stage.width - rect.width){
+                if (rect.x > stage.width - rect.width) {
                     x = -step;
-                }else if(rect.x < rect.width){
+                } else if (rect.x < rect.width) {
                     x = step;
                 }
                 rect.x += x;
@@ -1061,22 +1061,22 @@ var Code = {
                 stats.end();
             }
             stage.addLoop(sprite, loop);
-            function mOver(e){
+            function mOver(e) {
                 stage.container.style.cursor = 'pointer';
                 e.target.color = 'lightsteelblue';
                 e.target.parent.draw();
             }
-            function mOut(e){
+            function mOut(e) {
                 stage.container.style.cursor = 'default';
                 e.target.color = 'black';
                 e.target.parent.draw();
             }
-            function resume(e){
-                if(e.target.name === 'start') {
+            function resume(e) {
+                if (e.target.name === 'start') {
                     stage.start();
-                }else if(e.target.name === 'stop') {
+                } else if (e.target.name === 'stop') {
                     stage.stop();
-                }else{
+                } else {
                     stage.reset();
                     frames.txt = 'Current Frame Elapsed: ' + stage.getFrame();
                     times.txt = 'Current Time Elapsed: ' + stage.getTime() + 'Mls';
@@ -1128,9 +1128,9 @@ var Code = {
             function loop() {
                 stats.begin();
                 looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
-                if(rect.x > stage.width - rect.width){
+                if (rect.x > stage.width - rect.width) {
                     x = -step;
-                }else if(rect.x < rect.width){
+                } else if (rect.x < rect.width) {
                     x = step;
                 }
                 rect.x += x;
@@ -1138,34 +1138,34 @@ var Code = {
                 stats.end();
             }
             stage.addLoop(sprite, loop);
-            function mOver(e){
+            function mOver(e) {
                 stage.container.style.cursor = 'pointer';
                 e.target.color = 'lightsteelblue';
                 e.target.parent.draw();
             }
-            function mOut(e){
+            function mOut(e) {
                 stage.container.style.cursor = 'default';
                 e.target.color = 'black';
                 e.target.parent.draw();
             }
-            function resume(e){
-                if(e.target.name === 'start') {
+            function resume(e) {
+                if (e.target.name === 'start') {
                     stage.start();
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else if(e.target.name === 'stop') {
+                } else if (e.target.name === 'stop') {
                     stage.stop();
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else if(e.target.name === 'addloop') {
+                } else if (e.target.name === 'addloop') {
                     stage.addLoop(sprite, loop);
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else if(e.target.name === 'removeloop') {
+                } else if (e.target.name === 'removeloop') {
                     stage.removeLoop(sprite, loop);
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else {
+                } else {
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
                 }
@@ -1215,9 +1215,9 @@ var Code = {
             function loop() {
                 stats.begin();
                 looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
-                if(rect.x > stage.width - rect.width){
+                if (rect.x > stage.width - rect.width) {
                     x = -step;
-                }else if(rect.x < rect.width){
+                } else if (rect.x < rect.width) {
                     x = step;
                 }
                 rect.x += x;
@@ -1225,44 +1225,136 @@ var Code = {
                 stats.end();
             }
             stage.addLoop(sprite, loop);
-            function mOver(e){
+            function mOver(e) {
                 stage.container.style.cursor = 'pointer';
                 e.target.color = 'lightsteelblue';
                 e.target.parent.draw();
             }
-            function mOut(e){
+            function mOut(e) {
                 stage.container.style.cursor = 'default';
                 e.target.color = 'black';
                 e.target.parent.draw();
             }
-            function resume(e){
-                if(e.target.name === 'start') {
+            function resume(e) {
+                if (e.target.name === 'start') {
                     stage.start();
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else if(e.target.name === 'stop') {
+                } else if (e.target.name === 'stop') {
                     stage.stop();
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else if(e.target.name === 'addloop') {
+                } else if (e.target.name === 'addloop') {
                     stage.addLoop(sprite, loop);
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else if(e.target.name === 'removeloop') {
+                } else if (e.target.name === 'removeloop') {
                     stage.removeLoop(sprite, loop);
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else {
+                } else {
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
                 }
             }
         },
         enableEvt: function(c, w, h, params) {
-            
+            var stage = new Canvas2d.Stage(c, w, h, false);
+            var sprite = new Canvas2d.Sprite('main');
+            var disable = new Canvas2d.DisplayObjects('disable');
+            disable.text('Disable', 0, 0, 'normal', 22, 'Helvetica', 'black', null, 'start', 'top');
+            disable.x = 20;
+            disable.y = 70;
+            var label = disable.clone('label');
+            label.align = 'center';
+            label.txt = 'All the Event Listeners of Stage are Disabled';
+            label.x = stage.width / 2;
+            label.y = stage.height / 2;
+            disable.addEvent('click', endisAble);
+            disable.addEvent('mouseover', mOver);
+            disable.addEvent('mouseout', mOut);
+            sprite.add(disable);
+            sprite.add(label);
+            stage.add(sprite);
+
+            function mOver(e) {
+                stage.container.style.cursor = 'pointer';
+                e.target.color = 'lightsteelblue';
+                e.target.parent.draw();
+            }
+            function mOut(e) {
+                stage.container.style.cursor = 'default';
+                e.target.color = 'black';
+                e.target.parent.draw();
+            }
+            function endisAble(e) {
+                label.txt = 'All the Event Listeners of Stage are Disabled';
+                stage.reset();
+                stage.addLoop(sprite, loop);
+                stage.disableEvt();
+                mOut(e);
+            }
+            function loop() {
+                disable.txt = 'All Event Listeners Abled in: ' + (4000 - stage.getTime()) + 'Mls';
+                if (stage.getTime() > 4000) {
+                    stage.removeLoop(sprite, loop);
+                    label.txt = 'Now all the Event Listener of Stage are Abled, click on Disable';
+                    disable.txt = 'Disable';
+                    stage.enableEvt();
+                }
+                stage.draw();
+            }
+            stage.reset();
+            stage.addLoop(sprite, loop);
         },
         disableEvt: function(c, w, h, params) {
-            
+            var stage = new Canvas2d.Stage(c, w, h, false);
+            var sprite = new Canvas2d.Sprite('main');
+            var disable = new Canvas2d.DisplayObjects('disable');
+            disable.text('Disable', 0, 0, 'normal', 22, 'Helvetica', 'black', null, 'start', 'top');
+            disable.x = 20;
+            disable.y = 70;
+            var label = disable.clone('label');
+            label.align = 'center';
+            label.txt = 'All the Event Listeners of Stage are Disabled';
+            label.x = stage.width / 2;
+            label.y = stage.height / 2;
+            disable.addEvent('click', endisAble);
+            disable.addEvent('mouseover', mOver);
+            disable.addEvent('mouseout', mOut);
+            sprite.add(disable);
+            sprite.add(label);
+            stage.add(sprite);
+
+            function mOver(e) {
+                stage.container.style.cursor = 'pointer';
+                e.target.color = 'lightsteelblue';
+                e.target.parent.draw();
+            }
+            function mOut(e) {
+                stage.container.style.cursor = 'default';
+                e.target.color = 'black';
+                e.target.parent.draw();
+            }
+            function endisAble(e) {
+                label.txt = 'All the Event Listeners of Stage are Disabled';
+                stage.reset();
+                stage.addLoop(sprite, loop);
+                stage.disableEvt();
+                mOut(e);
+            }
+            function loop() {
+                disable.txt = 'All Event Listeners Abled in: ' + (4000 - stage.getTime()) + 'Mls';
+                if (stage.getTime() > 4000) {
+                    stage.removeLoop(sprite, loop);
+                    label.txt = 'Now all the Event Listener of Stage are Abled, click on Disable';
+                    disable.txt = 'Disable';
+                    stage.enableEvt();
+                }
+                stage.draw();
+            }
+            stage.reset();
+            stage.addLoop(sprite, loop);
         },
         getLoopList: function(c, w, h, params) {
             var stage = new Canvas2d.Stage(c, w, h);
@@ -1308,9 +1400,9 @@ var Code = {
             function loop() {
                 stats.begin();
                 looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
-                if(rect.x > stage.width - rect.width){
+                if (rect.x > stage.width - rect.width) {
                     x = -step;
-                }else if(rect.x < rect.width){
+                } else if (rect.x < rect.width) {
                     x = step;
                 }
                 rect.x += x;
@@ -1318,34 +1410,34 @@ var Code = {
                 stats.end();
             }
             stage.addLoop(sprite, loop);
-            function mOver(e){
+            function mOver(e) {
                 stage.container.style.cursor = 'pointer';
                 e.target.color = 'lightsteelblue';
                 e.target.parent.draw();
             }
-            function mOut(e){
+            function mOut(e) {
                 stage.container.style.cursor = 'default';
                 e.target.color = 'black';
                 e.target.parent.draw();
             }
-            function resume(e){
-                if(e.target.name === 'start') {
+            function resume(e) {
+                if (e.target.name === 'start') {
                     stage.start();
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else if(e.target.name === 'stop') {
+                } else if (e.target.name === 'stop') {
                     stage.stop();
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else if(e.target.name === 'addloop') {
+                } else if (e.target.name === 'addloop') {
                     stage.addLoop(sprite, loop);
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else if(e.target.name === 'removeloop') {
+                } else if (e.target.name === 'removeloop') {
                     stage.removeLoop(sprite, loop);
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
-                }else {
+                } else {
                     looplist.txt = 'Number of Element in the Loop List Array: ' + stage.getLoopList().length;
                     stage.draw();
                 }
@@ -1387,9 +1479,9 @@ var Code = {
             function loop() {
                 stats.begin();
                 animating.txt = 'Animation: ' + stage.isAnimating();
-                if(rect.x > stage.width - rect.width){
+                if (rect.x > stage.width - rect.width) {
                     x = -step;
-                }else if(rect.x < rect.width){
+                } else if (rect.x < rect.width) {
                     x = step;
                 }
                 rect.x += x;
@@ -1397,22 +1489,22 @@ var Code = {
                 stats.end();
             }
             stage.addLoop(sprite, loop);
-            function mOver(e){
+            function mOver(e) {
                 stage.container.style.cursor = 'pointer';
                 e.target.color = 'lightsteelblue';
                 e.target.parent.draw();
             }
-            function mOut(e){
+            function mOut(e) {
                 stage.container.style.cursor = 'default';
                 e.target.color = 'black';
                 e.target.parent.draw();
             }
-            function resume(e){
-                if(e.target.name === 'start') {
+            function resume(e) {
+                if (e.target.name === 'start') {
                     stage.start();
                     animating.txt = 'Animation: ' + stage.isAnimating();
                     stage.draw();
-                }else if(e.target.name === 'stop') {
+                } else if (e.target.name === 'stop') {
                     stage.stop();
                     animating.txt = 'Animation: ' + stage.isAnimating();
                     stage.draw();
@@ -1424,12 +1516,13 @@ var Code = {
             var sprite = new Canvas2d.Sprite('main');
             var source = new Canvas2d.Sprite('source');
             var destination = new Canvas2d.Sprite('destination', false);
+
+            var x1, x2, y1, y2, rect, n = 10, sourceimage, crop = {dx: 0, dy: 0, dw: 0, dh: 0};
             var image = new Canvas2d.DisplayObjects('image', false);
-            image.img(0, 0, null, false);
+            image.img(0, 0, null, false, null, 0, 0, crop);
             destination.add(image);
-            var x1, x2, y1, y2, rect, n = 10, sourceimage;
-            
-            for(var i =0; i < n; i++){
+
+            for (var i = 0; i < n; i++) {
                 rect = new Canvas2d.DisplayObjects('rect', false);
                 rect.rect(-50, -50, 100, 100, Colors.RandomRgb());
                 rect.x = 200 + Math.random() * 300;
@@ -1447,65 +1540,77 @@ var Code = {
             source.addEvent('drag', drag);
             source.addEvent('dragstop', dragStop);
             destination.x = stage.width / 2;
-            var start = new Canvas2d.DisplayObjects('start');
-            start.text('Start', 0, 0, 'normal', 22, 'Helvetica', 'black', null, 'start', 'top');
-            start.x = 20;
-            start.y = 70;
-            var looplist = start.clone('looplist');
-            looplist.txt = 'Number of Element in the Loop List Array: ';
-            looplist.y = 10;
-            looplist.x = 140;
-            start.addEvent('click', resume);
-            start.addEvent('mouseover', mOver);
-            start.addEvent('mouseout', mOut);
-            sprite.add(looplist);
-            source.add(start);
+            var description = new Canvas2d.DisplayObjects('description', false);
+            description.text('Drag the Mouse and Draw a Rect', 0, 0, 'normal', 22, 'Helvetica', 'black', null, 'start', 'top');
+            description.x = 20;
+            description.y = 20;
+            source.add(description);
             stage.add(sprite);
             stage.add(destination);
             stage.add(source);
             stage.draw();
-            
-            function mOver(e){
-                stage.container.style.cursor = 'pointer';
-                e.target.color = 'lightsteelblue';
-                e.target.parent.draw();
-            }
-            function mOut(e){
-                stage.container.style.cursor = 'default';
-                e.target.color = 'black';
-                e.target.parent.draw();
-            }
-            function resume(e){
-                destination.draw();
-            }
-            function dragStart(e){
+            function dragStart(e) {
                 x1 = e.mouse.x;
                 y1 = e.mouse.y;
                 sourcerect.x = x1;
                 sourcerect.y = y1;
             }
-            function drag(e){
+            function drag(e) {
                 sourcerect.width = e.mouse.x - x1;
                 sourcerect.height = e.mouse.y - y1;
                 e.target.draw();
             }
-            function dragStop(e){
+            function dragStop(e) {
                 x2 = e.mouse.x;
                 y2 = e.mouse.y;
+                crop = {dx: Math.min(x1, x2), dy: Math.min(y1, y2), dw: Math.max(x1, x2) - Math.min(x1, x2), dh: Math.max(y1, y2) - Math.min(y1, y2)};
                 sourceimage = stage.getDataURL('image/png', 8);
-                placeImg(sourceimage);
+                placeImg(sourceimage, crop);
             }
-            function placeImg(img){
-                image.loadImage(img, null, onComplete, true);console.log(image);
-                image.parent.draw();
-                //image.setCrop({dx : sourcerect.x, dy : sourcerect.y, dw : sourcerect.width, dh : sourcerect.height});
+            function placeImg(img, crop) {
+                image.setCrop(crop);
+                image.loadImage(img, null, onComplete, false);
+
             }
-            function onComplete(){
+            function onComplete() {
+                destination.draw();
+                image.x = 10;
+                image.y = stage.height / 2 - image.height / 2;
                 destination.draw();
             }
         },
         resize: function(c, w, h, params) {
-            
+            var stage = new Canvas2d.Stage(c, w, h, false);
+            var sprite = new Canvas2d.Sprite('main');
+            var disable = new Canvas2d.DisplayObjects('disable');
+            disable.text('Disable', 0, 0, 'normal', 22, 'Helvetica', 'black', null, 'start', 'top');
+            disable.x = 20;
+            disable.y = 70;
+            var label = disable.clone('label');
+            label.align = 'center';
+            label.txt = 'All the Event Listeners of Stage are Disabled';
+            label.x = stage.width / 2;
+            label.y = stage.height / 2;
+            disable.addEvent('click', endisAble);
+            disable.addEvent('mouseover', mOver);
+            disable.addEvent('mouseout', mOut);
+            sprite.add(disable);
+            sprite.add(label);
+            stage.add(sprite);
+
+            function mOver(e) {
+                stage.container.style.cursor = 'pointer';
+                e.target.color = 'lightsteelblue';
+                e.target.parent.draw();
+            }
+            function mOut(e) {
+                stage.container.style.cursor = 'default';
+                e.target.color = 'black';
+                e.target.parent.draw();
+            }
+            function endisAble(e) {
+
+            }
         }
     },
     Sprite: {
