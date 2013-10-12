@@ -2,6 +2,48 @@
 var Code = {
     Common: {
         method: {
+            clone: function(c, w, h, params) {
+                var stage = new Canvas2d.Stage(c, w, h);
+                var sprite = new Canvas2d.Sprite('main');
+                var newRect, i = 0;
+                var label = new Canvas2d.DisplayObjects('label', false);
+                label.text('Clone by Clicking It and Drag It where you Want', 0, 0, 'normal', 22, 'Helvetica', 'black', null, 'start', 'top');
+                label.x = label.y = 20;
+                var rect = new Canvas2d.DisplayObjects('rect');
+                rect.rect(0, 0, 100, 100, 'lightsteelblue');
+                rect.x = rect.y = 60;
+                rect.addEvent('click', cloneIt);
+                rect.addEvent('mouseover', mOver);
+                rect.addEvent('mouseout', mOut);
+                rect.addEvent('dragstart', dragSIt);
+                rect.addEvent('drag', dragIt);
+                sprite.add(label);
+                sprite.add(rect);
+                stage.add(sprite);
+                stage.draw();
+                function mOver() {
+                    stage.container.style.cursor = 'pointer';
+                }
+                function mOut() {
+                    stage.container.style.cursor = 'default';
+                }
+                function cloneIt(e){
+                    newRect = rect.clone('newRect_' + i++);
+                    newRect.color = Colors.RandomRgb();
+                    newRect.x = e.target.x + 10;
+                    newRect.y = e.target.y + 10;
+                    sprite.add(newRect);
+                    e.target.parent.draw();
+                }
+                function dragIt(e){
+                    e.target.x = e.mouse.ox;
+                    e.target.y = e.mouse.oy;
+                    e.target.parent.draw();
+                }
+                function dragSIt(e){
+                    e.target.zOrder('top');
+                }
+            },
             addEvent: function(c, w, h, params) {
                 var eventList = ['click', 'mouseover', 'mouseout', 'dragstart', 'drag', 'dragstop', 'mousedown', 'mouseup', 'mousemove'];
                 var stage = new Canvas2d.Stage(c, w, h);
@@ -755,17 +797,6 @@ var Code = {
                         ease: 'easeOutBounce', delay: 100 * i, duration: 1000});
                 }
             },
-            intro: function(c, w, h, params) {
-                var stage = new Canvas2d.Stage(c, w, h);
-                var sprite = new Canvas2d.Sprite('sprite_0');
-                var rect = new Canvas2d.DisplayObjects('rect_0');
-                rect.rect(0, 0, 100, 100, 'lightseagreen', 'lightblue', 4);
-                rect.x = stage.width / 2 - rect.width / 2;
-                rect.y = stage.height / 2 - rect.height / 2;
-                sprite.add(rect);
-                stage.add(sprite);
-                stage.draw();
-            },
             multyAnimation: function(c, w, h, params) {
                 var stage = new Canvas2d.Stage(c, w, h, false);
                 var sprite = new Canvas2d.Sprite('sprite_0');
@@ -854,40 +885,189 @@ var Code = {
                 }
             },
             stressTestLoop: function(c, w, h, params) {
-                var stats = new Stats();
-                var stage = new Canvas2d.Stage(c, w, h, false);
+                var stats = new Stats(), i, n = 1000, element, x, y, range = 0, r = h / 2, step = (Math.PI*2) / 360;
+                var stage = new Canvas2d.Stage(c, w, h);
                 stats.domElement.style.top = '0px';
                 stats.domElement.style.left = '0px';
                 stats.domElement.style.position = 'absolute';
                 stage.container.parentNode.appendChild(stats.domElement);
-                var sprite = new Canvas2d.Sprite("main");
-                var ne = 10000, x = 0, y = 0, range = (Math.PI * 2) / ne, r = 5;
-                for (var i = 0; i < ne; i++) {
-                    var rand = Math.random() * 40;
-                    x = (stage.width / 2) + Math.cos(range * i) * ((stage.width / ne) * i) / 1.7;
-                    y = (stage.width / 2) + Math.sin(range * i) * ((stage.width / ne) * i) / 1.7;
-                    var el = new Canvas2d.DisplayObjects();
-                    el.circle(0, 0, r, 0, Math.PI * 2, "red");
-                    el.x = x + rand;
-                    el.y = y + rand;
-                    el.speed = rand / 6;
-                    sprite.add(el);
+                var layerTop = new Canvas2d.Sprite("top");
+                var start = new Canvas2d.DisplayObjects('start');
+                start.text('Start', 0, 0, 'normal', 20, 'Helvetica', 'black', null, 'start', 'ideographic');
+                start.x = 20;
+                start.y = stage.height - 30;
+                var stop, plus, minus, label;
+                label = start.clone('label');
+                label.align = 'right';
+                label.enabledEvent = false;
+                label.txt = 'Number of Elemenets: ' + n;
+                label.x = stage.width - 20;
+                start.addEvent('mouseover', mOver);
+                start.addEvent('mouseout', mOut);
+                start.addEvent('click', click);
+                stop = start.clone('stop');
+                stop.txt = 'Stop';
+                stop.x = start.x + start.width + 20;
+                plus = start.clone('plus');
+                plus.txt = ' + 1000';
+                plus.x = stop.x + stop.width + 20;
+                minus = start.clone('minus');
+                minus.txt = ' - 1000';
+                minus.x = plus.x + 80;
+                layerTop.add(label);
+                layerTop.add(start);
+                layerTop.add(stop);
+                layerTop.add(plus);
+                layerTop.add(minus);
+                var sprite = new Canvas2d.Sprite("main", false);
+                function placeElements(n, s){
+                    range = 0;
+                    for(i = 0; i < n; i++){
+                        element = new Canvas2d.DisplayObjects();
+                        r = ((h / 2) / n) * i;
+                        x = (stage.width / 2) + (Math.cos(range) * r);
+                        y = (stage.height / 2) + (Math.sin(range) * r);
+                        element.circle(0, 0, 5 * (i / n + 1), 0, Math.PI * 2, Colors.RandomRgb());
+                        element.x = x;
+                        element.y = y;
+                        s.add(element);
+                        range += step;
+                    }
                 }
+                placeElements(n, sprite);
                 stage.add(sprite);
+                stage.add(layerTop);
                 stage.draw();
-                stats.end();
                 function loop() {
                     stats.begin();
                     for (var i = 0; i < sprite.children.length; i++) {
                         if (sprite.children[i].x >= stage.width) {
                             sprite.children[i].x = (-sprite.children[i].radius);
                         }
-                        sprite.children[i].x += sprite.children[i].speed;
+                        sprite.children[i].x += sprite.children[i].radius;
                     }
                     stage.draw();
                     stats.end();
                 }
                 stage.addLoop(sprite, loop);
+                function mOver(e) {
+                    stage.container.style.cursor = 'pointer';
+                }
+                function mOut(e) {
+                    stage.container.style.cursor = 'default';
+                }
+                function click(e){
+                    switch(e.target.name){
+                        case 'start':
+                            stage.addLoop(sprite, loop);
+                            break;
+                        case 'stop':
+                            stage.removeLoop(sprite, loop);
+                            break;
+                        case 'plus':
+                            n = n === 10000 ? 10000 : n + 1000;
+                            for(i = sprite.children.length-1; i > -1; i--){
+                                sprite.remove(sprite.children[i]);
+                            }
+                            placeElements(n, sprite);
+                            label.txt = 'Number of Elemenets: ' + n;
+                            label.parent.draw();
+                            break;
+                        case 'minus':
+                            n = n === 1000 ? 1000 : n - 1000;
+                            for(i = sprite.children.length-1; i > -1; i--){
+                                sprite.remove(sprite.children[i]);
+                            }
+                            placeElements(n, sprite);
+                            label.txt = 'Number of Elemenets: ' + n;
+                            label.parent.draw();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            },
+            stressTestDraw: function(c, w, h, params) {
+                var i, n = 1000, element,col = 0, row = 0, r, label, minus, start = (new Date()).getTime(), stop;
+                var stage = new Canvas2d.Stage(c, w, h);
+                var layerTop = new Canvas2d.Sprite("top");
+                var plus = new Canvas2d.DisplayObjects('plus');
+                plus.text(' + 1000', 0, 0, 'normal', 20, 'Helvetica', 'black', {color : 'rgba(255, 255, 255, 150)'}, 'start', 'ideographic');
+                plus.x = 20;
+                plus.y = stage.height - 30;
+                label = plus.clone('label');
+                label.align = 'right';
+                label.enabledEvent = false;
+                label.txt = 'Number of Elemenets: ' + n;
+                label.x = stage.width - 20;
+                plus.addEvent('mouseover', mOver);
+                plus.addEvent('mouseout', mOut);
+                plus.addEvent('click', click);
+                minus = plus.clone('minus');
+                minus.txt = ' - 1000';
+                minus.x = plus.x + plus.width + 20;
+                layerTop.add(label);
+                layerTop.add(plus);
+                layerTop.add(minus);
+                var sprite = new Canvas2d.Sprite("main", false);
+                function placeElements(n, s){
+                    row = 0;
+                    col = 0;
+                    r = Math.sqrt((w * h) / n) / 2;
+                    for(i = 0; i < n; i++){
+                        row += r * 2;
+                        element = new Canvas2d.DisplayObjects();
+                        element.circle(0, 0, r, 0, Math.PI * 2, Colors.RandomRgb());
+                        element.x = row;
+                        element.y = (r * 2) * col;
+                        s.add(element);
+                        row = row > stage.width - (r * 2) ? 0 : row;
+                        col = row === 0 ? col + 1 : col;
+                    }
+                }
+                placeElements(n, sprite);
+                stage.add(sprite);
+                stage.add(layerTop);
+                stage.draw();
+                stop = (new Date()).getTime();
+                label.txt = 'Number of Elemenets: ' + n + ' Time Elapsed: ' + (stop - start) + ' Mls';
+                label.parent.draw();
+                function mOver(e) {
+                    stage.container.style.cursor = 'pointer';
+                }
+                function mOut(e) {
+                    stage.container.style.cursor = 'default';
+                }
+                function click(e){
+                    switch(e.target.name){
+                        case 'plus':
+                            n = n === 20000 ? 20000 : n + 1000;
+                            for(i = sprite.children.length-1; i > -1; i--){
+                                sprite.remove(sprite.children[i]);
+                            }
+                            start = (new Date()).getTime();
+                            placeElements(n, sprite);
+                            stage.draw();
+                            stop = (new Date()).getTime();
+                            label.txt = 'Number of Elemenets: ' + n + ' Time Elapsed: ' + (stop - start) + ' Mls';
+                            label.parent.draw();
+                            break;
+                        case 'minus':
+                            n = n === 1000 ? 1000 : n - 1000;
+                            for(i = sprite.children.length-1; i > -1; i--){
+                                sprite.remove(sprite.children[i]);
+                            }
+                            start = (new Date()).getTime();
+                            placeElements(n, sprite);
+                            stage.draw();
+                            stop = (new Date()).getTime();
+                            label.txt = 'Number of Elemenets: ' + n + ' Time Elapsed: ' + (stop - start) + ' Mls';
+                            label.parent.draw();
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
         },
         start: function(c, w, h, params) {
@@ -2802,16 +2982,18 @@ var Code = {
         },
         setCrop: function(c, w, h, params) {
             var stage = new Canvas2d.Stage(c, w, h);
-            var sp = new Canvas2d.Sprite();
-            var im = new Canvas2d.DisplayObjects();
-            var crop = {dx: 0, dy: 0, dw: w, dh: h};
+            var sprite = new Canvas2d.Sprite('main');
+            var im = new Canvas2d.DisplayObjects('image');
+            var crop = {dx: 100, dy: 50, dw: w - 200, dh: h - 100};
             im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false);
             im.loadImage(im.source, null, complete);
+            im.x = crop.dx;
+            im.y = crop.dy;
             function complete(e) {
                 e.parent.draw();
             }
-            sp.add(im);
-            stage.add(sp);
+            sprite.add(im);
+            stage.add(sprite);
             stage.draw();
             stage.addEvent('mousemove', mMove);
             function mMove(e) {
@@ -2819,12 +3001,18 @@ var Code = {
                 x = x + crop.dw > im.image.width ? im.image.width - crop.dw - 1 : x;
                 var y = e.mouse.y;
                 y = y + crop.dh > im.image.height ? im.image.height - crop.dh - 1 : y;
-                crop.dx = Math.max(0, x);
-                crop.dy = Math.max(0, y);
+                crop.dx = Math.min(e.mouse.x,im.width);
+                crop.dy = Math.min(e.mouse.y,im.height);
                 im.setCrop(crop);
-                sp.draw();
+                sprite.draw();
             }
 
+        },
+        cacheAsBitmap: function(c, w, h, params) {
+            
+        },
+        loadImage: function(c, w, h, params) {
+            
         }
     },
     Tweener: {
@@ -3505,6 +3693,85 @@ var Code = {
             color4: function(c, w, h, params) {
 
             }
+        },
+        namedColor: function(c, w, h, params) {
+            var stage = new Canvas2d.Stage(c, w, h);
+            var sprite = new Canvas2d.Sprite('main');
+            var colorResult = new Canvas2d.Sprite('sprite_labels', false);
+            var colorScroll = new Canvas2d.Sprite('sprite_scroll');
+            var cref = new Canvas2d.DisplayObjects('colorname');
+            cref.rect(0, -50, 100, 100, 'black', 'black', 2);
+            cref.x = 700;
+            cref.y = stage.height / 2;
+            var cname = new Canvas2d.DisplayObjects('colorname'), chex, crgb;
+            cname.text('Color Name: ', 0, 0, 'bold', 22, 'Helvetica', [200,34,35], null, 'start', 'middle');
+            cname.y = (stage.height / 2) - 30;
+            cname.x = 300;
+            chex = cname.clone('colorhex');
+            chex.txt = 'Hex Value: ';
+            chex.y = (stage.height / 2);
+            crgb = cname.clone('colorarray');
+            crgb.txt = 'Rgb Value: ';
+            crgb.y = (stage.height / 2) + 30;
+            colorResult.add(cname);
+            colorResult.add(chex);
+            colorResult.add(crgb);
+            colorResult.add(cref);
+            var scroll = new Canvas2d.DisplayObjects('scroll');
+            scroll.rectRound(-10, 4, 18, 60, 8, 'lightgray');
+            scroll.x = 230;
+            scroll.addEvent('drag', drag);
+            scroll.addEvent('mouseover', mOver);
+            scroll.addEvent('mouseout', mOut);
+            var mask = new Canvas2d.DisplayObjects('mask');
+            mask.rect(0, 0, 220, 300, null);
+            mask.mask = true;
+            colorScroll.add(mask);
+            var l, i = 0, sh = 20;
+            for(var o in Colors.namedColor) {
+                l = new Canvas2d.DisplayObjects(o);
+                l.text(o, 0, 0, 'normal', 18, 'Helvetica', 'black', null, 'start', 'top');
+                l.addEvent('mouseover', mOver);
+                l.addEvent('mouseout', mOut);
+                l.addEvent('click', click);
+                l.x = 10;
+                l.y = 4 + (20 * i);
+                colorScroll.add(l);
+                i++;
+            }
+            sh = l.y;
+            colorScroll.y = 20;
+            sprite.add(scroll);
+            stage.add(colorResult);
+            stage.add(colorScroll);
+            stage.add(sprite);
+            function mOver(e) {
+                stage.container.style.cursor = 'pointer';
+                e.target.color = e.target.name === 'scroll' ? 'gray' : Colors.Invert(e.target.name);
+                e.target.backGround = e.target.name === 'scroll' ? null : {color : e.target.name};
+                e.target.parent.draw();
+            }
+            function mOut(e) {
+                stage.container.style.cursor = 'default';
+                e.target.color = e.target.name === 'scroll' ? 'lightgray' : 'black';
+                e.target.backGround = null;
+                e.target.parent.draw();
+            }
+            function click(e){
+                cname.txt = 'Color Name: ' + e.target.name;
+                chex.txt = 'Hex Value: ' + Colors.namedColor[e.target.name][0];
+                crgb.txt = 'Rgb Value: ' + Colors.namedColor[e.target.name][1][0] + ', ' + Colors.namedColor[e.target.name][1][1] + ', ' + Colors.namedColor[e.target.name][1][2];
+                cref.color = e.target.name;
+                colorResult.draw();
+            }
+            function drag(e){
+                e.target.y=e.mouse.oy>-1&&e.mouse.oy<298-e.target.height?e.mouse.oy:e.target.y;
+                colorScroll.y=-(((sh-280)/(280-scroll.height))*(e.target.y));
+                mask.y = Math.abs(colorScroll.y);
+                colorScroll.draw();
+                sprite.draw();
+            }
+            stage.draw();
         }
     }
 };
