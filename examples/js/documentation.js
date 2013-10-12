@@ -1,8 +1,8 @@
 function startCanvas(l){
     var codePre=document.getElementById('codecode'),examples=document.getElementById('example'),location=l.indexOf('localhost')>-1?true:false;
-    //codePre.innerHTML='<div class="tempmessage"><h1>CODE</h1></div>';
-    //examples.innerHTML='<div id="examples"><div class="tempmessage1"><h1>EXAMPLE</h1></div></div>';
-    var methodsList={addEvent:'addEvent',removeEvent:'removeEvent',add:'add',remove:'remove',zOrder:'zOrder',clear:'clear',draw:'draw',getFrame:'getFrame',getTime:'getTime',getFps:'getFps',getTimeInterval:'getTimeInterval'};
+    var gitlogo=document.getElementById('gitlogo'),githref=location?'img/blacktocat.png':'http://www.somentinglikethis.it/img/hosted/blacktocat.png';gitlogo.innerHTML='<a target="_blank" href="https://github.com/elbatico1/Canvas2d" title="download javascript library Canvas2d from github"><img src="'+githref+'" width="66" height="66"/></a>';
+    var clogo=document.getElementById('canvaslogo'),chref=location?'img/canvas2d_64.png':'http://www.somethinglikethis.it/img/hosted/canvas2d_64.png';clogo.innerHTML='<img src="'+chref+'"/>'
+    var methodsList={addEvent:'addEvent',removeEvent:'removeEvent',add:'add',remove:'remove',zOrder:'zOrder',clear:'clear',draw:'draw',getFrame:'getFrame',getTime:'getTime',getFps:'getFps',getTimeInterval:'getTimeInterval',clone:'clone'};
     //stage elements
     var width='innerWidth' in window?window.innerWidth:document.documentElement.clientWidth;width=1200;
     var height='innerHeight' in window?window.innerHeight:document.documentElment.clientHeight,h=300;
@@ -27,7 +27,7 @@ function startCanvas(l){
     xqr.open('get',location?'js/exampledocs.js':'https://rawgithub.com/elbatico1/Canvas2d/master/examples/js/exampledocs.js',false);
     xqr.send();
     //parse data Examples
-    var codeObj={Stage:{},Sprite:{},DisplayObjects:{},Tweener:{},Colors:{},Common:{}},codeIsOpen=false,multyIsOpen=false;; 
+    var codeObj={Stage:{},Sprite:{},DisplayObjects:{},Tweener:{},Colors:{},Common:{}};
     var oc=false,ock=false,obc=false,obck=false,obf=false,obfk=false,oso=false,osok=false,osf=false,osfk=false,oty,pro,spro;
     for(var i=0;i<code.length;i++){
         if(oc && !ock){
@@ -129,7 +129,7 @@ function startCanvas(l){
         return c;
     }
     //set background's element
-    var infoLabel,infoRow,rowColor='gray',font='Helvetica,Verdana,Sans-serif',mainBackground=new Canvas2d.Sprite('backgrounds',false);
+    var infoLabel,infoRow,rowColor='gray',font='Lucida Grande,Helvetica,Verdana,Sans-serif',mainBackground=new Canvas2d.Sprite('backgrounds',false);
     var gradientMenu={color:['hsla(200,60%,90%,1)','hsla(180,10%,90%,0)'],offset:[0,1],coord:{x0:0,y0:0,r0:0,x1:0,y1:30,r1:0},type:'linear'};
     var backMenu=new Canvas2d.DisplayObjects('backmenu',false);backMenu.rect(0,0,width,40,'white');//mainBackground.add(backMenu);//backMenu.gradient=gradientMenu;
     infoRow=new Canvas2d.DisplayObjects('infonrow');

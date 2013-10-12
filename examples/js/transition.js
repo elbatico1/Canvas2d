@@ -1459,6 +1459,26 @@ var Colors = {
             return color;
         }
     },
+    Invert: function(args) {
+        var c = this.ParseColor(args);
+        return 'rgb('+(255 - c[0])+','+(255 - c[1])+','+(255 - c[2])+')';
+    },
+    Complementary: function(args) {
+        var c = this.ParseColor(args), b;
+        b = this.RgbToHsl(c[0], c[1], c[2]);
+        c = this.HslToRgb((b[0]+0.5>1?1-(b[0]+0.5):b[0]+0.5), b[1], b[2]);
+        return 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+    },
+    HueShift: function(h, s) {
+        h += s;
+        while(h >= 360.0) {
+            h -= 360.0;
+        }
+        while(h < 0.0) {
+            h += 360.0;
+        }
+        return h;
+    },
     /**
      * namedColor - Colors -
      * @type object Colors
