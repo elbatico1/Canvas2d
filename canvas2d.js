@@ -79,7 +79,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
     this.container.style.height = height + 'px';
     this.container.style.position = 'absolute';
     this.container.onmousedown = function() {
-        return false;
+        //return false;
     };
     Canvas2d.container.id = container;
     Canvas2d.container.width = width;
@@ -132,7 +132,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             loop: [],
             prId: 0,
             whipe: function() {
-                this.loop=[];
+                this.loop = [];
             },
             getLoop: function() {
                 return this.loop;
@@ -192,7 +192,8 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             addLoop: function(target, func) {
                 if (!this.isChild(target)) {
                     this.prId++;
-                    this.start();target.PRID=this.prId;
+                    this.start();
+                    target.PRID = this.prId;
                     this.loop.push({target: target, func: func, id: this.prId});
                 }
                 return this.prId;
@@ -490,7 +491,7 @@ Canvas2d.Stage.prototype = {
         }
         child.index = this.indexCount;
         child.parent = this;
-        this._setContainer(child,this);
+        this._setContainer(child, this);
         this.children.push(child);
         this.indexCount++;
         this._orderCanvases();
@@ -553,13 +554,13 @@ Canvas2d.Stage.prototype = {
             }
         }
     },
-    _setContainer:function(child,parent){
-        child.width=parent.width;
-        child.height=parent.height;
-        child.stage=parent.container;
-        child.canvas.width=parent.width;
-        child.canvas.height=parent.height;
-        child.ctx=child.canvas.getContext('2d');
+    _setContainer: function(child, parent) {
+        child.width = parent.width;
+        child.height = parent.height;
+        child.stage = parent.container;
+        child.canvas.width = parent.width;
+        child.canvas.height = parent.height;
+        child.ctx = child.canvas.getContext('2d');
     },
     /**
      *_orderCanvases - Stage - internal function - reorder the canvases (Sprite) elements.
@@ -593,7 +594,7 @@ Canvas2d.Stage.prototype = {
         this.width = w;
         this.height = h;
         for (var i = 0; i < this.children.length; i++) {
-            this._setContainer(this.children[i],this);
+            this._setContainer(this.children[i], this);
         }
     },
     _functestmobile: function() {
@@ -1182,13 +1183,13 @@ Canvas2d.Sprite = function(name, enableevent) {
     this.rotation = 0;
     this.evtListeners = {};
 };
-function _setContainer(child,parent){
-    child.width=parent.width;
-    child.height=parent.height;
-    child.stage=parent.container;
-    child.canvas.width=parent.width;
-    child.canvas.height=parent.height;
-    child.ctx=child.canvas.getContext('2d');
+function _setContainer(child, parent) {
+    child.width = parent.width;
+    child.height = parent.height;
+    child.stage = parent.container;
+    child.canvas.width = parent.width;
+    child.canvas.height = parent.height;
+    child.ctx = child.canvas.getContext('2d');
 }
 Canvas2d.Sprite.prototype = {
     /**
@@ -1282,18 +1283,18 @@ Canvas2d.Sprite.prototype = {
      * @see text
      * @link text
      */
-    getBound: function(){
-        var ax=[],ay=[],aw=[],ah=[];
+    getBound: function() {
+        var ax = [], ay = [], aw = [], ah = [];
         for (var i = 0; i < this.children.length; i++) {
-            ax.push(this.children[i].x+this.children[i].width);
-            ay.push(this.children[i].y+this.children[i].height);
+            ax.push(this.children[i].x + this.children[i].width);
+            ay.push(this.children[i].y + this.children[i].height);
         }
         function compareNumbers(a, b) {
             return a - b;
         }
         ax.sort(compareNumbers);
         ay.sort(compareNumbers);
-        return {width:ax[ax.length-1],height:ay[ay.length-1]};
+        return {width: ax[ax.length - 1], height: ay[ay.length - 1]};
     },
     /**
      * zOrder - Sprite - change the order of a nested DisplayObjects passing either a index number or a string 'top' or 'bottom'
@@ -2047,6 +2048,7 @@ Canvas2d.DisplayObjects.prototype = {
         ctx.textAlign = this.align;
         ctx.textBaseline = this.baseLine;
         this.width = ctx.measureText(txt).width;
+        delete ctx;
     },
     /**
      * img - DisplayObjects - create an image
@@ -2132,6 +2134,34 @@ Canvas2d.DisplayObjects.prototype = {
             this.imageCrop[i] = args[i] ? args[i] : this.imageCrop[i];
         }
         this.doneimage = false;
+    },
+    roulette: function(stator, rotor, rotorOffset, multyplier, step, rType) {
+        var step = (step / 360) * (Math.PI * 2), x, y, theta = 0, i = 0, p = [];
+        var R = stator * multyplier;
+        var r = rotor * multyplier;
+        var d = rotorOffset * multyplier;console.log(360 / step * rotor)
+        while (i <= 360 / step * rotor) {
+            if (rType === 'Epicycloid') {
+                x = (R + r) * Math.cos(theta) - r * Math.cos((R + r) / r * theta);
+                y = (R + r) * Math.sin(theta) - r * Math.sin((R + r) / r * theta);
+            }
+            if (rType === 'Epitrochoid') {
+                x = (R + r) * Math.cos(theta) - d * Math.cos((R + r) / r * theta);
+                y = (R + r) * Math.sin(theta) - d * Math.sin((R + r) / r * theta);
+            }
+            if (rType === 'Hypocycloid') {
+                x = (R - r) * Math.cos(theta) + r * Math.cos((R - r) / r * theta);
+                y = (R - r) * Math.sin(theta) - r * Math.sin((R - r) / r * theta);
+            }
+            if (rType === 'Hypotrochoid') {
+                x = (R - r) * Math.cos(theta) + d * Math.cos((R - r) / r * theta);
+                y = (R - r) * Math.sin(theta) - d * Math.sin((R - r) / r * theta);
+            }
+            theta += step;
+            i++;
+            p.push([x, y]);
+        }
+        return p;
     },
     /**
      * filter - displayObjects - apply a filter to the image
@@ -2438,8 +2468,8 @@ Canvas2d.DisplayObjects.prototype = {
      *@param miterlimit { number - default 10 }
      */
     _setStyle: function(color, linecolor, linewidth, linecap, linejoin, miterlimit) {
-        this.color = color;
-        this.lineColor = linecolor;
+        this.color = color instanceof Array ? this._parseColor(color) : color;
+        this.lineColor = linecolor instanceof Array ? this._parseColor(linecolor) : linecolor;
         this.lineCap = (this._capList[linecap]) ? linecap : 'butt';
         this.lineJoin = (this._joinList[linejoin]) ? linejoin : 'miter';
         this.lineWidth = (linewidth) ? linewidth : 1.0;
@@ -3160,7 +3190,7 @@ Canvas2d.DisplayObjects.prototype = {
 Canvas2d.Tweener = function() {
     this.children = {};
     this._tempChildren = {};
-    this.charList=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',' ','0','1','2','3','4','5','6','7','8','9',',','"','\'',',',':',';','(',')','[',']','{','}','*','@','.','!','?','\\','/','<','>','#','+','-','_','=','^','ì','è','é','ò','à','ù','&','$','£','|','∞','°','ç'];
+    this.charList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ',', '"', '\'', ',', ':', ';', '(', ')', '[', ']', '{', '}', '*', '@', '.', '!', '?', '\\', '/', '<', '>', '#', '+', '-', '_', '=', '^', 'ì', 'è', 'é', 'ò', 'à', 'ù', '&', '$', '£', '|', '∞', '°', 'ç'];
 };
 Canvas2d.Tweener.prototype = {
     /**
@@ -3228,7 +3258,7 @@ Canvas2d.Tweener.prototype = {
             return;
         }
         var twnobj = {};
-        var properties = ['x', 'y', 'width', 'height', 'rotation', 'scaleX', 'scaleY', 'lineWidth', 'fontSize', 'radius','startAngle','endAngle'];
+        var properties = ['x', 'y', 'width', 'height', 'rotation', 'scaleX', 'scaleY', 'lineWidth', 'fontSize', 'radius', 'startAngle', 'endAngle'];
         var x, colorReq, r, g, b, rqAlpha, rqlineAlpha, alpha, lineAlpha, colorSrc, data = args.data ? args.data : null;
         var delay = args['delay'] ? args['delay'] : 0;
         var ease = args['ease'] ? args['ease'] : 'easeNone';
@@ -3247,7 +3277,7 @@ Canvas2d.Tweener.prototype = {
             }
             twnobj['obj'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'obj', subprop: [], index: [], request: [], target: o};
             for (var io in args['obj']) {
-                
+
                 for (var obje in args['obj'][io]) {
                     for (var ele = 0; ele < args['obj'][io][obje].length; ele++) {
                         twnobj['obj'].index.push(parseInt(io));
@@ -3260,24 +3290,28 @@ Canvas2d.Tweener.prototype = {
                 }
             }
         }
-        if('txt' in args){
-            if(o['txt']==='') return;
-            args.txt=args.txt!==''?args.txt:'cutFwd';
-            r=[];var d=[];g=o['txt'];
-            for(i=0;i<this.charList.length;i++){
+        if ('txt' in args) {
+            if (o['txt'] === '')
+                return;
+            args.txt = args.txt !== '' ? args.txt : 'cutFwd';
+            r = [];
+            var d = [];
+            g = o['txt'];
+            for (i = 0; i < this.charList.length; i++) {
                 d.push(this.charList[i]);
             }
-            d=this._shuffle(d);
-            for(i=0;i<g.length;i++){
-                for(x=0;x<d.length;x++){
-                    if(g.charAt(i)===d[x]){
+            d = this._shuffle(d);
+            for (i = 0; i < g.length; i++) {
+                for (x = 0; x < d.length; x++) {
+                    if (g.charAt(i) === d[x]) {
                         r.push(x);
                         break;
                     }
                 }
             }
-            twnobj['txt']={ease: ease, to: g.length, ct: 0, d: duration, from: 0, prop: 'txt', subprop: r, request: '', target: o, text:o.txt, type:args.txt, charlist:d};
-            o._prevTxt=o.txt;o.txt='';
+            twnobj['txt'] = {ease: ease, to: g.length, ct: 0, d: duration, from: 0, prop: 'txt', subprop: r, request: '', target: o, text: o.txt, type: args.txt, charlist: d};
+            o._prevTxt = o.txt;
+            o.txt = '';
         }
         if ('shadow' in args) {
             if (!o['shadow']) {
@@ -3364,14 +3398,14 @@ Canvas2d.Tweener.prototype = {
         twnobj.state = {start: true, tweening: false, end: false, onStart: onStart, onTween: onTween, onEnd: onEnd, target: o, duration: duration, delay: delay, data: data};
 
         if (delay > 0) {
-            this._tempChildren[o.id]='';
+            this._tempChildren[o.id] = '';
             var that = this;
             setTimeout(function() {
-                if(o.id in that._tempChildren){
+                if (o.id in that._tempChildren) {
                     delete that._tempChildren[o.id];
                     that.children[o.id] = twnobj;
                 }
-                
+
             }, delay);
         } else {
             this.children[o.id] = twnobj;
@@ -3389,14 +3423,14 @@ Canvas2d.Tweener.prototype = {
      *@link text
      */
     removeTweener: function(child) {
-        if(child.id in this._tempChildren){
+        if (child.id in this._tempChildren) {
             delete this._tempChildren[child.id];
         }
         if (child.id in this.children) {
-            this.children[child.id].state.end=true;
+            this.children[child.id].state.end = true;
         }
     },
-    _shuffle: function(array){
+    _shuffle: function(array) {
         for (var i = array.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
             var temp = array[i];
@@ -3416,10 +3450,13 @@ Canvas2d.Tweener.prototype = {
                     that.children[o].state.tweening = false;
                     obj = that.children[o].state;
                     delete that.children[o];
-                    
+
                     that._states(obj);
-                    for (n in that.children) {}
-                    if (!that.children[o]&&!that.children[n]) {window.rqanim.removeLoop(that);}
+                    for (n in that.children) {
+                    }
+                    if (!that.children[o] && !that.children[n]) {
+                        window.rqanim.removeLoop(that);
+                    }
                     continue;
                 } else {
                     that.children[o].state.tweening = true;
@@ -3518,30 +3555,31 @@ Canvas2d.Tweener.prototype = {
             args['ct'] = 1;
             args['d'] = 1;
             ctrl.end = true;
-        }var n;
-        
-        switch(args.type){
+        }
+        var n;
+
+        switch (args.type) {
             case 'cutFwd':
                 n = Math.floor(this[args.ease](args['ct'], args['from'], args['to'], args['d']));
-                args['target'][args['prop']]=args.text.substr(0,n);
+                args['target'][args['prop']] = args.text.substr(0, n);
                 break;
             case 'cutBack':
                 n = Math.floor(this[args.ease](args['ct'], args['from'], args['to'], args['d']));
-                args['target'][args['prop']]=args.text.substr(0,args.to-n);
+                args['target'][args['prop']] = args.text.substr(0, args.to - n);
                 break;
             case 'matrix':
-                for(var i=0;i<args.subprop.length;i++){
+                for (var i = 0; i < args.subprop.length; i++) {
                     n = Math.floor(this[args.ease](args['ct'], 0, args.subprop[i], args['d']));
-                    n=n>this.charList.length-1?n-this.charList.length:n;
-                    args.request+=args.charlist[n];
+                    n = n > this.charList.length - 1 ? n - this.charList.length : n;
+                    args.request += args.charlist[n];
                 }
-                args['target'][args['prop']]=args.text=args.request;
-                args.request='';
+                args['target'][args['prop']] = args.text = args.request;
+                args.request = '';
                 break;
             default:
                 break;
         }
-        
+
     },
     _states: function(ctrl) {
         for (var o in ctrl) {
@@ -3607,7 +3645,7 @@ Canvas2d.Tweener.prototype = {
      * @link http://code.google.com/p/tweener/
      */
     easeSine: function(t, b, c, d, p_params) {
-        return b+c*(Math.sin((Math.PI/d)*t));
+        return b + c * (Math.sin((Math.PI / d) * t));
     },
     /**
      * easeInQuad
@@ -4610,7 +4648,7 @@ var Colors = {
      */
     ParseColor: function(color) {
         if (!color) {
-            return [0,0,0];
+            return [0, 0, 0];
         }
         if (typeof color === 'string') {
             var result = color.replace(/\s/g, "").toLowerCase();
@@ -4625,12 +4663,12 @@ var Colors = {
             } else if (result.indexOf('hsl') > -1) {
                 re = /hsl\((.*),(\d{1,3})?%,(\d{1,3})/g;
                 ar = re.exec(result);
-                var hsl = this.HslToRgb(ar[1]/360, ar[2]/100, ar[3]/100);
+                var hsl = this.HslToRgb(ar[1] / 360, ar[2] / 100, ar[3] / 100);
                 return hsl;
             } else if (result.indexOf('hsv') > -1) {
                 re = /hsv\((.*),(\d{1,3})?%,(\d{1,3})/g;
                 ar = re.exec(result);
-                var hsv = this.HsvToRgb(ar[1]/360, ar[2]/100, ar[3]/100);
+                var hsv = this.HsvToRgb(ar[1] / 360, ar[2] / 100, ar[3] / 100);
                 return hsv;
             } else if (result in this.namedColor) {
                 ar = this.namedColor[result][1];
@@ -4641,6 +4679,10 @@ var Colors = {
         } else {
             return color;
         }
+    },
+    Invert: function(args) {
+        var c = this.ParseColor(args);
+        return [255 - c[0], 255 - c[1], 255 - c[2]];
     },
     /**
      * namedColor - Colors -
