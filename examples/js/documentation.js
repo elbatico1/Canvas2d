@@ -1,6 +1,6 @@
 function startCanvas(l){
     var codePre=document.getElementById('codecode'),examples=document.getElementById('example'),location=l.indexOf('localhost')>-1?true:false;
-    var gitlogo=document.getElementById('gitlogo'),githref=location?'img/blacktocat.png':'http://www.sometinglikethis.it/img/hosted/blacktocat.png';gitlogo.innerHTML='<a target="_blank" href="https://github.com/elbatico1/Canvas2d" title="download javascript library Canvas2d from github"><img src="'+githref+'" width="66" height="66"/></a>';
+    var gitlogo=document.getElementById('gitlogo'),githref=location?'img/blacktocat.png':'http://www.somethinglikethis.it/img/hosted/blacktocat.png';gitlogo.innerHTML='<a target="_blank" href="https://github.com/elbatico1/Canvas2d" title="download javascript library Canvas2d from github"><img src="'+githref+'" width="66" height="66"/></a>';
     var clogo=document.getElementById('canvaslogo'),chref=location?'img/canvas2d_64.png':'http://www.somethinglikethis.it/img/hosted/canvas2d_64.png';clogo.innerHTML='<img src="'+chref+'"/>'
     var methodsList={addEvent:'addEvent',removeEvent:'removeEvent',add:'add',remove:'remove',zOrder:'zOrder',clear:'clear',draw:'draw',getFrame:'getFrame',getTime:'getTime',getFps:'getFps',getTimeInterval:'getTimeInterval',clone:'clone'};
     //stage elements
