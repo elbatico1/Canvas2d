@@ -2769,7 +2769,7 @@ var Code = {
                 btn.rectRound(-(140 / 4), -(30 / 4), 140, 30, 8, 'lightseagreen');
                 bt.addEvent('mousedown', pixelated);
                 var tx = new Canvas2d.DisplayObjects();
-                tx.text('Non Grayscale', 0, 0, 'normal', 20, 'Calibri',
+                tx.text('Original', 0, 0, 'normal', 20, 'Calibri',
                         'whitesmoke', null, 'center', 'middle');
                 bt.add(btn);
                 bt.add(tx);
@@ -2778,7 +2778,7 @@ var Code = {
 
                 var im = new Canvas2d.DisplayObjects();
                 var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-                im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+                im.img(0, 0, params[0] ? 'img/image_test.jpg' : 'http://www.somethinglikethis.it/img/hosted/image_test.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
                 im.x = 180;
                 im.y = 20;
                 im.loadImage(im.source, null, complete);
@@ -2793,7 +2793,7 @@ var Code = {
                 function pixelated(e) {
                     if (im.currentFilter === 'grayscale') {
                         im.restore();
-                        tx.txt = 'Non Grayscale';
+                        tx.txt = 'Original';
                     } else {
                         im.filter('grayscale');
                         tx.txt = 'Grayscale';
@@ -2810,7 +2810,7 @@ var Code = {
                 btn.rectRound(-(140 / 4), -(30 / 4), 140, 30, 8, 'lightseagreen');
                 bt.addEvent('mousedown', pixelated);
                 var tx = new Canvas2d.DisplayObjects();
-                tx.text('Non Pixelated', 0, 0, 'normal', 20, 'Calibri',
+                tx.text('Original', 0, 0, 'normal', 20, 'Calibri',
                         'whitesmoke', null, 'center', 'middle');
                 bt.add(btn);
                 bt.add(tx);
@@ -2819,7 +2819,7 @@ var Code = {
 
                 var im = new Canvas2d.DisplayObjects();
                 var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-                im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+                im.img(0, 0, params[0] ? 'img/image_test.jpg' : 'http://www.somethinglikethis.it/img/hosted/image_test.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
                 im.x = 180;
                 im.y = 20;
                 im.loadImage(im.source, null, complete);
@@ -2834,7 +2834,7 @@ var Code = {
                 function pixelated(e) {
                     if (im.currentFilter === 'pixelated') {
                         im.restore();
-                        tx.txt = 'Non Pixelated';
+                        tx.txt = 'Original';
                     } else {
                         im.filter('pixelated', [12]);
                         tx.txt = 'Pixelated';
@@ -2918,7 +2918,7 @@ var Code = {
 
                 var im = new Canvas2d.DisplayObjects();
                 var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-                im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
+                im.img(0, 0, params[0] ? 'img/image_test.jpg' : 'http://www.somethinglikethis.it/img/hosted/image_test.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
                 im.x = 150;
                 im.y = 20;
                 im.loadImage(im.source, null, complete);
@@ -2939,43 +2939,73 @@ var Code = {
                 stage.draw();
             },
             invert: function(c, w, h, params) {
+                // set Stage ( container, width, height, enabledEvent:Boolean )
                 var stage = new Canvas2d.Stage(c, w, h);
+                
+                // set Sprite ( name, enabledEvent:Boolean )
                 var sp = new Canvas2d.Sprite();
                 var bt = new Canvas2d.Sprite();
-
+                
+                // set DisplayObjects ( name, enabledEvent:Boolean )
                 var btn = new Canvas2d.DisplayObjects();
+                
+                // create type rectRound ( localX, localY, width, height, radius, color, lineColor, lineWeight )
                 btn.rectRound(-(140 / 4), -(30 / 4), 140, 30, 8, 'lightseagreen');
+                
+                // add event addEvent ( type, func:Function )
                 bt.addEvent('mousedown', pixelated);
+                
+                // set DisplayObjects ( name, enabledEvent:Boolean )
                 var tx = new Canvas2d.DisplayObjects();
-                tx.text('Non Invert', 0, 0, 'normal', 20, 'Calibri',
-                        'whitesmoke', null, 'center', 'middle');
+                
+                // create type text ( txt, localX, localY, fontWeight, fontSize, fontType, color, {backGround}, align, baseLine )
+                tx.text('Original', 0, 0, 'normal', 20, 'Calibri', 'whitesmoke', null, 'center', 'middle');
+                
+                // add objects to his container
                 bt.add(btn);
                 bt.add(tx);
+                
+                //place object's x and y coordinates relative to his container
                 bt.x = 90;
                 bt.y = 35;
 
                 var im = new Canvas2d.DisplayObjects();
-                var crop = {dx: 250, dy: 250, dw: 300, dh: 250};
-                im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false, 'rgba(120,100,15,0.3)', 5, 5);
-                im.x = 180;
-                im.y = 20;
+                
+                //set parameters for image ( localX, localY, source, show, {backGround}, paddingTop, paddingLeft )
+                im.img(0, 0, params[0] ? 'img/image_test.jpg' : 'http://www.somethinglikethis.it/img/hosted/image_test.jpg', false);
+                
+                // keep track of the loading process ( source, progressEvent, completeEvent )
                 im.loadImage(im.source, null, complete);
+                
                 function complete(e) {
-                    e.setCrop(crop);
+                    //place object's x and y coordinates relative to his container
+                    im.x = stage.width / 2 - im.width / 2;
+                    im.y = stage.height / 2 - im.height / 2;
+                    
+                    // draw every objects in the target parent
                     e.parent.draw();
                 }
+                // add objects to his container
                 sp.add(im);
+                
+                // add container to stage
                 stage.add(sp);
                 stage.add(bt);
+                
+                // draw every element in stage
                 stage.draw();
                 function pixelated(e) {
+                    //if the filter is applied : restore the original image else apply filter
                     if (im.currentFilter === 'invert') {
+                        // restore the original image myImage.restore() it'll draw every objects in his parent
                         im.restore();
-                        tx.txt = 'Non Invert';
+                        tx.txt = 'Original';
                     } else {
+                        // apply filter myImage.filter( type, args:Array, value ) it'll draw every objects in his parent
                         im.filter('invert');
                         tx.txt = 'Invert';
                     }
+                    // draw every element in stage
                     stage.draw();
                 }
             }
@@ -2985,7 +3015,7 @@ var Code = {
             var sprite = new Canvas2d.Sprite('main');
             var im = new Canvas2d.DisplayObjects('image');
             var crop = {dx: 100, dy: 50, dw: w - 200, dh: h - 100};
-            im.img(0, 0, params[0] ? 'img/zoom2.jpg' : 'http://www.somethinglikethis.it/img/hosted/zoom2.jpg', false);
+            im.img(0, 0, params[0] ? 'img/image_test.jpg' : 'http://www.somethinglikethis.it/img/hosted/image_test.jpg', false);
             im.loadImage(im.source, null, complete);
             im.x = crop.dx;
             im.y = crop.dy;
