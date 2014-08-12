@@ -53,7 +53,7 @@ function startCanvas(l){
     //collect data from canvas2d as text
     xqr=new XMLHttpRequest();
     xqr.onload=function(){response=xqr.responseText.replace(END,'\n').split('\n');};
-    xqr.open('get',location?'../canvas2d.js':'https://rawgithub.com/elbatico1/Canvas2d/master/canvas2d.js',false);
+    xqr.open('get',location?'../canvas2d.js':'https://rawgit.com/elbatico1/Canvas2d/master/canvas2d.js',false);
     xqr.send();
     //parse Data
     for(i=0;i<response.length;i++){
