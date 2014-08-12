@@ -1,7 +1,7 @@
 function startCanvas(l){
     var codePre=document.getElementById('codecode'),examples=document.getElementById('example'),location=l.indexOf('localhost')>-1?true:false;
     var gitlogo=document.getElementById('gitlogo'),githref=location?'img/blacktocat.png':'http://www.somethinglikethis.it/img/hosted/blacktocat.png';gitlogo.innerHTML='<a target="_blank" href="https://github.com/elbatico1/Canvas2d" title="download javascript library Canvas2d from github"><img src="'+githref+'" width="66" height="66"/></a>';
-    var clogo=document.getElementById('canvaslogo'),chref=location?'img/canvas2d_64.png':'http://www.somethinglikethis.it/img/hosted/canvas2d_64.png';clogo.innerHTML='<img src="'+chref+'"/>'
+    var clogo=document.getElementById('canvaslogo'),chref=location?'img/canvas2d_64.png':'http://www.somethinglikethis.it/img/hosted/canvas2d_64.png';clogo.innerHTML='<img src="'+chref+'"/>';
     var methodsList={addEvent:'addEvent',removeEvent:'removeEvent',add:'add',remove:'remove',zOrder:'zOrder',clear:'clear',draw:'draw',getFrame:'getFrame',getTime:'getTime',getFps:'getFps',getTimeInterval:'getTimeInterval',clone:'clone'};
     //stage elements
     var width='innerWidth' in window?window.innerWidth:document.documentElement.clientWidth;width=1200;
@@ -11,7 +11,7 @@ function startCanvas(l){
     var badgeDw=new Canvas2d.Stage('badgedw',160,h);
     var trans=new Transition();
     //set variables
-    var response,code,i,o,ii=-1,ia,a=[],b=[],c,d,filter,ja=false,ne=false,xqr,xp,multyOpen=false;;
+    var response,code,i,o,ii=-1,ia,a=[],b=[],c,d,filter,ja=false,ne=false,xqr,xp,multyOpen=false,offY=0;
     var refList={Stage:'Stage',Sprite:'Sprite',DisplayObjects:'DisplayObjects',Tweener:'Tweener',Colors:'Colors'};
     var proList=['Stage','Sprite','DisplayObjects','Tweener','Colors'],numList=[],ease='easeOutExpo';
     //set regular expression
@@ -24,7 +24,7 @@ function startCanvas(l){
     //collect data from canvas2d Examples as text
     xqr=new XMLHttpRequest();
     xqr.onload=function(){code=xqr.responseText.replace(END,'\n').split('\n');};
-    xqr.open('get',location?'js/exampledocs.js':'https://rawgithub.com/elbatico1/Canvas2d/master/examples/js/exampledocs.js',false);
+    xqr.open('get',location?'js/exampledocs.js':'https://rawgit.com/elbatico1/Canvas2d/master/examples/js/exampledocs.js',false);
     xqr.send();
     //parse data Examples
     var codeObj={Stage:{},Sprite:{},DisplayObjects:{},Tweener:{},Colors:{},Common:{}};
@@ -165,21 +165,43 @@ function startCanvas(l){
         dClass.text(proList[i],0,0,'bold',26,font,'#999999',null,'center','middle');dClass.paddingLeft=dClass.paddingTop=5;
         b.push(dClass);wS=i===0?b[0].width:b[i-1].width;wSum+=wS;dClass.x=wSum+(dClass.width/2)+(50*i)+50;dClass.y=20;
         c=360/numList[i];ia=0;dClass.addEvent('click',classOpen);dClass.addEvent('mouseover',dcOver);dClass.addEvent('mouseout',dcOut);
-        sConstr=new Canvas2d.Sprite('sub_'+proList[i]);sConstrh=new Canvas2d.Sprite('subh_'+proList[i],false);
+        //sConstr=new Canvas2d.Sprite('sub_'+proList[i]);
+        var testDocs=document.getElementById('maindocs');
+        sConstr=document.createElement('div');sConstr.style.position='absolute';testDocs.appendChild(sConstr);sConstr.style.zIndex=100;
+        sConstrh=new Canvas2d.Sprite('subh_'+proList[i],false);
         for(o in ii){
             //set parameters text fields
-            dConstr=new Canvas2d.DisplayObjects(i+'_'+o);dConstrh=new Canvas2d.DisplayObjects(i+'h_'+o);
+            /*dConstr=new Canvas2d.DisplayObjects(i+'_'+o);
             dConstr.text(o,0,0,'lighter',16,font,'black',null,'left','bottom');dConstr.alpha=0;dConstr.paddingLeft=dConstr.paddingTop=4;
             dConstr.x=dClass.x;dConstr.y=dClass.y;dConstr.origin={x:dClass.x,y:dClass.y,set:false,parent:dClass};dConstr.dest={x:0,y:0,set:false};
             dConstr.addEvent('click',constrOpen);dConstr.addEvent('mouseover',coOver);dConstr.addEvent('mouseout',coOut);
-            sConstr.add(dConstr);
+            sConstr.add(dConstr);*/
+            dConstrh=new Canvas2d.DisplayObjects(i+'h_'+o);
+            dConstr=document.createElement('p');
+            dConstr.id=i+'_'+o;
+            dConstr.innerHTML=o;
+            dConstr.style.position='absolute';
+            dConstr.style.opacity='0';
+            dConstr.style.lineHeight='-16px';
+            dConstr.style.height='16px';
+            dConstr.style.padding='0px';
+            dConstr.style.margin='0px';
+            dConstr.style.textAlign='left';
+            dConstr.style.left=dClass.x+'px';
+            dConstr.style.top=dClass.y+'px';
+            dConstr.origin={x:dClass.x,y:dClass.y,set:false,parent:dClass,owner:sConstr,txt:o,ownertxt:proList[i]};dConstr.dest={x:0,y:0,set:false};
+            addEvt(dConstr,'click',constrOpen);
+            addEvt(dConstr,'mouseover',coOver);
+            addEvt(dConstr,'mouseout',coOut);
+            sConstr.appendChild(dConstr);
             //set lines for text fields to follow
             dConstrh.shape(0,0,[{'moveTo':[dClass.x,dClass.y]}, {'quadraticCurveTo':[dClass.x,dClass.y,dClass.x,dClass.y]}],null,'hsl('+(c*ia)+',100%,50%)',1.2,false);
             dConstrh.origin={x:dClass.x,y:dClass.y,set:false};dConstr.ref={x:25,y:h-15,txt:'',isopen:false,result:ii[o]};dConstrh.content=dConstr;dConstr.content=dConstrh;
             sConstrh.add(dConstrh);ia++;dConstrh.lineAlpha=0.3;
         }
-        sConstr.visible=false;dClass.content={dc:sConstr,dch:sConstrh,isopen:false,n:numList[i]};
-        sClass.add(dClass);mainDocs.add(sConstrh);mainDocs.add(sConstr);infoLabel.x=dClass.x+dClass.width;infoLabel.y=20;infoRow.x=infoLabel.x+infoLabel.width+10;infoRow.y=20;
+        sConstr.style.display='none';dClass.content={dc:sConstr,dch:sConstrh,isopen:false,n:numList[i]};
+        //mainDocs.add(sConstr);
+        sClass.add(dClass);mainDocs.add(sConstrh);infoLabel.x=dClass.x+dClass.width;infoLabel.y=20;infoRow.x=infoLabel.x+infoLabel.width+10;infoRow.y=20;
     }
     //add everithings into mainDocs 'main stage'
     sConstr=new Canvas2d.Sprite('backgroundmenulayer',false);
@@ -190,7 +212,7 @@ function startCanvas(l){
     var tween=new Canvas2d.Tweener(),currS=null,currC=null,togo=false,aEle,bEle;
     //function classes constructors
     function classOpen(e){
-        aEle=e.target.content.dc.children;bEle=e.target.content.dch.children;a=150;b=30;c=0;currC=null;
+        aEle=e.target.content.dc.getElementsByTagName('p');bEle=e.target.content.dch.children;a=150;b=30;c=0;currC=null;
         if(!e.target.content.isopen){
             if(currS!==e&&currS!==null){
                 if(currS.target.id!==e.target.id){
@@ -201,17 +223,18 @@ function startCanvas(l){
             e.target.content.isopen=true;tween.addTweener(infoLabel,{txt:'cutBack',alpha:0,duration:400,onEnd:info,data:{txt:e.target.txt,color:rowColor},onTween:null,onStart:labelStart});
             for(i=0;i<aEle.length;i++){
                 if(!aEle[i].origin.set){
-                    if(aEle[i].txt in refList){
-                        x=42;y=54;
+                    if(aEle[i].innerHTML in refList){
+                        x=42;y=54-offY;
                     }else{
                         b=30*c;x=width-a;y=(e.target.y+50)+b;c++;
                     }
-                    aEle[i].dest.x=x;aEle[i].dest.y=y;
+                    aEle[i].dest.x=x;aEle[i].dest.y=y-offY;
                 }else{
                     x=aEle[i].dest.x;y=aEle[i].dest.y;
                 }
-                bEle[i].lineAlpha=0.3;bEle[i].lineWidth=1.2;aEle[i].color='black';
-                tween.addTweener(aEle[i],{x:x,y:y,duration:1000,ease:ease,alpha:1,delay:10*i,onStart:i===0?isVisible:null,data:{visible:true,e:e,togo:togo}});
+                bEle[i].lineAlpha=0.3;bEle[i].lineWidth=1.2;aEle[i].style.color='black';
+                //tween.addTweener(aEle[i],{x:x,y:y,duration:1000,ease:ease,alpha:1,delay:10*i,onStart:i===0?isVisible:null,data:{visible:true,e:e,togo:togo}});
+                trans.addTweener(aEle[i],{left:x,top:y,duration:1000,ease:ease,opacity:1,delay:10*i,onStart:i===0?isVisible:null,data:{visible:'block',e:e,togo:togo}});
                 tween.addTweener(bEle[i],{obj:{'1':{quadraticCurveTo:[x/4,y+120,x,y]}},duration:1000,ease:ease,delay:10*i});
                 if(!aEle[i].origin.set){
                     if(b>(h/2)){
@@ -228,36 +251,39 @@ function startCanvas(l){
                     aEle[i].ref.isopen=false;
                 }
                 x=aEle[i].origin.x;y=aEle[i].origin.y;
-                tween.addTweener(aEle[i],{scaleX:1,scaleY:1,x:x,y:y,duration:800,ease:'easeInBack',alpha:0,delay:10*(aEle.length-i),onEnd:i===0?isVisible:null,data:{visible:false,e:e}});
+                //tween.addTweener(aEle[i],{scaleX:1,scaleY:1,x:x,y:y,duration:800,ease:'easeInBack',alpha:0,delay:10*(aEle.length-i),onEnd:i===0?isVisible:null,data:{visible:false,e:e}});
+                trans.addTweener(aEle[i],{fontSize:16,left:x,top:y,duration:800,ease:'easeInBack',opacity:0,delay:10*(aEle.length-i),onEnd:i===0?isVisible:null,data:{visible:'none',e:e}});
                 tween.addTweener(bEle[i],{obj:{'1':{quadraticCurveTo:[x,y,x,y]}},duration:800,ease:'easeInBack',delay:10*(aEle.length-i)});
             }
         }
     }
     function constrOpen(e){
-        e.target.color='black';mainDocs.container.style.cursor='default';
+        e.target.style.color='black';mainDocs.container.style.cursor='default';
         if(currC!==e&&currC!==null){
             if(currC.target.id!==e.target.id){
                 constrOpen(currC);
             }else{
-                tween.addTweener(infoLabel,{txt:'cutBack',alpha:0,duration:400,onEnd:info,data:{txt:e.target.origin.parent.txt,color:e.target.content.lineColor},onTween:null,onStart:labelStart});
+                tween.addTweener(infoLabel,{txt:'cutBack',alpha:0,duration:400,onEnd:info,data:{txt:e.target.origin.ownertxt,color:e.target.content.lineColor},onTween:null,onStart:labelStart});
             }
         }
         if(!e.target.ref.isopen){
             e.target.ref.isopen=true;x=e.target.ref.x;y=e.target.ref.y;currC=e;closeAll();
-            tween.addTweener(infoLabel,{txt:'cutBack',alpha:0,duration:400,onEnd:info,data:{txt:e.target.txt,color:e.target.content.lineColor},onTween:null,onStart:labelStart});
-            tween.addTweener(e.target,{scaleX:2,scaleY:2,x:x,y:y,duration:1000,ease:ease,data:true});
+            tween.addTweener(infoLabel,{txt:'cutBack',alpha:0,duration:400,onEnd:info,data:{txt:e.target.origin.txt,color:e.target.content.lineColor},onTween:null,onStart:labelStart});
+            //tween.addTweener(e.target,{scaleX:2,scaleY:2,x:x,y:y,duration:1000,ease:ease,data:true});
+            trans.addTweener(e.target,{fontSize:32,left:x,top:y,duration:1000,ease:ease,data:true});
             tween.addTweener(e.target.content,{obj:{'1':{quadraticCurveTo:[x+250,y,x,y]}},lineWidth:2,lineAlpha:1,duration:1000,ease:ease,onEnd:constrEnd,data:{target:e.target}});
 
         }else{
             e.target.ref.isopen=false;x=e.target.dest.x;y=e.target.dest.y;currC=null;
-            tween.addTweener(e.target,{scaleX:1,scaleY:1,x:x,y:y,duration:800,ease:'easeInOutBack',data:false});
+            //tween.addTweener(e.target,{scaleX:1,scaleY:1,x:x,y:y,duration:800,ease:'easeInOutBack',data:false});
+            trans.addTweener(e.target,{fontSize:16,left:x,top:y,duration:1000,ease:'easeInOutBack',data:false});
             tween.addTweener(e.target.content,{obj:{'1':{quadraticCurveTo:[x/2,y+100,x,y]}},lineWidth:1.2,lineAlpha:0.3,duration:900,ease:'easeInOutBack'});
         }
     }
     //mishellaneous
     function isVisible(e){
-        e.target.parent.visible=e.data.visible;
-        if(e.data.visible){
+        e.target.origin.owner.style.display=e.data.visible;
+        if(e.data.visible==='block'){
             currS=e.data.e;
             togo=currS;
         }else{
@@ -305,7 +331,7 @@ function startCanvas(l){
         }
     }
     function scrollVisible(e){
-        pushExample(e.data.target.origin.parent.txt,e.data.target.txt);
+        pushExample(e.data.target.origin.ownertxt,e.data.target.origin.txt);
         idx=refLayerHolder.getBound();
         if(idx.height>refDocs.height){
             refLayerScroll.visible=true;
@@ -411,13 +437,13 @@ function startCanvas(l){
     }
     function coOver(e){
         mainDocs.container.style.cursor='pointer';
-        e.target.color=e.target.content.lineColor;
-        e.target.parent.draw();
+        e.target.style.color=e.target.content.lineColor;
+        //e.target.parent.draw();
     }
     function coOut(e){
         mainDocs.container.style.cursor='default';
-        e.target.color='black';
-        e.target.parent.draw();
+        e.target.style.color='black';
+        //e.target.parent.draw();
     }
     function bwOver(e){
         badgeDw.container.style.cursor='pointer';
