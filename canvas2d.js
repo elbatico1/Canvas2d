@@ -1,5 +1,5 @@
 /**
- * Canvas2d JavaScript Library v1.0
+ * Canvas2d JavaScript Library v1.1
  * http://www.somethinglikethis.it/canvas2d/
  * Copyright 2012, Fabio Fantini
  * Licensed under the MIT or GPL Version 2 licenses.
@@ -2139,7 +2139,7 @@ Canvas2d.DisplayObjects.prototype = {
         var step = (step / 360) * (Math.PI * 2), x, y, theta = 0, i = 0, p = [];
         var R = stator * multyplier;
         var r = rotor * multyplier;
-        var d = rotorOffset * multyplier;console.log(360 / step * rotor)
+        var d = rotorOffset * multyplier;console.log(360 / step * rotor);
         while (i <= 360 / step * rotor) {
             if (rType === 'Epicycloid') {
                 x = (R + r) * Math.cos(theta) - r * Math.cos((R + r) / r * theta);
@@ -2201,6 +2201,12 @@ Canvas2d.DisplayObjects.prototype = {
                 data = this._filterPixelated(data, args, c);
                 this.currentFilter = "pixelated";
                 break;
+            case "cut":
+                var range = args[1];
+                args = args.length === 4 ? args : Colors.ParseColor(args[0]);
+                data = this._filterCut(data, args, range);
+                this.currentFilter = "cut";
+                break;
             default:
                 this.currentFilter = null;
                 break;
@@ -2246,6 +2252,20 @@ Canvas2d.DisplayObjects.prototype = {
             d[i] = 255 - d[i]; //red
             d[i + 1] = 255 - d[i + 1]; //green
             d[i + 2] = 255 - d[i + 2]; //blue
+        }
+        return data;
+    },
+    _filterCut: function(data, args, r) {
+        var d = data.data, t = 0;
+        function raise(a, b, c) {
+            //return (c >= a - b) && (c <= a + b) ? true : false;
+            return (c >= a - b) && (c <= a + b) ? Math.floor(255*Math.abs((a-c)/r)) : 255;
+        }
+        for (var i = 0; i < d.length; i += 4) {
+            //d[i + 3] = (d[i] + d[i + 1] + d[i + 2]) >= (args * 3) ? 0 : d[i + 3]; //alpha
+            //d[i + 3] = raise(d[i], r, args[0]) && raise(d[i + 1], r, args[1]) && raise(d[i + 2], r, args[2]) ? 0 : d[i + 3]; //alpha
+            t = raise(d[i], r, args[0]) + raise(d[i + 1], r, args[1]) + raise(d[i + 2], r, args[2]);
+            d[i + 3] = Math.floor(t / 3);
         }
         return data;
     },
@@ -3398,19 +3418,20 @@ Canvas2d.Tweener.prototype = {
         twnobj.state = {start: true, tweening: false, end: false, onStart: onStart, onTween: onTween, onEnd: onEnd, target: o, duration: duration, delay: delay, data: data};
 
         if (delay > 0) {
-            this._tempChildren[o.id] = '';
-            var that = this;
-            setTimeout(function() {
-                if (o.id in that._tempChildren) {
-                    delete that._tempChildren[o.id];
-                    that.children[o.id] = twnobj;
-                }
-
-            }, delay);
+            this._delayFun(this.children,twnobj,o.id,delay);
         } else {
-            this.children[o.id] = twnobj;
-            window.rqanim.addLoop(this, this._callTween);
+            this._startFun(this.children,twnobj,o.id);
         }
+    },
+    _delayFun: function(c,o,id,d){
+        var that=this;
+        setTimeout(function(){
+            that._startFun(c,o,id);
+        }, d);
+    },
+    _startFun: function(c,o,id){
+        c[id]=o;
+        window.rqanim.addLoop(this, this._callTween);
     },
     /**
      * removeTweener - Tweener - remove an object from the animation cicle list
