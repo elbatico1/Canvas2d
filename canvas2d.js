@@ -44,10 +44,10 @@ var Canvas2d = {
  * @property {div DOMElement} container div element that will contained all the canvas's elements
  * @property {number} width Stage width
  * @property {number} height Stage height
- * @property {number} x orizontal coordinate
+ * @property {number} x horizontal coordinate
  * @property {number} y vertical coordinate
  * @property {number} alpha opacity value in range 0-1
- * @property {number} scaleX orizontal scale
+ * @property {number} scaleX horizontal scale
  * @property {number} scaleY vertival scale
  * @property {number} rotation rotation expressed in degrees
  * @property {boolean} visible visibility of the object
@@ -1131,10 +1131,10 @@ Canvas2d.Stage.prototype = {
  * @description container for all type of DisplayObjects
  * @property {number} width Stage width
  * @property {number} height Stage height
- * @property {number} x orizontal coordinate
+ * @property {number} x horizontal coordinate
  * @property {number} y vertical coordinate
  * @property {number} alpha opacity value in range 0-1
- * @property {number} scaleX orizontal scale
+ * @property {number} scaleX horizontal scale
  * @property {number} scaleY vertival scale
  * @property {number} rotation rotation expressed in degrees
  * @property {boolean} visible visibility of the object
@@ -1414,10 +1414,10 @@ Canvas2d.Sprite.prototype = {
  * @description object constructor of all shapes, texts, images and clips
  * @property {number} width Stage width
  * @property {number} height Stage height
- * @property {number} x orizontal coordinate
+ * @property {number} x horizontal coordinate
  * @property {number} y vertical coordinate
  * @property {number} alpha opacity value in range 0-1
- * @property {number} scaleX orizontal scale
+ * @property {number} scaleX horizontal scale
  * @property {number} scaleY vertival scale
  * @property {number} rotation rotation expressed in degrees
  * @property {boolean} visible visibility of the object
@@ -1756,9 +1756,9 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * rect - DisplayObjects - create a rectangle
-     * @type constructor rect
+     * @type constructor rect DisplayObjects
      * @description create a rectangle
-     * @param {number} x LOCAL orizontal coordinate
+     * @param {number} x LOCAL horizontal coordinate
      * @param {number} y LOCAL vertical coordinate
      * @param {number} width object width
      * @param {number} height object height
@@ -1780,9 +1780,9 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * rectRound - DisplayObjects - create a rectangle with rounded corner
-     * @type constructor rectRound
+     * @type constructor rectRound DisplayObjects
      * @description create a rectangle width rounded corner
-     * @param {number} x LOCAL orizontal coordinate
+     * @param {number} x LOCAL horizontal coordinate
      * @param {number} y LOCAL vertical coordinate
      * @param {number} radius radius of corners
      * @param {number} width object width
@@ -1806,9 +1806,9 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * polygon - DisplayObjects - create a polygon
-     * @type constructor polygon
+     * @type constructor polygon DisplayObjects
      * @description create a polygon
-     * @param {number} x LOCAL orizontal coordinate
+     * @param {number} x LOCAL horizontal coordinate
      * @param {number} y LOCAL vertical coordinate
      * @param {array} points a collection of two points coordinates [[x,y],..]
      * @param {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
@@ -1854,9 +1854,9 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * shape - DisplayObjects - create a shape
-     * @type constructor shape
+     * @type constructor shape DisplayObjects
      * @description create a shape
-     * @param {number} x LOCAL orizontal coordinate
+     * @param {number} x LOCAL horizontal coordinate
      * @param {number} y LOCAL vertical coordinate
      * @param {array} obj a collection of objects key-value; [{moveTo:[..]},{lineTo:[..]},{quadraticCurveTo:[....]},{bezierCurveTo:[....]},{arcTo:[...]}]
      * @param {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
@@ -1936,14 +1936,14 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * line - DisplayObjects - creatye a line
-     * @type constructor line
+     * @type constructor line DisplayObjects
      * @description create a line
      * @property {array} points contain two array corresponding to the coordinates x,y of [x0,y0],[x1,y1]
-     * @param {number} x LOCAL orizontal coordinate
+     * @param {number} x LOCAL horizontal coordinate
      * @param {number} y LOCAL vertical coordinate
-     * @param {number} x0 starting orizontal coordinate
+     * @param {number} x0 starting horizontal coordinate
      * @param {number} y0 starting vertical coordinate
-     * @param {number} x1 ending orizontal coordinate
+     * @param {number} x1 ending horizontal coordinate
      * @param {number} y1 ending vertical coordinate
      * @param {type} linecolor color value; hex, name, array, string; rgb, hsl, hsv
      * @param {number} linewidth weight of line
@@ -1989,9 +1989,9 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * circle - DisplayObjects - create a crcle
-     * @type constructor circle
+     * @type constructor circle DisplayObjects
      * @description create a circle
-     * @param {type} x LOCAL orizontal coordinate
+     * @param {type} x LOCAL horizontal coordinate
      * @param {type} y LOCAL vertical coordinate
      * @param {type} radius radius width
      * @param {type} startAngle starting point angle in degrees
@@ -2017,17 +2017,17 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * text - DisplayObjects - create a text field
-     * @type constructor text
+     * @type constructor text DisplayObjects
      * @description create a text field
      * @param {string} txt the text to use for text field
-     * @param {number} x LOCAL orizontal coordinate
+     * @param {number} x LOCAL horizontal coordinate
      * @param {number} y LOCAL vertical coordinate
      * @param {string} fontweigth style of weight text field; normal, bold, italic, bold italic; default normal
      * @param {number} fontsize the size of font
      * @param {string} font the font-family type to use for the text fiel; default Verdana, multiple value are allowed
      * @param {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
      * @param {object} background an object rapresenting the style of the twxt field background; {color:..,linecolor:..,linewidth:..}
-     * @param {string} align the orizontal alignment of the text field; start, end, left, right, center; default left
+     * @param {string} align the horizontal alignment of the text field; start, end, left, right, center; default left
      * @param {string} baseline the vertical alignment of text field; top, hanging, middle, alphabetic, ideographic, bottom; default alphabetic
      * @example myObject.text('testo da inserire',0,0,'normal',18,'Verdana,Helvetica,Sans-serife',{color:'red'},'center','bottom');
      * @returns {undefined} none none
@@ -2052,9 +2052,9 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * img - DisplayObjects - create an image
-     * @type constructor img
+     * @type constructor img DisplayObjects
      * @description create an image
-     * @param {number} x LOCAL orizontal coordinate
+     * @param {number} x LOCAL horizontal coordinate
      * @param {number} y LOCAL vertical coordinate
      * @param {mixed} source img DOM Element or string url
      * @param {boolean} show determin if manage directly or automatically the process of loading
@@ -2082,9 +2082,9 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      * clip - DisplayObjects - create a clip
-     * @type constructor clip
+     * @type constructor clip DisplayObjects
      * @description create a clip
-     * @param {number} x LOCAL orizontal coordinate
+     * @param {number} x LOCAL horizontal coordinate
      * @param {number} y LOCAL vertical coordinate
      * @param {mixed} source img DOM Element or string url
      * @param {array} framelist a list of object that specified the sequence of image to cut;[{x,..,y:..,map:{x:..,y:..,width:..,height:..},...]
