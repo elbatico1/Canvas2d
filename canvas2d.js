@@ -35,7 +35,8 @@
 var Canvas2d = {
     'globalId': 1,
     'container': {'id': 0, 'width': 0, 'height': 0, 'element': null},
-    'fakeCtx': null
+    'fakeCtx': null,
+    wn:null
 };
 /**
  * Stage
@@ -111,129 +112,135 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             this._functest();
         }
     }
-    if (!window.fire) {
-        window.fire = (function(callback) {
-            return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
-                window.setTimeout(callback, 1000 / 60);
-            };
-        })();
-        window.cancelFire = (function(id) {
-            return window.cancelRequestAnimationFrame || window.webkitCancelRequestAnimationFrame || window.mozCancelRequestAnimationFrame || window.oCancelRequestAnimationFrame || window.msCancelRequestAnimationFrame || function(id) {
-                window.clearTimeout(id);
-            };
-        })();
-        window.rqanim = {
-            time: 0,
-            timeInterval: 0,
-            startTime: 0,
-            lastTime: 0,
-            frame: 0,
-            animating: false,
-            loop: [],
-            prId: 0,
-            whipe: function() {
-                this.loop = [];
-            },
-            getLoop: function() {
-                return this.loop;
-            },
-            getTime: function() {
-                return this.time;
-            },
-            getFps: function() {
-                return this.timeInterval > 0 ? 1000 / this.timeInterval : 0;
-            },
-            getFrame: function() {
-                return this.frame;
-            },
-            getTimeInterval: function() {
-                return this.timeInterval;
-            },
-            _animationLoop: function() {
-                if (this.animating) {
-                    var that = this;
-                    this.frame++;
-                    var date = new Date();
-                    var thisTime = date.getTime();
-                    this.timeInterval = thisTime - this.lastTime;
-                    this.time += this.timeInterval;
-                    this.lastTime = thisTime;
-                    for (var i = 0; i < this.loop.length; i++) {
-                        var illo = this.loop[i];
-                        illo.func.apply(illo.target, [illo.target]);
-                    }
-                    window.fire(function() {
-                        that._animationLoop();
-                    });
-                }
-            },
-            start: function() {
-                if (!this.animating) {
-                    var date = new Date();
-                    this.startTime = date.getTime();
-                    this.lastTime = this.startTime;
-                    this.animating = true;
-                    this._animationLoop();
-                }
-            },
-            reset: function() {
-                this.time = 0;
-                this.timeInterval = 0;
-                this.startTime = 0;
-                this.lastTime = 0;
-                this.frame = 0;
+    Canvas2d.wn=new Date().getTime();
+    this.wn=Canvas2d.wn;
+    window.fire = (function(callback) {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
+            window.setTimeout(callback, 1000 / 60);
+        };
+    })();
+    window.cancelFire = (function(id) {
+        return window.cancelRequestAnimationFrame || window.webkitCancelRequestAnimationFrame || window.mozCancelRequestAnimationFrame || window.oCancelRequestAnimationFrame || window.msCancelRequestAnimationFrame || function(id) {
+            window.clearTimeout(id);
+        };
+    })();
+    window[Canvas2d.wn+'rqanim'] = {
+        time: 0,
+        timeInterval: 0,
+        startTime: 0,
+        lastTime: 0,
+        frame: 0,
+        animating: false,
+        loop: [],
+        prId: 0,
+        whipe: function() {
+            this.loop = [];
+        },
+        getLoop: function() {
+            return this.loop;
+        },
+        getTime: function() {
+            return this.time;
+        },
+        getFps: function() {
+            return this.timeInterval > 0 ? 1000 / this.timeInterval : 0;
+        },
+        getFrame: function() {
+            return this.frame;
+        },
+        getTimeInterval: function() {
+            return this.timeInterval;
+        },
+        _animationLoop: function() {
+            if (this.animating) {
+                var that = this;
+                this.frame++;
                 var date = new Date();
-                this.startTime = date.getTime();
-                this.lastTime = this.startTime;
-            },
-            stop: function() {
-                this.animating = false;
-            },
-            addLoop: function(target, func) {
-                if (!this.isChild(target)) {
-                    this.prId++;
-                    this.start();
-                    target.PRID = this.prId;
-                    this.loop.push({target: target, func: func, id: this.prId});
-                }
-                return this.prId;
-            },
-            isChild: function(target) {
-                var id = -1;
+                var thisTime = date.getTime();
+                this.timeInterval = thisTime - this.lastTime;
+                this.time += this.timeInterval;
+                this.lastTime = thisTime;
                 for (var i = 0; i < this.loop.length; i++) {
-                    if (this.loop[i].target === target) {
-                        id = i;
-                        break;
-                    }
+                    var illo = this.loop[i];
+                    illo.func.apply(illo.target, [illo.target]);
                 }
-                return id > -1 ? true : false;
-            },
-            removeLoop: function(target) {
-                var id = -1;
-                for (var i = 0; i < this.loop.length; i++) {
-                    if (this.loop[i].id === target.PRID) {
-                        id = i;
-                        break;
-                    }
-                }
-                if (id > -1) {
-                    this.loop.splice(id, 1);
-                }
-                if (this.loop.length === 0) {
-                    this.stop();
-                }
-            },
-            _init: function() {
+                window.fire(function() {
+                    that._animationLoop();
+                });
+            }
+        },
+        start: function() {
+            if (!this.animating) {
                 var date = new Date();
                 this.startTime = date.getTime();
                 this.lastTime = this.startTime;
                 this.animating = true;
                 this._animationLoop();
             }
-        };
-    } else {
-
-    }
+        },
+        reset: function() {
+            this.time = 0;
+            this.timeInterval = 0;
+            this.startTime = 0;
+            this.lastTime = 0;
+            this.frame = 0;
+            var date = new Date();
+            this.startTime = date.getTime();
+            this.lastTime = this.startTime;
+        },
+        stop: function() {
+            this.animating = false;
+        },
+        addLoop: function(target, func) {
+            var id=true;
+            if (target.className==='DisplayObjects') {
+                id=target.parent.parent.wn===Canvas2d.wn?true:false;
+            }else if(target.className==='Sprite'){
+                id=target.parent.wn===Canvas2d.wn?true:false;
+            }else if(target.className==='Stage'){
+                id=target.wn===Canvas2d.wn?true:false;
+            }
+            if (!this.isChild(target)&&id) {
+                this.prId++;
+                this.start();
+                target.PRID = this.prId;
+                this.loop.push({target: target, func: func, id: this.prId});
+            }
+            return this.prId;
+        },
+        isChild: function(target) {
+            var id = false;
+            for (var i = 0; i < this.loop.length; i++) {
+                if (this.loop[i].target === target) {
+                    id = true;
+                    break;
+                }
+            }
+            return id;
+        },
+        removeLoop: function(target) {
+            var id = -1;
+            for (var i = 0; i < this.loop.length; i++) {
+                if (this.loop[i].id === target.PRID) {
+                    id = i;
+                    break;
+                }
+            }
+            if (id > -1) {
+                this.loop.splice(id, 1);
+            }
+            if (this.loop.length === 0) {
+                this.stop();
+            }
+        },
+        _init: function() {
+            var date = new Date();
+            this.startTime = date.getTime();
+            this.lastTime = this.startTime;
+            this.animating = true;
+            this._animationLoop();
+        }
+    };
 };
 Canvas2d.Stage.prototype = {
     /**
@@ -287,7 +294,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     addLoop: function(target, func) {
-        window.rqanim.addLoop(target, func);
+        window[Canvas2d.wn+'rqanim'].addLoop(target, func);
     },
     /**
      *removeLoop - Stage - set the main function for animation.
@@ -300,7 +307,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     removeLoop: function(target) {
-        window.rqanim.removeLoop(target);
+        window[Canvas2d.wn+'rqanim'].removeLoop(target);
     },
     /**
      * start - Stage - start the animation cicle
@@ -312,7 +319,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     start: function() {
-        window.rqanim.start();
+        window[Canvas2d.wn+'rqanim'].start();
     },
     /**
      * reset - -Stage - reset the animation cicle
@@ -324,7 +331,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     reset: function() {
-        window.rqanim.reset();
+        window[Canvas2d.wn+'rqanim'].reset();
     },
     /**
      * stop - Stage - stop the animation cicle
@@ -336,7 +343,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     stop: function() {
-        window.rqanim.animating = false;
+        window[Canvas2d.wn+'rqanim'].animating = false;
     },
     /**
      * getFrame - Stage - get the current increasing number of frame fired
@@ -348,7 +355,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getFrame: function() {
-        return window.rqanim.getFrame();
+        return window[Canvas2d.wn+'rqanim'].getFrame();
     },
     /**
      * getTime - Stage - get the current increasing number of millisecond
@@ -360,7 +367,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getTime: function() {
-        return window.rqanim.getTime();
+        return window[Canvas2d.wn+'rqanim'].getTime();
     },
     /**
      *getFps - Stage - get the current number of frame per seconds
@@ -372,7 +379,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getFps: function() {
-        return window.rqanim.getFps();
+        return window[Canvas2d.wn+'rqanim'].getFps();
     },
     /**
      * getTimeInterval - Stage - get the actual delay in millisecond between cicle loops
@@ -384,7 +391,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getTimeInterval: function() {
-        return window.rqanim.getTimeInterval();
+        return window[Canvas2d.wn+'rqanim'].getTimeInterval();
     },
     /**
      * getLoopList - Stage - get a list of all the element in the loop cicle
@@ -396,7 +403,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getLoopList: function() {
-        return window.rqanim.loop;
+        return window[Canvas2d.wn+'rqanim'].loop;
     },
     /**
      * isAnimating - Stage - get a true/false value indicating the activiti of the animation cicle loop
@@ -408,7 +415,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     isAnimating: function() {
-        return window.rqanim.animating;
+        return window[Canvas2d.wn+'rqanim'].animating;
     },
     /**
      *getDataURL - Stage - take a screen shot of stage
@@ -1473,7 +1480,7 @@ Canvas2d.DisplayObjects.prototype = {
     fontStyle: null,
     fontSize: 10,
     fontType: 'Verdana',
-    fontWeigth: 'normal',
+    fontWeight: 'normal',
     align: 'center',
     baseLine: 'alphabetic',
     backGround: null,
@@ -2203,7 +2210,7 @@ Canvas2d.DisplayObjects.prototype = {
                 break;
             case "cut":
                 var range = args[1];
-                args = args.length === 4 ? args : Colors.ParseColor(args[0]);
+                args = args.length === 4 ? args : Colors._parseColor(args[0]);
                 data = this._filterCut(data, args, range);
                 this.currentFilter = "cut";
                 break;
@@ -2533,7 +2540,7 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.shadowBlur = this.lineShadow.blur;
                 if (this.lineColor) {
                     ctx.globalAlpha = this._g.lineAlpha;
-                    ctx.strokeStyle = this.lineColor;
+                    ctx.strokeStyle = Colors.ParseColor(this.lineColor);
                     ctx.stroke();
                 }
                 ctx.restore();
@@ -2544,7 +2551,7 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.miterLimit = this.lineMiter;
                 if (this.lineColor) {
                     ctx.globalAlpha = this._g.lineAlpha;
-                    ctx.strokeStyle = this.lineColor;
+                    ctx.strokeStyle = Colors.ParseColor(this.lineColor);
                     ctx.stroke();
                 }
             }
@@ -2582,7 +2589,7 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.restore();
             } else {
                 if (this.color) {
-                    ctx.fillStyle = this.color;
+                    ctx.fillStyle = Colors.ParseColor(this.color);
                     ctx.fill();
                 }
             }
@@ -2597,8 +2604,8 @@ Canvas2d.DisplayObjects.prototype = {
      *@param base { string - 'top' or 'hanging' or 'middle' or 'alphabetic' or 'ideographic' or 'bottom' - default 'alphabetic' }
      */
     _setFont: function(fontweight, fontsize, font, align, base) {
-        this.fontWeigth = fontweight ? fontweight : this.fontWeigth;
-        this.fontStyle = this.fontWeigth + ' ' + fontsize.toString() + 'px ' + font;
+        this.fontWeight = fontweight ? fontweight : this.fontWeight;
+        this.fontStyle = this.fontWeight + ' ' + fontsize.toString() + 'px ' + font;
         this.fontType = font;
         this.fontSize = fontsize;
         this.align = (this._alignList[align]) ? align : 'center';
@@ -2953,7 +2960,7 @@ Canvas2d.DisplayObjects.prototype = {
         ctx.scale(this.scaleX, this.scaleY);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
-        this.fontStyle = this.fontWeigth + ' ' + this.fontSize + 'px ' + this.fontType;
+        this.fontStyle = this.fontWeight + ' ' + this.fontSize + 'px ' + this.fontType;
         ctx.font = this.fontStyle;
         ctx.textAlign = this.align;
         ctx.textBaseline = this.baseLine;
@@ -3208,6 +3215,7 @@ Canvas2d.DisplayObjects.prototype = {
  *@link text
  */
 Canvas2d.Tweener = function() {
+    this.className = 'Tweener';
     this.children = {};
     this._tempChildren = {};
     this.charList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ',', '"', '\'', ',', ':', ';', '(', ')', '[', ']', '{', '}', '*', '@', '.', '!', '?', '\\', '/', '<', '>', '#', '+', '-', '_', '=', '^', 'ì', 'è', 'é', 'ò', 'à', 'ù', '&', '$', '£', '|', '∞', '°', 'ç'];
@@ -3223,7 +3231,7 @@ Canvas2d.Tweener.prototype = {
      *@link text
      */
     getFrame: function() {
-        return window.rqanim.getFrame();
+        return window[Canvas2d.wn+'rqanim'].getFrame();
     },
     /**
      * getTime - Tweener - get the current increasing number of millisecond
@@ -3235,7 +3243,7 @@ Canvas2d.Tweener.prototype = {
      * @link text
      */
     getTime: function() {
-        return window.rqanim.getTime();
+        return window[Canvas2d.wn+'rqanim'].getTime();
     },
     /**
      *getFps - Tweener - get the current number of frame per seconds
@@ -3247,7 +3255,7 @@ Canvas2d.Tweener.prototype = {
      *@link text
      */
     getFps: function() {
-        return window.rqanim.getFps();
+        return window[Canvas2d.wn+'rqanim'].getFps();
     },
     /**
      * getTimeInterval - Tweener - get the actual delay in millisecond between cicle loops
@@ -3259,7 +3267,7 @@ Canvas2d.Tweener.prototype = {
      *@link text
      */
     getTimeInterval: function() {
-        return window.rqanim.getTimeInterval();
+        return window[Canvas2d.wn+'rqanim'].getTimeInterval();
     },
     /**
      * addTweener - Tweener - Add an objects with parameter to be transitioned
@@ -3340,8 +3348,8 @@ Canvas2d.Tweener.prototype = {
             twnobj['shadow'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'shadow', subprop: [], request: [], target: o};
             for (var io in args['shadow']) {
                 if (io === "color") {
-                    colorReq = Colors.ParseColor(args['shadow'][io]);
-                    colorSrc = Colors.ParseColor(o['shadow'][io]);
+                    colorReq = Colors._parseColor(args['shadow'][io]);
+                    colorSrc = Colors._parseColor(o['shadow'][io]);
                     r = colorReq[0] - colorSrc[0];
                     g = colorReq[1] - colorSrc[1];
                     b = colorReq[2] - colorSrc[2];
@@ -3366,8 +3374,8 @@ Canvas2d.Tweener.prototype = {
             twnobj['lineShadow'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'lineShadow', subprop: [], request: [], target: o};
             for (var oi in args['lineShadow']) {
                 if (oi === "color") {
-                    colorReq = Colors.ParseColor(args['lineShadow'][oi]);
-                    colorSrc = Colors.ParseColor(o['lineShadow'][oi]);
+                    colorReq = Colors._parseColor(args['lineShadow'][oi]);
+                    colorSrc = Colors._parseColor(o['lineShadow'][oi]);
                     r = colorReq[0] - colorSrc[0];
                     g = colorReq[1] - colorSrc[1];
                     b = colorReq[2] - colorSrc[2];
@@ -3386,16 +3394,16 @@ Canvas2d.Tweener.prototype = {
             }
         }
         if ('color' in args) {
-            colorReq = Colors.ParseColor(args['color']);
-            colorSrc = Colors.ParseColor(o.color);
+            colorReq = Colors._parseColor(args['color']);
+            colorSrc = Colors._parseColor(o.color);
             r = colorReq[0] - colorSrc[0];
             g = colorReq[1] - colorSrc[1];
             b = colorReq[2] - colorSrc[2];
             twnobj['rgb'] = {ease: ease, tor: r, tog: g, tob: b, ct: 0, d: duration, fromr: colorSrc[0], fromg: colorSrc[1], fromb: colorSrc[2], prop: 'color', request: colorReq, target: o};
         }
         if ('lineColor' in args) {
-            colorReq = Colors.ParseColor(args['lineColor']);
-            colorSrc = Colors.ParseColor(o.lineColor);
+            colorReq = Colors._parseColor(args['lineColor']);
+            colorSrc = Colors._parseColor(o.lineColor);
             r = colorReq[0] - colorSrc[0];
             g = colorReq[1] - colorSrc[1];
             b = colorReq[2] - colorSrc[2];
@@ -3431,7 +3439,7 @@ Canvas2d.Tweener.prototype = {
     },
     _startFun: function(c,o,id){
         c[id]=o;
-        window.rqanim.addLoop(this, this._callTween);
+        window[Canvas2d.wn+'rqanim'].addLoop(this, this._callTween);
     },
     /**
      * removeTweener - Tweener - remove an object from the animation cicle list
@@ -3476,7 +3484,7 @@ Canvas2d.Tweener.prototype = {
                     for (n in that.children) {
                     }
                     if (!that.children[o] && !that.children[n]) {
-                        window.rqanim.removeLoop(that);
+                        window[Canvas2d.wn+'rqanim'].removeLoop(that);
                     }
                     continue;
                 } else {
@@ -3486,7 +3494,7 @@ Canvas2d.Tweener.prototype = {
             that._states(that.children[o].state);
             for (var oo in that.children[o]) {
                 if (oo !== 'state') {
-                    var ct = window.rqanim.getTimeInterval();
+                    var ct = window[Canvas2d.wn+'rqanim'].getTimeInterval();
                     if (oo === 'rgb' || oo === 'rgbl') {
                         that.children[o][oo].ct += ct;
                         that._tweenColor(that.children[o][oo], that.children[o].state);
@@ -4477,7 +4485,7 @@ var Colors = {
      * RgbToHsl - Colors -
      * @type static method Colors
      * @description Converts an RGB color value to HSL. Assumes r, g, and b are contained in the set [0, 255] and returns h, s, and l in the set [0, 1].
-     * @param {number} r number The red color value 
+     * @param {number} r number The red color value
      * @param {number} g number The green color value
      * @param {number} b number The blue color value
      * @example var myValue= Colors.RgbToHsl([r, g, b]);
@@ -4487,7 +4495,8 @@ var Colors = {
      */
     RgbToHsl: function(r, g, b) {
         r /= 255, g /= 255, b /= 255;
-        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var max = Math.max(r, g, b),
+            min = Math.min(r, g, b);
         var h, s, l = (max + min) / 2;
 
         if (max === min) {
@@ -4515,8 +4524,8 @@ var Colors = {
      * HslToRgb - Colors -
      * @type static method Colors
      * @description Converts an HSL color value to RGB. Assumes h, s, and l are contained in the set [0, 1] and returns r, g, and b in the set [0, 255].
-     * @param {number} h Number The hue 
-     * @param {number} s Number The saturation 
+     * @param {number} h Number The hue
+     * @param {number} s Number The saturation
      * @param {number} l Number The lightness
      * @example var myValue= Colors.HslToRgb([h, s, l]);
      * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
@@ -4566,7 +4575,8 @@ var Colors = {
      */
     RgbToHsv: function(r, g, b) {
         r = r / 255, g = g / 255, b = b / 255;
-        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var max = Math.max(r, g, b),
+            min = Math.min(r, g, b);
         var h, s, v = max;
 
         var d = max - min;
@@ -4658,9 +4668,9 @@ var Colors = {
 
     },
     /**
-     * PraseColor - Colors - return a rgb array 
+     * PraseColor - Colors - return a rgb string
      * @type static method Colors
-     * @description return a rgb array from any kind of accepted color formats
+     * @description return a rgb string from any kind of accepted color formats
      * @param {mixed} color any kind of accepted color formats; string, name, hex, array
      * @example var myValue= Colors.ParseColor(myObject.color);
      * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
@@ -4669,27 +4679,61 @@ var Colors = {
      */
     ParseColor: function(color) {
         if (!color) {
+            console.log(color, ' isn\'t a valid value.');
+            return undefined;
+        }
+        if (typeof color === 'string') {
+            var result = color.replace(/\s/g, "").toLowerCase();
+            var re, ar;
+            if (result.indexOf('rgb') > -1) {
+                return result;
+            } else if (result.indexOf('#') > -1) {
+                var hex = this.Rgb(result);
+                return 'rgb(' + hex[0] + ',' + hex[1] + ',' + hex[2] + ')';
+            } else if (result.indexOf('hsl') > -1) {
+                re = /[hsla\(\)]/g;
+                ar = result.replace(re, '').split(',');
+                var hsl = this.HslToRgb(parseFloat(ar[0]) / 360, parseFloat(ar[1]) / 100, parseFloat(ar[2]) / 100);
+                return 'rgb(' + hsl[0] + ',' + hsl[1] + ',' + hsl[2] + ')';
+            } else if (result.indexOf('hsv') > -1) {
+                re = /[hsv\(\)]/g;
+                ar = result.replace(re, '').split(',');
+                var hsv = this.HsvToRgb(parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3]));
+                return 'rgb(' + hsv[0] + ',' + hsv[1] + ',' + hsv[2] + ')';
+            } else if (result in this.namedColor) {
+                ar = this.namedColor[result][1];
+                return 'rgb(' + ar[0] + ',' + ar[1] + ',' + ar[2] + ')';
+            } else {
+                console.log(color, ' isn\'t a valid value.');
+                return 'rgb(0,0,0)';
+            }
+        } else {
+            return 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+        }
+    },
+    _parseColor: function(color) {
+        if (!color) {
             return [0, 0, 0];
         }
         if (typeof color === 'string') {
             var result = color.replace(/\s/g, "").toLowerCase();
             var re, ar;
             if (result.indexOf('rgb') > -1) {
-                re = /\-?(\d{1,3}),\-?(\d{1,3}),\-?(\d{1,3})/g;
-                ar = re.exec(result);
-                return [parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3])];
+                re = /[rgba\(\)]/g;
+                ar = result.replace(re, '').split(',');
+                return [parseInt(ar[0]), parseInt(ar[1]), parseInt(ar[2])];
             } else if (result.indexOf('#') > -1) {
                 var hex = this.Rgb(result);
                 return hex;
             } else if (result.indexOf('hsl') > -1) {
-                re = /hsl\((.*),(\d{1,3})?%,(\d{1,3})/g;
-                ar = re.exec(result);
-                var hsl = this.HslToRgb(ar[1] / 360, ar[2] / 100, ar[3] / 100);
+                re = /[hsla\(\)]/g;
+                ar = result.replace(re, '').split(',');
+                var hsl = this.HslToRgb(ar[0] / 360, ar[1] / 100, ar[2] / 100);
                 return hsl;
             } else if (result.indexOf('hsv') > -1) {
-                re = /hsv\((.*),(\d{1,3})?%,(\d{1,3})/g;
-                ar = re.exec(result);
-                var hsv = this.HsvToRgb(ar[1] / 360, ar[2] / 100, ar[3] / 100);
+                re = /[hsva\(\)]/g;
+                ar = result.replace(re, '').split(',');
+                var hsv = this.HsvToRgb(ar[0] / 360, ar[1] / 100, ar[2] / 100);
                 return hsv;
             } else if (result in this.namedColor) {
                 ar = this.namedColor[result][1];
@@ -4702,8 +4746,25 @@ var Colors = {
         }
     },
     Invert: function(args) {
-        var c = this.ParseColor(args);
+        var c = this._parseColor(args);
         return [255 - c[0], 255 - c[1], 255 - c[2]];
+    },
+    Complementary: function(args) {
+        var c = this._parseColor(args),
+            b;
+        b = this.RgbToHsl(c[0], c[1], c[2]);
+        c = this.HslToRgb((b[0] + 0.5 > 1 ? 1 - (b[0] + 0.5) : b[0] + 0.5), b[1], b[2]);
+        return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+    },
+    HueShift: function(h, s) {
+        h += s;
+        while (h >= 360.0) {
+            h -= 360.0;
+        }
+        while (h < 0.0) {
+            h += 360.0;
+        }
+        return h;
     },
     /**
      * namedColor - Colors -
@@ -4714,7 +4775,7 @@ var Colors = {
      * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
      */
-    namedColor: {//147 colors
+    namedColor: { //147 colors
         "aliceblue": ["#f0f8ff", [240, 248, 255]],
         "antiquewhite": ["#faebd7", [250, 235, 215]],
         "aqua": ["#00ffff", [0, 255, 255]],
@@ -4861,5 +4922,6 @@ var Colors = {
         "white": ["#ffffff", [255, 255, 255]],
         "whitesmoke": ["#f5f5f5", [245, 245, 245]],
         "yellow": ["#ffff00", [255, 255, 0]],
-        "yellowgreen": ["#9acd32", [154, 205, 50]]}
+        "yellowgreen": ["#9acd32", [154, 205, 50]]
+    }
 };
