@@ -1,11 +1,11 @@
 /**
- * Canvas2d JavaScript Library v1.1
+ * Canvas2d JavaScript Library v1.3.2
  * http://www.somethinglikethis.it/canvas2d/
  * Copyright 2012, Fabio Fantini
  * Licensed under the MIT or GPL Version 2 licenses.
- * Date: Aug 20 2012
+ * Date: Aug 28 2016
  *
- * Copyright (C) 2011 - 2012 by Fabio Fantini
+ * Copyright (C) 2011 - 2016 by Fabio Fantini
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,9 +34,14 @@
 //////////////////////////////////////////////////////////////
 var Canvas2d = {
     'globalId': 1,
-    'container': {'id': 0, 'width': 0, 'height': 0, 'element': null},
+    'container': {
+        'id': 0,
+        'width': 0,
+        'height': 0,
+        'element': null
+    },
     'fakeCtx': null,
-    wn:null
+    wn: null
 };
 /**
  * Stage
@@ -75,10 +80,11 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
     this.date = new Date();
     this.name = "Stage_" + this.date.getTime().toString();
     this.indexCount = 0;
-    this.container = document.getElementById(container);
+    this.container = typeof container === 'string' ? document.getElementById(container) : container;
     this.container.style.width = width + 'px';
     this.container.style.height = height + 'px';
     this.container.style.position = 'absolute';
+    this.container.style.margin = '0 auto';
     this.container.onmousedown = function() {
         //return false;
     };
@@ -112,8 +118,8 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             this._functest();
         }
     }
-    Canvas2d.wn=new Date().getTime();
-    this.wn=Canvas2d.wn;
+    Canvas2d.wn = new Date().getTime();
+    this.wn = Canvas2d.wn;
     window.fire = (function(callback) {
         return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
             window.setTimeout(callback, 1000 / 60);
@@ -124,7 +130,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             window.clearTimeout(id);
         };
     })();
-    window[Canvas2d.wn+'rqanim'] = {
+    window[Canvas2d.wn + 'rqanim'] = {
         time: 0,
         timeInterval: 0,
         startTime: 0,
@@ -134,7 +140,10 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
         loop: [],
         prId: 0,
         whipe: function() {
+            this.stop();
+            this.reset();
             this.loop = [];
+            window.cancelFire(window.fire);
         },
         getLoop: function() {
             return this.loop;
@@ -192,19 +201,23 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             this.animating = false;
         },
         addLoop: function(target, func) {
-            var id=true;
-            if (target.className==='DisplayObjects') {
-                id=target.parent.parent.wn===Canvas2d.wn?true:false;
-            }else if(target.className==='Sprite'){
-                id=target.parent.wn===Canvas2d.wn?true:false;
-            }else if(target.className==='Stage'){
-                id=target.wn===Canvas2d.wn?true:false;
+            var id = true;
+            if (target.className === 'DisplayObjects') {
+                id = target.parent.parent.wn === Canvas2d.wn ? true : false;
+            } else if (target.className === 'Sprite') {
+                id = target.parent.wn === Canvas2d.wn ? true : false;
+            } else if (target.className === 'Stage') {
+                id = target.wn === Canvas2d.wn ? true : false;
             }
-            if (!this.isChild(target)&&id) {
+            if (!this.isChild(target) && id) {
                 this.prId++;
                 this.start();
                 target.PRID = this.prId;
-                this.loop.push({target: target, func: func, id: this.prId});
+                this.loop.push({
+                    target: target,
+                    func: func,
+                    id: this.prId
+                });
             }
             return this.prId;
         },
@@ -294,7 +307,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     addLoop: function(target, func) {
-        window[Canvas2d.wn+'rqanim'].addLoop(target, func);
+        window[Canvas2d.wn + 'rqanim'].addLoop(target, func);
     },
     /**
      *removeLoop - Stage - set the main function for animation.
@@ -307,7 +320,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     removeLoop: function(target) {
-        window[Canvas2d.wn+'rqanim'].removeLoop(target);
+        window[Canvas2d.wn + 'rqanim'].removeLoop(target);
     },
     /**
      * start - Stage - start the animation cicle
@@ -319,7 +332,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     start: function() {
-        window[Canvas2d.wn+'rqanim'].start();
+        window[Canvas2d.wn + 'rqanim'].start();
     },
     /**
      * reset - -Stage - reset the animation cicle
@@ -331,7 +344,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     reset: function() {
-        window[Canvas2d.wn+'rqanim'].reset();
+        window[Canvas2d.wn + 'rqanim'].reset();
     },
     /**
      * stop - Stage - stop the animation cicle
@@ -343,7 +356,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     stop: function() {
-        window[Canvas2d.wn+'rqanim'].animating = false;
+        window[Canvas2d.wn + 'rqanim'].animating = false;
     },
     /**
      * getFrame - Stage - get the current increasing number of frame fired
@@ -355,7 +368,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getFrame: function() {
-        return window[Canvas2d.wn+'rqanim'].getFrame();
+        return window[Canvas2d.wn + 'rqanim'].getFrame();
     },
     /**
      * getTime - Stage - get the current increasing number of millisecond
@@ -367,7 +380,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getTime: function() {
-        return window[Canvas2d.wn+'rqanim'].getTime();
+        return window[Canvas2d.wn + 'rqanim'].getTime();
     },
     /**
      *getFps - Stage - get the current number of frame per seconds
@@ -379,7 +392,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getFps: function() {
-        return window[Canvas2d.wn+'rqanim'].getFps();
+        return window[Canvas2d.wn + 'rqanim'].getFps();
     },
     /**
      * getTimeInterval - Stage - get the actual delay in millisecond between cicle loops
@@ -391,7 +404,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getTimeInterval: function() {
-        return window[Canvas2d.wn+'rqanim'].getTimeInterval();
+        return window[Canvas2d.wn + 'rqanim'].getTimeInterval();
     },
     /**
      * getLoopList - Stage - get a list of all the element in the loop cicle
@@ -403,7 +416,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     getLoopList: function() {
-        return window[Canvas2d.wn+'rqanim'].loop;
+        return window[Canvas2d.wn + 'rqanim'].loop;
     },
     /**
      * isAnimating - Stage - get a true/false value indicating the activiti of the animation cicle loop
@@ -415,7 +428,7 @@ Canvas2d.Stage.prototype = {
      *@link text
      */
     isAnimating: function() {
-        return window[Canvas2d.wn+'rqanim'].animating;
+        return window[Canvas2d.wn + 'rqanim'].animating;
     },
     /**
      *getDataURL - Stage - take a screen shot of stage
@@ -455,7 +468,9 @@ Canvas2d.Stage.prototype = {
         if (type in this.evtListeners) {
             this.evtListeners[type].func.push(func);
         } else {
-            this.evtListeners[type] = {'func': [func]};
+            this.evtListeners[type] = {
+                'func': [func]
+            };
         }
     },
     /**
@@ -574,6 +589,7 @@ Canvas2d.Stage.prototype = {
      */
     _orderCanvases: function() {
         var that = this;
+
         function _childRecursion(child) {
             for (var i = 0; i < child.length; i++) {
                 if (child[i].className === "Sprite") {
@@ -608,9 +624,19 @@ Canvas2d.Stage.prototype = {
         this.container.addEventListener('touchmove', _testhandlermobile, false);
         this.container.addEventListener('touchstart', _testhandlermobile, false);
         this.container.addEventListener('touchend', _testhandlermobile, false);
-        var that = this, i, evt, c, sp, ob, tfound = false, m, target, ptarget, offx, offy, poffx, poffy;
+        var that = this,
+            i, evt, c, sp, ob, tfound = false,
+            m, target, ptarget, offx, offy, poffx, poffy;
         var isgstart, isgend, isgchange, radius, angle, scale, dstart, ddrag, dstop, m2, ttarget, pttarget;
-        var mouse = {'touchstart': null, 'touchend': null, 'touchmove': null, 'gestureend': null, 'dragstop': false, 'click': false};
+        var mouse = {
+            'touchstart': null,
+            'touchend': null,
+            'touchmove': null,
+            'gestureend': null,
+            'dragstop': false,
+            'click': false
+        };
+
         function _testhandlermobile(e) {
             e.preventDefault();
             mouse.touchend = false;
@@ -722,6 +748,7 @@ Canvas2d.Stage.prototype = {
             }
         }
         this._evtData = [_testhandlermobile];
+
         function _tLen(e) {
             if (e.type !== 'touchend') {
                 if (e.touches.length === 2) {
@@ -730,14 +757,21 @@ Canvas2d.Stage.prototype = {
             }
             return false;
         }
+
         function _teststagehandler(e, evnt, opt) {
             if (evnt in that.evtListeners) {
                 m = that._parentOffset(e, that);
                 for (evt = 0; evt < that.evtListeners[evnt].func.length; evt++) {
-                    that.evtListeners[evnt].func[evt].apply(that, [{'target': that, 'mouse': m, 'type': evnt, 'event': opt}]);
+                    that.evtListeners[evnt].func[evt].apply(that, [{
+                        'target': that,
+                        'mouse': m,
+                        'type': evnt,
+                        'event': opt
+                    }]);
                 }
             }
         }
+
         function _gesturehandler(e, target, opt) {
             if ('gesturechange' in target.evtListeners) {
                 var p = target === that ? that : target.parent;
@@ -753,10 +787,16 @@ Canvas2d.Stage.prototype = {
                 m1['scale'] = s;
                 m1['angle'] = a2;
                 for (evt = 0; evt < target.evtListeners['gesturechange'].func.length; evt++) {
-                    target.evtListeners['gesturechange'].func[evt].apply(ob, [{'target': target, 'mouse': m1, 'type': 'gesturechange', 'event': e}]);
+                    target.evtListeners['gesturechange'].func[evt].apply(ob, [{
+                        'target': target,
+                        'mouse': m1,
+                        'type': 'gesturechange',
+                        'event': e
+                    }]);
                 }
             }
         }
+
         function _gestureShandler(e, target, opt) {
             var p = target === that ? that : target.parent;
             var m1, m2;
@@ -770,17 +810,29 @@ Canvas2d.Stage.prototype = {
                 m1['scale'] = scale;
                 m1['angle'] = angle;
                 for (evt = 0; evt < target.evtListeners['gesturestart'].func.length; evt++) {
-                    target.evtListeners['gesturestart'].func[evt].apply(ob, [{'target': target, 'mouse': m1, 'type': 'gesturestart', 'event': e}]);
+                    target.evtListeners['gesturestart'].func[evt].apply(ob, [{
+                        'target': target,
+                        'mouse': m1,
+                        'type': 'gesturestart',
+                        'event': e
+                    }]);
                 }
             }
         }
+
         function _dragShandler(e, target, m) {
             if ('dragstart' in target.evtListeners) {
                 for (evt = 0; evt < target.evtListeners['dragstart'].func.length; evt++) {
-                    target.evtListeners['dragstart'].func[evt].apply(ob, [{'target': target, 'mouse': m, 'type': 'dragstart', 'event': e}]);
+                    target.evtListeners['dragstart'].func[evt].apply(ob, [{
+                        'target': target,
+                        'mouse': m,
+                        'type': 'dragstart',
+                        'event': e
+                    }]);
                 }
             }
         }
+
         function _draghandler(e, target, opt, offx, offy) {
             if ('drag' in target.evtListeners) {
                 var m = that._parentOffset(e, target.parent);
@@ -788,14 +840,23 @@ Canvas2d.Stage.prototype = {
                 x = m.ox - offx;
                 y = m.oy - offy;
                 m.ox = x;
-                m.oy = y;//m.offx=m.ox-offx;m.offy=m.oy-offy;
+                m.oy = y; //m.offx=m.ox-offx;m.offy=m.oy-offy;
                 for (evt = 0; evt < target.evtListeners['drag'].func.length; evt++) {
-                    target.evtListeners['drag'].func[evt].apply(ob, [{'target': target, 'mouse': m, 'type': 'drag', 'event': opt}]);
+                    target.evtListeners['drag'].func[evt].apply(ob, [{
+                        'target': target,
+                        'mouse': m,
+                        'type': 'drag',
+                        'event': opt
+                    }]);
                 }
             }
         }
+
         function testTouch(e) {
-            var touches = {'pageX': 0, 'pageY': 0};
+            var touches = {
+                'pageX': 0,
+                'pageY': 0
+            };
             if (e.touches && e.touches.length > 0) {
                 touches = e.touches[0];
             } else if (e.changedTouches && e.changedTouches.length > 0) {
@@ -803,6 +864,7 @@ Canvas2d.Stage.prototype = {
             }
             return touches;
         }
+
         function _handler(e, evnt, evnt2, opt, off) {
             for (i = that.children.length - 1; i > -1; i--) {
                 sp = that.children[i];
@@ -814,12 +876,22 @@ Canvas2d.Stage.prototype = {
                             if (m) {
                                 if (evnt in ob.evtListeners) {
                                     for (evt = 0; evt < ob.evtListeners[evnt].func.length; evt++) {
-                                        ob.evtListeners[evnt].func[evt].apply(ob, [{'target': ob, 'mouse': m, 'type': evnt, 'event': opt}]);
+                                        ob.evtListeners[evnt].func[evt].apply(ob, [{
+                                            'target': ob,
+                                            'mouse': m,
+                                            'type': evnt,
+                                            'event': opt
+                                        }]);
                                     }
                                 }
                                 if (evnt2 in ob.evtListeners) {
                                     for (evt = 0; evt < ob.evtListeners[evnt2].func.length; evt++) {
-                                        ob.evtListeners[evnt2].func[evt].apply(ob, [{'target': ob, 'mouse': m, 'type': evnt2, 'event': opt}]);
+                                        ob.evtListeners[evnt2].func[evt].apply(ob, [{
+                                            'target': ob,
+                                            'mouse': m,
+                                            'type': evnt2,
+                                            'event': opt
+                                        }]);
                                     }
                                 }
                                 target = ob;
@@ -833,12 +905,22 @@ Canvas2d.Stage.prototype = {
                         var m2 = that._testdetect(e, sp);
                         if (evnt in sp.evtListeners) {
                             for (evt = 0; evt < sp.evtListeners[evnt].func.length; evt++) {
-                                sp.evtListeners[evnt].func[evt].apply(sp, [{'target': sp, 'mouse': m2, 'type': evnt, 'event': opt}]);
+                                sp.evtListeners[evnt].func[evt].apply(sp, [{
+                                    'target': sp,
+                                    'mouse': m2,
+                                    'type': evnt,
+                                    'event': opt
+                                }]);
                             }
                         }
                         if (evnt2 in sp.evtListeners) {
                             for (evt = 0; evt < sp.evtListeners[evnt2].func.length; evt++) {
-                                sp.evtListeners[evnt2].func[evt].apply(sp, [{'target': sp, 'mouse': m2, 'type': evnt2, 'event': opt}]);
+                                sp.evtListeners[evnt2].func[evt].apply(sp, [{
+                                    'target': sp,
+                                    'mouse': m2,
+                                    'type': evnt2,
+                                    'event': opt
+                                }]);
                             }
                         }
                         ptarget = sp;
@@ -857,9 +939,22 @@ Canvas2d.Stage.prototype = {
         this.container.addEventListener('click', _testhandler, false);
         this.container.addEventListener('mouseover', _resethandler, false);
         this.container.addEventListener('mouseout', _resethandler, false);
-        var mouse = {'mouseup': false, 'mousedown': false, 'mousemove': false, 'click': false, 'mouseover': false, 'mouseout': false, 'dragstart': false, 'drag': false, 'dragstop': false};
+        var mouse = {
+            'mouseup': false,
+            'mousedown': false,
+            'mousemove': false,
+            'click': false,
+            'mouseover': false,
+            'mouseout': false,
+            'dragstart': false,
+            'drag': false,
+            'dragstop': false
+        };
         var isover, isout, over, out, dstart, ddrag, dstop, target, lasttarget, ptarget, plasttarget, pover, pout, pisout, pisover;
-        var offx = 0, offy = 0, poffx, poffy;
+        var offx = 0,
+            offy = 0,
+            poffx, poffy;
+
         function _resethandler(e) {
             if (e.type === 'mouseout' && lasttarget) {
                 _outhandler(e, lasttarget);
@@ -868,8 +963,19 @@ Canvas2d.Stage.prototype = {
                 _outhandler(e, plasttarget);
             }
             isover = isout = over = out = dstart = ddrag = dstop = target = lasttarget = ptarget = plasttarget = pover = pout = pisover = pisout = false;
-            mouse = {'mouseup': false, 'mousedown': false, 'mousemove': false, 'click': false, 'mouseover': false, 'mouseout': false, 'dragstart': false, 'drag': false, 'dragstop': false};
+            mouse = {
+                'mouseup': false,
+                'mousedown': false,
+                'mousemove': false,
+                'click': false,
+                'mouseover': false,
+                'mouseout': false,
+                'dragstart': false,
+                'drag': false,
+                'dragstop': false
+            };
         }
+
         function _testhandler(e) {
             e.preventDefault();
             _teststagehandler(e);
@@ -911,6 +1017,7 @@ Canvas2d.Stage.prototype = {
             }
         }
         this._evtData = [_testhandler, _resethandler];
+
         function _testdragP(e) {
             if (dstart && ptarget) {
                 var mp = that._parentOffset(e, ptarget.parent);
@@ -924,6 +1031,7 @@ Canvas2d.Stage.prototype = {
             }
             return false;
         }
+
         function _testdrag(e) {
             if (dstart && target) {
                 var mt = that._parentOffset(e, target.parent);
@@ -937,6 +1045,7 @@ Canvas2d.Stage.prototype = {
             }
             return false;
         }
+
         function _testoveroutP(e) {
             pover = ptarget ? true : false;
             pout = plasttarget ? plasttarget === ptarget ? false : true : false;
@@ -955,6 +1064,7 @@ Canvas2d.Stage.prototype = {
             }
             plasttarget = pover ? ptarget : plasttarget;
         }
+
         function _testoverout(e) {
             over = target ? true : false;
             out = lasttarget ? lasttarget === target ? false : true : false;
@@ -973,38 +1083,65 @@ Canvas2d.Stage.prototype = {
             }
             lasttarget = over ? target : lasttarget;
         }
-        var that = this, i, evt, c, sp, ob, tfound = false, m;
+        var that = this,
+            i, evt, c, sp, ob, tfound = false,
+            m;
+
         function _teststagehandler(e) {
             if (e.type in that.evtListeners) {
                 m = that._parentOffset(e, that);
                 for (evt = 0; evt < that.evtListeners[e.type].func.length; evt++) {
-                    that.evtListeners[e.type].func[evt].apply(that, [{'target': that, 'mouse': m, 'type': e.type, 'event': e}]);
+                    that.evtListeners[e.type].func[evt].apply(that, [{
+                        'target': that,
+                        'mouse': m,
+                        'type': e.type,
+                        'event': e
+                    }]);
                 }
             }
         }
+
         function _overhandler(e, target) {
             if ('mouseover' in target.evtListeners) {
                 m = that._parentOffset(e, target.parent);
                 for (evt = 0; evt < target.evtListeners['mouseover'].func.length; evt++) {
-                    target.evtListeners['mouseover'].func[evt].apply(ob, [{'target': target, 'mouse': m, 'type': 'mouseover', 'event': e}]);
+                    target.evtListeners['mouseover'].func[evt].apply(ob, [{
+                        'target': target,
+                        'mouse': m,
+                        'type': 'mouseover',
+                        'event': e
+                    }]);
                 }
             }
         }
+
         function _outhandler(e, target) {
             if (target && 'mouseout' in target.evtListeners) {
                 m = that._parentOffset(e, target.parent);
                 for (evt = 0; evt < target.evtListeners['mouseout'].func.length; evt++) {
-                    target.evtListeners['mouseout'].func[evt].apply(ob, [{'target': target, 'mouse': m, 'type': 'mouseout', 'event': e}]);
+                    target.evtListeners['mouseout'].func[evt].apply(ob, [{
+                        'target': target,
+                        'mouse': m,
+                        'type': 'mouseout',
+                        'event': e
+                    }]);
                 }
             }
         }
+
         function _dragShandler(e, target, m) {
             if ('dragstart' in target.evtListeners) {
                 for (evt = 0; evt < target.evtListeners['dragstart'].func.length; evt++) {
-                    target.evtListeners['dragstart'].func[evt].apply(ob, [{'target': target, 'mouse': m, 'type': 'dragstart', 'event': e}]);
+                    target.evtListeners['dragstart'].func[evt].apply(ob, [{
+                        'target': target,
+                        'mouse': m,
+                        'type': 'dragstart',
+                        'event': e
+                    }]);
                 }
             }
         }
+
         function _draghandler(e, target, offx, offy) {
             if ('drag' in target.evtListeners) {
                 var m = that._parentOffset(e, target.parent);
@@ -1012,12 +1149,18 @@ Canvas2d.Stage.prototype = {
                 x = m.ox - offx;
                 y = m.oy - offy;
                 m.ox = x;
-                m.oy = y;//m.offx=m.ox-offx;m.offy=m.oy-offy;
+                m.oy = y; //m.offx=m.ox-offx;m.offy=m.oy-offy;
                 for (evt = 0; evt < target.evtListeners['drag'].func.length; evt++) {
-                    target.evtListeners['drag'].func[evt].apply(ob, [{'target': target, 'mouse': m, 'type': 'drag', 'event': e}]);
+                    target.evtListeners['drag'].func[evt].apply(ob, [{
+                        'target': target,
+                        'mouse': m,
+                        'type': 'drag',
+                        'event': e
+                    }]);
                 }
             }
         }
+
         function _handler(e, evnt, off) {
             for (i = that.children.length - 1; i > -1; i--) {
                 sp = that.children[i];
@@ -1030,7 +1173,12 @@ Canvas2d.Stage.prototype = {
                             if (m) {
                                 if (evnt in ob.evtListeners) {
                                     for (evt = 0; evt < ob.evtListeners[evnt].func.length; evt++) {
-                                        ob.evtListeners[evnt].func[evt].apply(ob, [{'target': ob, 'mouse': m, 'type': evnt, 'event': e}]);
+                                        ob.evtListeners[evnt].func[evt].apply(ob, [{
+                                            'target': ob,
+                                            'mouse': m,
+                                            'type': evnt,
+                                            'event': e
+                                        }]);
                                     }
                                 }
                                 target = ob;
@@ -1043,7 +1191,12 @@ Canvas2d.Stage.prototype = {
                     if (tfound && m) {
                         if (evnt in sp.evtListeners) {
                             for (evt = 0; evt < sp.evtListeners[evnt].func.length; evt++) {
-                                sp.evtListeners[evnt].func[evt].apply(sp, [{'target': sp, 'mouse': m, 'type': evnt, 'event': e}]);
+                                sp.evtListeners[evnt].func[evt].apply(sp, [{
+                                    'target': sp,
+                                    'mouse': m,
+                                    'type': evnt,
+                                    'event': e
+                                }]);
                             }
                         }
                         ptarget = sp;
@@ -1073,7 +1226,17 @@ Canvas2d.Stage.prototype = {
         child.draw(this.fakeCtx, true);
         this.fakeCtx.restore();
         if (this.fakeCtx.isPointInPath(x, y)) {
-            return {'x': x, 'y': y, 'ox': cos, 'oy': sin, 'gx': g.x, 'gy': g.y, 'scaleX': g.scaleX, 'scaleY': g.scaleY, 'rotation': g.rotation};
+            return {
+                'x': x,
+                'y': y,
+                'ox': cos,
+                'oy': sin,
+                'gx': g.x,
+                'gy': g.y,
+                'scaleX': g.scaleX,
+                'scaleY': g.scaleY,
+                'rotation': g.rotation
+            };
         } else {
             return false;
         }
@@ -1089,7 +1252,17 @@ Canvas2d.Stage.prototype = {
         a = Math.atan2(y - g.y, x - g.x) - g.rotation;
         cos = Math.cos(a) * r;
         sin = Math.sin(a) * r;
-        return {'x': x, 'y': y, 'ox': cos, 'oy': sin, 'gx': g.x, 'gy': g.y, 'scaleX': g.scaleX, 'scaleY': g.scaleY, 'rotation': g.rotation};
+        return {
+            'x': x,
+            'y': y,
+            'ox': cos,
+            'oy': sin,
+            'gx': g.x,
+            'gy': g.y,
+            'scaleX': g.scaleX,
+            'scaleY': g.scaleY,
+            'rotation': g.rotation
+        };
     },
     _global: function() {
         return {
@@ -1190,6 +1363,7 @@ Canvas2d.Sprite = function(name, enableevent) {
     this.rotation = 0;
     this.evtListeners = {};
 };
+
 function _setContainer(child, parent) {
     child.width = parent.width;
     child.height = parent.height;
@@ -1214,7 +1388,9 @@ Canvas2d.Sprite.prototype = {
         if (type in this.evtListeners) {
             this.evtListeners[type].func.push(func);
         } else {
-            this.evtListeners[type] = {'func': [func]};
+            this.evtListeners[type] = {
+                'func': [func]
+            };
         }
     },
     /**
@@ -1291,17 +1467,24 @@ Canvas2d.Sprite.prototype = {
      * @link text
      */
     getBound: function() {
-        var ax = [], ay = [], aw = [], ah = [];
+        var ax = [],
+            ay = [],
+            aw = [],
+            ah = [];
         for (var i = 0; i < this.children.length; i++) {
             ax.push(this.children[i].x + this.children[i].width);
             ay.push(this.children[i].y + this.children[i].height);
         }
+
         function compareNumbers(a, b) {
             return a - b;
         }
         ax.sort(compareNumbers);
         ay.sort(compareNumbers);
-        return {width: ax[ax.length - 1], height: ay[ay.length - 1]};
+        return {
+            width: ax[ax.length - 1],
+            height: ay[ay.length - 1]
+        };
     },
     /**
      * zOrder - Sprite - change the order of a nested DisplayObjects passing either a index number or a string 'top' or 'bottom'
@@ -1347,7 +1530,8 @@ Canvas2d.Sprite.prototype = {
         this.ctx.clearRect(0, 0, this.width, this.height);
     },
     _global: function() {
-        var g = this.parent._global(), cos, sin;
+        var g = this.parent._global(),
+            cos, sin;
         if (this.parent.rotation !== 0) {
             var a = Math.atan2(this.y, this.x) + this.parent.rotation;
             var r = Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
@@ -1470,7 +1654,12 @@ Canvas2d.DisplayObjects = function(name, enableevent) {
     this.lineMiter = 10;
     this.backUpImage = null;
     this.imageData = null;
-    this.imageCrop = {dw: -1, dh: -1, dx: 0, dy: 0};
+    this.imageCrop = {
+        dw: -1,
+        dh: -1,
+        dx: 0,
+        dy: 0
+    };
     this.doneimage = false;
     this.currentFilter = null;
 };
@@ -1496,10 +1685,31 @@ Canvas2d.DisplayObjects.prototype = {
     lineShadow: null,
     gradient: null,
     lineGradient: null,
-    _alignList: {'start': 'start', 'end': 'end', 'left': 'left', 'right': 'right', 'center': 'center'},
-    _baseList: {'top': 'top', 'hanging': 'hanging', 'middle': 'middle', 'alphabetic': 'alphabetic', 'ideographic': 'ideographic', 'bottom': 'bottom'},
-    _capList: {'butt': 'butt', 'round': 'round', 'square': 'square'},
-    _joinList: {'bevel': 'bevel', 'round': 'round', 'miter': 'miter'},
+    _alignList: {
+        'start': 'start',
+        'end': 'end',
+        'left': 'left',
+        'right': 'right',
+        'center': 'center'
+    },
+    _baseList: {
+        'top': 'top',
+        'hanging': 'hanging',
+        'middle': 'middle',
+        'alphabetic': 'alphabetic',
+        'ideographic': 'ideographic',
+        'bottom': 'bottom'
+    },
+    _capList: {
+        'butt': 'butt',
+        'round': 'round',
+        'square': 'square'
+    },
+    _joinList: {
+        'bevel': 'bevel',
+        'round': 'round',
+        'miter': 'miter'
+    },
     /**
      * addEvent - DisplayObjects - add an event into the listening cicle
      * @type method DisplayObjects
@@ -1515,7 +1725,9 @@ Canvas2d.DisplayObjects.prototype = {
         if (type in this.evtListeners) {
             this.evtListeners[type].func.push(func);
         } else {
-            this.evtListeners[type] = {'func': [func]};
+            this.evtListeners[type] = {
+                'func': [func]
+            };
         }
     },
     /**
@@ -1599,12 +1811,13 @@ Canvas2d.DisplayObjects.prototype = {
         var t = type ? type : 'rgb';
         return this._parseGetColor(this.lineColor, t);
     },
-//////////
-//internal - switch the current color and return always an array rgb value
+    //////////
+    ///internal - return a rgb string from any kind of accepted color formats
+    ///color formats: string, name, hex, array
     _parseColor: function(color) {
         if (!color) {
             console.log(color, ' isn\'t a valid value.');
-            return undefined;
+            return null;
         }
         if (typeof color === 'string') {
             var result = color.replace(/\s/g, "").toLowerCase();
@@ -1618,12 +1831,12 @@ Canvas2d.DisplayObjects.prototype = {
                 re = /[hsla\(\)]/g;
                 ar = result.replace(re, '').split(',');
                 var hsl = Colors.HslToRgb(parseFloat(ar[0]) / 360, parseFloat(ar[1]) / 100, parseFloat(ar[2]) / 100);
-                return 'rgb(' + hsl[0] + ',' + hsl[1] + ',' + hsl[2] + ')';
+                return 'rgb' + this._isSet(ar, 'a') + '(' + hsl[0] + ',' + hsl[1] + ',' + hsl[2] + this._isSet(ar, ',') + ')';
             } else if (result.indexOf('hsv') > -1) {
-                re = /[hsv\(\)]/g;
+                re = /[hsva\(\)]/g;
                 ar = result.replace(re, '').split(',');
                 var hsv = Colors.HsvToRgb(parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3]));
-                return 'rgb(' + hsv[0] + ',' + hsv[1] + ',' + hsv[2] + ')';
+                return 'rgb' + this._isSet(ar, 'a') + '(' + hsv[0] + ',' + hsv[1] + ',' + hsv[2] + this._isSet(ar, ',') + ')';
             } else if (result in Colors.namedColor) {
                 ar = Colors.namedColor[result][1];
                 return 'rgb(' + ar[0] + ',' + ar[1] + ',' + ar[2] + ')';
@@ -1631,12 +1844,24 @@ Canvas2d.DisplayObjects.prototype = {
                 console.log(color, ' isn\'t a valid value.');
                 return 'rgb(0,0,0)';
             }
+        } else if (Array.isArray(color)) {
+            return 'rgb' + this._isSet(color, 'a') + '(' + color[0] + ',' + color[1] + ',' + color[2] + this._isSet(color, ',') + ')';
         } else {
-            return 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+            return color;
         }
     },
-//////////
-//internal - switch the current color and return what specified as type - 'hex' 'rgb' 'hsl' 'hsv' 'name'
+    ///////////
+    ///internal - if we have a third value then it has alpha
+    _isSet: function(a, b) {
+        return a.length > 3 ? b + (b === ',' ? a[3] : '') : '';
+    },
+    ///////////
+    ///internal - evaluate if color is array then parse it otherwise return color
+    _parseC: function(color) {
+        return Array.isArray(color) ? this._parseColor(color) : color;
+    },
+    //////////
+    //internal - switch the current color and return what specified as type - 'hex' 'rgb' 'hsl' 'hsv' 'name'
     _parseGetColor: function(color, type) {
         if (!color) {
             console.log(color, ' isn\'t a valid value.');
@@ -1694,13 +1919,23 @@ Canvas2d.DisplayObjects.prototype = {
      *@link text
      */
     cacheAsBitmap: function() {
-        var types = {polygon: "polygon", shape: "shape", text: "text", rect: "rect", rectround: "rectround", line: "line", circle: "circle"};
-        if (this.type in types) {
-        } else {
+        var types = {
+            polygon: "polygon",
+            shape: "shape",
+            text: "text",
+            rect: "rect",
+            rectround: "rectround",
+            line: "line",
+            circle: "circle"
+        };
+        if (this.type in types) {} else {
             console.log("wrong type ", this.type);
             return;
         }
-        var fc = document.createElement("canvas"), ox = this.x, oy = this.y, or = this.rotation;
+        var fc = document.createElement("canvas"),
+            ox = this.x,
+            oy = this.y,
+            or = this.rotation;
         var img = new Image();
         fc.width = this.width + this.lineWidth * 2;
         fc.height = this.height + this.lineWidth * 2;
@@ -1834,16 +2069,19 @@ Canvas2d.DisplayObjects.prototype = {
         this.y = this.localY = y;
         this.points = points;
         this._setStyle(color, linecolor, linewidth);
-        var pX = [], pY = [];
+        var pX = [],
+            pY = [];
         for (var i = 0; i < this.points.length; i++) {
             pX.push(this.points[i][0] + this.localX);
             pY.push(this.points[i][1] + this.localY);
         }
+
         function compareNumbers(a, b) {
             return a - b;
         }
         pX.sort(compareNumbers);
         pY.sort(compareNumbers);
+
         function sum(a, b) {
             if (a > 0) {
                 return b - a;
@@ -1857,7 +2095,10 @@ Canvas2d.DisplayObjects.prototype = {
         }
         this.width = sum(pX[0], pX[pX.length - 1]);
         this.height = sum(pY[0], pY[pY.length - 1]);
-        this._coord = {x: pX, y: pY};
+        this._coord = {
+            x: pX,
+            y: pY
+        };
     },
     /**
      * shape - DisplayObjects - create a shape
@@ -1882,7 +2123,8 @@ Canvas2d.DisplayObjects.prototype = {
         this.y = this.localY = y;
         this.obj = obj;
         this._setStyle(color, linecolor, linewidth);
-        var pX = [], pY = [];
+        var pX = [],
+            pY = [];
         for (var i = 0; i < this.obj.length; i++) {
             for (var o in this.obj[i]) {
                 var obj1 = this.obj[i][o];
@@ -1920,11 +2162,13 @@ Canvas2d.DisplayObjects.prototype = {
                 }
             }
         }
+
         function compareNumbers(a, b) {
             return a - b;
         }
         pX.sort(compareNumbers);
         pY.sort(compareNumbers);
+
         function sum(a, b) {
             if (a > 0) {
                 return b - a;
@@ -1935,11 +2179,13 @@ Canvas2d.DisplayObjects.prototype = {
                     return Math.abs(a) + b;
                 }
             }
-        }
-        ;
+        };
         this.width = sum(pX[0], pX[pX.length - 1]);
         this.height = sum(pY[0], pY[pY.length - 1]);
-        this._coord = {x: pX, y: pY};
+        this._coord = {
+            x: pX,
+            y: pY
+        };
     },
     /**
      * line - DisplayObjects - creatye a line
@@ -1966,12 +2212,17 @@ Canvas2d.DisplayObjects.prototype = {
         this.type = 'line';
         this.x = this.localX = x;
         this.y = this.localY = y;
-        this.points = [[x0, y0], [x1, y1]];
-        var pX = [], pY = [];
+        this.points = [
+            [x0, y0],
+            [x1, y1]
+        ];
+        var pX = [],
+            pY = [];
         for (var i = 0; i < this.points.length; i++) {
             pX.push(this.points[i][0] + this.localX);
             pY.push(this.points[i][1] + this.localY);
         }
+
         function compareNumbers(a, b) {
             return a - b;
         }
@@ -1979,6 +2230,7 @@ Canvas2d.DisplayObjects.prototype = {
         pY.sort(compareNumbers);
         this.width = sum(pX[0], pX[pX.length - 1]);
         this.height = sum(pY[0], pY[pY.length - 1]);
+
         function sum(a, b) {
             if (a > 0) {
                 return b - a;
@@ -1990,7 +2242,10 @@ Canvas2d.DisplayObjects.prototype = {
                 }
             }
         }
-        this._coord = {x: pX, y: pY};
+        this._coord = {
+            x: pX,
+            y: pY
+        };
         this.len = Math.sqrt(Math.pow(x0 + x1, 2) + Math.pow(y0 + y1, 2));
         this._setStyle(null, linecolor, linewidth, lineCap, lineJoin, lineMiter);
     },
@@ -2143,10 +2398,13 @@ Canvas2d.DisplayObjects.prototype = {
         this.doneimage = false;
     },
     roulette: function(stator, rotor, rotorOffset, multyplier, step, rType) {
-        var step = (step / 360) * (Math.PI * 2), x, y, theta = 0, i = 0, p = [];
+        var step = (step / 360) * (Math.PI * 2),
+            x, y, theta = 0,
+            i = 0,
+            p = [];
         var R = stator * multyplier;
         var r = rotor * multyplier;
-        var d = rotorOffset * multyplier;console.log(360 / step * rotor);
+        var d = rotorOffset * multyplier;
         while (i <= 360 / step * rotor) {
             if (rType === 'Epicycloid') {
                 x = (R + r) * Math.cos(theta) - r * Math.cos((R + r) / r * theta);
@@ -2263,10 +2521,12 @@ Canvas2d.DisplayObjects.prototype = {
         return data;
     },
     _filterCut: function(data, args, r) {
-        var d = data.data, t = 0;
+        var d = data.data,
+            t = 0;
+
         function raise(a, b, c) {
             //return (c >= a - b) && (c <= a + b) ? true : false;
-            return (c >= a - b) && (c <= a + b) ? Math.floor(255*Math.abs((a-c)/r)) : 255;
+            return (c >= a - b) && (c <= a + b) ? Math.floor(255 * Math.abs((a - c) / r)) : 255;
         }
         for (var i = 0; i < d.length; i += 4) {
             //d[i + 3] = (d[i] + d[i + 1] + d[i + 2]) >= (args * 3) ? 0 : d[i + 3]; //alpha
@@ -2383,17 +2643,15 @@ Canvas2d.DisplayObjects.prototype = {
         }
 
     },
-// This encoding function is from Philippe Tenenhaus's example at http://www.philten.com/us-xmlhttprequest-image/
-    _base64Encode: function(inputStr, caller, show)
-    {
+    // This encoding function is from Philippe Tenenhaus's example at http://www.philten.com/us-xmlhttprequest-image/
+    _base64Encode: function(inputStr, caller, show) {
         var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
         var outputStr = "";
         var i = 0;
 
-        while (i < inputStr.length)
-        {
-//all three "& 0xff" added below are there to fix a known bug 
-//with bytes returned by xhr.responseText
+        while (i < inputStr.length) {
+            //all three "& 0xff" added below are there to fix a known bug 
+            //with bytes returned by xhr.responseText
             var byte1 = inputStr.charCodeAt(i++) & 0xff;
             var byte2 = inputStr.charCodeAt(i++) & 0xff;
             var byte3 = inputStr.charCodeAt(i++) & 0xff;
@@ -2402,19 +2660,13 @@ Canvas2d.DisplayObjects.prototype = {
             var enc2 = ((byte1 & 3) << 4) | (byte2 >> 4);
 
             var enc3, enc4;
-            if (isNaN(byte2))
-            {
+            if (isNaN(byte2)) {
                 enc3 = enc4 = 64;
-            }
-            else
-            {
+            } else {
                 enc3 = ((byte2 & 15) << 2) | (byte3 >> 6);
-                if (isNaN(byte3))
-                {
+                if (isNaN(byte3)) {
                     enc4 = 64;
-                }
-                else
-                {
+                } else {
                     enc4 = byte3 & 63;
                 }
             }
@@ -2422,6 +2674,7 @@ Canvas2d.DisplayObjects.prototype = {
             var ok = i < inputStr.length ? false : true;
             stop(ok);
         }
+
         function stop(ok) {
             if (ok) {
                 var img = new Image();
@@ -2459,6 +2712,7 @@ Canvas2d.DisplayObjects.prototype = {
         var c = document.createElement('canvas');
         var ctx, i, data;
         var that = this;
+
         function lo() {
             that.frameList[this.indice].data = this;
             if (this.indice === that.frameList.length - 1) {
@@ -2495,8 +2749,8 @@ Canvas2d.DisplayObjects.prototype = {
      *@param miterlimit { number - default 10 }
      */
     _setStyle: function(color, linecolor, linewidth, linecap, linejoin, miterlimit) {
-        this.color = color instanceof Array ? this._parseColor(color) : color;
-        this.lineColor = linecolor instanceof Array ? this._parseColor(linecolor) : linecolor;
+        this.color = this._parseC(color);
+        this.lineColor = this._parseC(linecolor);
         this.lineCap = (this._capList[linecap]) ? linecap : 'butt';
         this.lineJoin = (this._joinList[linejoin]) ? linejoin : 'miter';
         this.lineWidth = (linewidth) ? linewidth : 1.0;
@@ -2514,7 +2768,7 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.lineCap = this.lineCap;
                 ctx.lineJoin = this.lineJoin;
                 ctx.miterLimit = this.lineMiter;
-                ctx.shadowColor = this.lineShadow.color;
+                ctx.shadowColor = this._parseC(this.lineShadow.color);
                 ctx.shadowOffsetX = this.lineShadow.offsetX;
                 ctx.shadowOffsetY = this.lineShadow.offsetY;
                 ctx.shadowBlur = this.lineShadow.blur;
@@ -2534,13 +2788,13 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.lineCap = this.lineCap;
                 ctx.lineJoin = this.lineJoin;
                 ctx.miterLimit = this.lineMiter;
-                ctx.shadowColor = this.lineShadow.color;
+                ctx.shadowColor = this._parseC(this.lineShadow.color);
                 ctx.shadowOffsetX = this.lineShadow.offsetX;
                 ctx.shadowOffsetY = this.lineShadow.offsetY;
                 ctx.shadowBlur = this.lineShadow.blur;
                 if (this.lineColor) {
                     ctx.globalAlpha = this._g.lineAlpha;
-                    ctx.strokeStyle = Colors.ParseColor(this.lineColor);
+                    ctx.strokeStyle = this._parseC(this.lineColor);
                     ctx.stroke();
                 }
                 ctx.restore();
@@ -2551,7 +2805,7 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.miterLimit = this.lineMiter;
                 if (this.lineColor) {
                     ctx.globalAlpha = this._g.lineAlpha;
-                    ctx.strokeStyle = Colors.ParseColor(this.lineColor);
+                    ctx.strokeStyle = this._parseC(this.lineColor);
                     ctx.stroke();
                 }
             }
@@ -2565,7 +2819,7 @@ Canvas2d.DisplayObjects.prototype = {
         if (this.gradient) {
             if (this.shadow) {
                 ctx.save();
-                ctx.shadowColor = this.shadow.color;
+                ctx.shadowColor = this._parseC(this.shadow.color);
                 ctx.shadowOffsetX = this.shadow.offsetX;
                 ctx.shadowOffsetY = this.shadow.offsetY;
                 ctx.shadowBlur = this.shadow.blur;
@@ -2578,18 +2832,18 @@ Canvas2d.DisplayObjects.prototype = {
         } else {
             if (this.shadow) {
                 ctx.save();
-                ctx.shadowColor = this.shadow.color;
+                ctx.shadowColor = this._parseC(this.shadow.color);
                 ctx.shadowOffsetX = this.shadow.offsetX;
                 ctx.shadowOffsetY = this.shadow.offsetY;
                 ctx.shadowBlur = this.shadow.blur;
                 if (this.color) {
-                    ctx.fillStyle = this.color;
+                    ctx.fillStyle = this._parseC(this.color);
                     ctx.fill();
                 }
                 ctx.restore();
             } else {
                 if (this.color) {
-                    ctx.fillStyle = Colors.ParseColor(this.color);
+                    ctx.fillStyle = this._parseC(this.color);
                     ctx.fill();
                 }
             }
@@ -2605,7 +2859,7 @@ Canvas2d.DisplayObjects.prototype = {
      */
     _setFont: function(fontweight, fontsize, font, align, base) {
         this.fontWeight = fontweight ? fontweight : this.fontWeight;
-        this.fontStyle = this.fontWeight + ' ' + fontsize.toString() + 'px ' + font;
+        this.fontStyle = this.fontWeight + ' ' + fontsize + 'px ' + font;
         this.fontType = font;
         this.fontSize = fontsize;
         this.align = (this._alignList[align]) ? align : 'center';
@@ -2617,7 +2871,7 @@ Canvas2d.DisplayObjects.prototype = {
      */
     _setShadow: function(ctx) {
         if (this.shadow) {
-            ctx.shadowColor = this.shadow.color;
+            ctx.shadowColor = this._parseC(this.shadow.color);
             ctx.shadowOffsetX = this.shadow.offsetX;
             ctx.shadowOffsetY = this.shadow.offsetY;
             ctx.shadowBlur = this.shadow.blur;
@@ -2629,7 +2883,7 @@ Canvas2d.DisplayObjects.prototype = {
      */
     _setLineShadow: function(ctx) {
         if (this.lineShadow) {
-            ctx.shadowColor = this.lineShadow.color;
+            ctx.shadowColor = this._parseC(this.lineShadow.color);
             ctx.shadowOffsetX = this.lineShadow.offsetX;
             ctx.shadowOffsetY = this.lineShadow.offsetY;
             ctx.shadowBlur = this.lineShadow.blur;
@@ -2654,7 +2908,7 @@ Canvas2d.DisplayObjects.prototype = {
             gradient = ctx.createRadialGradient(g.coord.x0, g.coord.y0, g.coord.r0, g.coord.x1, g.coord.y1, g.coord.r1);
         }
         for (var i = 0; i < g.color.length; i++) {
-            gradient.addColorStop(g.offset[i], g.color[i]);
+            gradient.addColorStop(g.offset[i], this._parseC(g.color[i]));
         }
         ctx.fillStyle = gradient;
         ctx.fill();
@@ -2678,7 +2932,7 @@ Canvas2d.DisplayObjects.prototype = {
             gradient = ctx.createRadialGradient(g.coord.x0, g.coord.y0, g.coord.r0, g.coord.x1, g.coord.y1, g.coord.r1);
         }
         for (var i = 0; i < g.color.length; i++) {
-            gradient.addColorStop(g.offset[i], g.color[i]);
+            gradient.addColorStop(g.offset[i], this._parseC(g.color[i]));
         }
         ctx.stokeStyle = gradient;
         ctx.stroke();
@@ -2754,7 +3008,8 @@ Canvas2d.DisplayObjects.prototype = {
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         ctx.beginPath();
-        var pX = [], pY = [];
+        var pX = [],
+            pY = [];
         for (var i = 0; i < this.points.length; i++) {
             if (i === 0) {
                 ctx.moveTo(this.localX + this.points[i][0], this.localY + this.points[i][1]);
@@ -2770,6 +3025,7 @@ Canvas2d.DisplayObjects.prototype = {
         if (!buffer) {
             this._setFillStyle(ctx);
             this._setLineStyle(ctx);
+
             function sum(a, b) {
                 if (a > 0) {
                     return b - a;
@@ -2789,7 +3045,10 @@ Canvas2d.DisplayObjects.prototype = {
             });
             this.width = sum(pX[0], pX[pX.length - 1]);
             this.height = sum(pY[0], pY[pY.length - 1]);
-            this._coord = {x: pX, y: pY};
+            this._coord = {
+                x: pX,
+                y: pY
+            };
         }
         ctx.restore();
         if (this.mask) {
@@ -2808,7 +3067,8 @@ Canvas2d.DisplayObjects.prototype = {
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         ctx.beginPath();
-        var pX = [], pY = [];
+        var pX = [],
+            pY = [];
         for (var i = 0; i < this.obj.length; i++) {
             for (var o in this.obj[i]) {
                 var obj = this.obj[i][o];
@@ -2857,6 +3117,7 @@ Canvas2d.DisplayObjects.prototype = {
         if (!buffer) {
             this._setFillStyle(ctx);
             this._setLineStyle(ctx);
+
             function sum(a, b) {
                 if (a > 0) {
                     return b - a;
@@ -2876,7 +3137,10 @@ Canvas2d.DisplayObjects.prototype = {
             });
             this.width = sum(pX[0], pX[pX.length - 1]);
             this.height = sum(pY[0], pY[pY.length - 1]);
-            this._coord = {x: pX, y: pY};
+            this._coord = {
+                x: pX,
+                y: pY
+            };
         }
         ctx.restore();
         if (this.mask) {
@@ -2899,11 +3163,13 @@ Canvas2d.DisplayObjects.prototype = {
         ctx.lineTo(this.points[1][0] + this.localX, this.points[1][1] + this.localY);
         ctx.closePath();
         this._setLineStyle(ctx);
-        var pX = [], pY = [];
+        var pX = [],
+            pY = [];
         for (var i = 0; i < this.points.length; i++) {
             pX.push(this.points[i][0] + this.localX);
             pY.push(this.points[i][1] + this.localY);
         }
+
         function compareNumbers(a, b) {
             return a - b;
         }
@@ -2911,6 +3177,7 @@ Canvas2d.DisplayObjects.prototype = {
         pY.sort(compareNumbers);
         this.width = sum(pX[0], pX[pX.length - 1]);
         this.height = sum(pY[0], pY[pY.length - 1]);
+
         function sum(a, b) {
             if (a > 0) {
                 return b - a;
@@ -2922,7 +3189,10 @@ Canvas2d.DisplayObjects.prototype = {
                 }
             }
         }
-        this._coord = {x: pX, y: pY};
+        this._coord = {
+            x: pX,
+            y: pY
+        };
         this.len = Math.sqrt(Math.pow(pX[0] + pX[1], 2) + Math.pow(pY[0] + pY[1], 2));
         ctx.restore();
     },
@@ -3003,12 +3273,12 @@ Canvas2d.DisplayObjects.prototype = {
         if (this.backGround) {
             if (!buffer) {
                 if (this.backGround.color) {
-                    ctx.fillStyle = this.backGround.color;
+                    ctx.fillStyle = this._parseC(this.backGround.color);
                     ctx.fill();
                 }
                 if (this.backGround.lineColor) {
                     ctx.lineWidth = this.backGround.lineWidth ? this.backGround.lineWidth : 2;
-                    ctx.strokeStyle = this.backGround.lineColor;
+                    ctx.strokeStyle = this._parseC(this.backGround.lineColor);
                     ctx.stroke();
                 }
             } else {
@@ -3031,7 +3301,7 @@ Canvas2d.DisplayObjects.prototype = {
                     if (this.shadow) {
                         this._setShadow(ctx);
                     }
-                    ctx.fillStyle = this.color;
+                    ctx.fillStyle = this._parseC(this.color);
                     ctx.fillText(this.txt, this.localX, this.localY);
                     ctx.restore();
                 }
@@ -3041,7 +3311,6 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.lineCap = this.lineCap;
                 ctx.lineJoin = this.lineJoin;
                 ctx.miterLimit = this.lineMiter;
-                ctx.strokeStyle = this.lineColor;
 
                 if (this.lineGradient) {
                     ctx.save();
@@ -3056,7 +3325,7 @@ Canvas2d.DisplayObjects.prototype = {
                     if (this.lineShadow) {
                         this._setLineShadow(ctx);
                     }
-                    ctx.strokeStyle = this.lineColor;
+                    ctx.strokeStyle = this._parseC(this.lineColor);
                     ctx.strokeText(this.txt, this.localX, this.localY);
                     ctx.restore();
                 }
@@ -3231,7 +3500,7 @@ Canvas2d.Tweener.prototype = {
      *@link text
      */
     getFrame: function() {
-        return window[Canvas2d.wn+'rqanim'].getFrame();
+        return window[Canvas2d.wn + 'rqanim'].getFrame();
     },
     /**
      * getTime - Tweener - get the current increasing number of millisecond
@@ -3243,7 +3512,7 @@ Canvas2d.Tweener.prototype = {
      * @link text
      */
     getTime: function() {
-        return window[Canvas2d.wn+'rqanim'].getTime();
+        return window[Canvas2d.wn + 'rqanim'].getTime();
     },
     /**
      *getFps - Tweener - get the current number of frame per seconds
@@ -3255,7 +3524,7 @@ Canvas2d.Tweener.prototype = {
      *@link text
      */
     getFps: function() {
-        return window[Canvas2d.wn+'rqanim'].getFps();
+        return window[Canvas2d.wn + 'rqanim'].getFps();
     },
     /**
      * getTimeInterval - Tweener - get the actual delay in millisecond between cicle loops
@@ -3267,7 +3536,7 @@ Canvas2d.Tweener.prototype = {
      *@link text
      */
     getTimeInterval: function() {
-        return window[Canvas2d.wn+'rqanim'].getTimeInterval();
+        return window[Canvas2d.wn + 'rqanim'].getTimeInterval();
     },
     /**
      * addTweener - Tweener - Add an objects with parameter to be transitioned
@@ -3295,7 +3564,16 @@ Canvas2d.Tweener.prototype = {
             for (var n = 0; n < properties.length; n++) {
                 if (i === properties[n]) {
                     x = (args[i] > o[i]) ? args[i] - o[i] : -(o[i] - args[i]);
-                    twnobj[i] = {ease: ease, to: x, ct: 0, d: duration, from: o[i], prop: i, request: args[i], target: o};
+                    twnobj[i] = {
+                        ease: ease,
+                        to: x,
+                        ct: 0,
+                        d: duration,
+                        from: o[i],
+                        prop: i,
+                        request: args[i],
+                        target: o
+                    };
                 }
             }
         }
@@ -3303,7 +3581,18 @@ Canvas2d.Tweener.prototype = {
             if (!o['obj']) {
                 return;
             }
-            twnobj['obj'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'obj', subprop: [], index: [], request: [], target: o};
+            twnobj['obj'] = {
+                ease: ease,
+                to: [],
+                ct: 0,
+                d: duration,
+                from: [],
+                prop: 'obj',
+                subprop: [],
+                index: [],
+                request: [],
+                target: o
+            };
             for (var io in args['obj']) {
 
                 for (var obje in args['obj'][io]) {
@@ -3337,7 +3626,20 @@ Canvas2d.Tweener.prototype = {
                     }
                 }
             }
-            twnobj['txt'] = {ease: ease, to: g.length, ct: 0, d: duration, from: 0, prop: 'txt', subprop: r, request: '', target: o, text: o.txt, type: args.txt, charlist: d};
+            twnobj['txt'] = {
+                ease: ease,
+                to: g.length,
+                ct: 0,
+                d: duration,
+                from: 0,
+                prop: 'txt',
+                subprop: r,
+                request: '',
+                target: o,
+                text: o.txt,
+                type: args.txt,
+                charlist: d
+            };
             o._prevTxt = o.txt;
             o.txt = '';
         }
@@ -3345,7 +3647,17 @@ Canvas2d.Tweener.prototype = {
             if (!o['shadow']) {
                 return;
             }
-            twnobj['shadow'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'shadow', subprop: [], request: [], target: o};
+            twnobj['shadow'] = {
+                ease: ease,
+                to: [],
+                ct: 0,
+                d: duration,
+                from: [],
+                prop: 'shadow',
+                subprop: [],
+                request: [],
+                target: o
+            };
             for (var io in args['shadow']) {
                 if (io === "color") {
                     colorReq = Colors._parseColor(args['shadow'][io]);
@@ -3371,7 +3683,17 @@ Canvas2d.Tweener.prototype = {
             if (!o['lineShadow']) {
                 return;
             }
-            twnobj['lineShadow'] = {ease: ease, to: [], ct: 0, d: duration, from: [], prop: 'lineShadow', subprop: [], request: [], target: o};
+            twnobj['lineShadow'] = {
+                ease: ease,
+                to: [],
+                ct: 0,
+                d: duration,
+                from: [],
+                prop: 'lineShadow',
+                subprop: [],
+                request: [],
+                target: o
+            };
             for (var oi in args['lineShadow']) {
                 if (oi === "color") {
                     colorReq = Colors._parseColor(args['lineShadow'][oi]);
@@ -3399,7 +3721,20 @@ Canvas2d.Tweener.prototype = {
             r = colorReq[0] - colorSrc[0];
             g = colorReq[1] - colorSrc[1];
             b = colorReq[2] - colorSrc[2];
-            twnobj['rgb'] = {ease: ease, tor: r, tog: g, tob: b, ct: 0, d: duration, fromr: colorSrc[0], fromg: colorSrc[1], fromb: colorSrc[2], prop: 'color', request: colorReq, target: o};
+            twnobj['rgb'] = {
+                ease: ease,
+                tor: r,
+                tog: g,
+                tob: b,
+                ct: 0,
+                d: duration,
+                fromr: colorSrc[0],
+                fromg: colorSrc[1],
+                fromb: colorSrc[2],
+                prop: 'color',
+                request: colorReq,
+                target: o
+            };
         }
         if ('lineColor' in args) {
             colorReq = Colors._parseColor(args['lineColor']);
@@ -3407,39 +3742,81 @@ Canvas2d.Tweener.prototype = {
             r = colorReq[0] - colorSrc[0];
             g = colorReq[1] - colorSrc[1];
             b = colorReq[2] - colorSrc[2];
-            twnobj['rgbl'] = {ease: ease, tor: r, tog: g, tob: b, ct: 0, d: duration, fromr: colorSrc[0], fromg: colorSrc[1], fromb: colorSrc[2], prop: 'lineColor', request: colorReq, target: o};
+            twnobj['rgbl'] = {
+                ease: ease,
+                tor: r,
+                tog: g,
+                tob: b,
+                ct: 0,
+                d: duration,
+                fromr: colorSrc[0],
+                fromg: colorSrc[1],
+                fromb: colorSrc[2],
+                prop: 'lineColor',
+                request: colorReq,
+                target: o
+            };
         }
         if ('alpha' in args) {
             rqAlpha = args['alpha'];
             alpha = rqAlpha - o.alpha;
-            twnobj['alpha'] = {ease: ease, to: alpha, ct: 0, d: duration, from: o.alpha, prop: 'alpha', request: rqAlpha, target: o};
+            twnobj['alpha'] = {
+                ease: ease,
+                to: alpha,
+                ct: 0,
+                d: duration,
+                from: o.alpha,
+                prop: 'alpha',
+                request: rqAlpha,
+                target: o
+            };
         }
         if ('lineAlpha' in args) {
             rqAlpha = (args['lineAlpha'] > 1) ? args['lineAlpha'] / 100 : args['lineAlpha'];
             lineAlpha = rqAlpha - o.lineAlpha;
-            twnobj['lineAlpha'] = {ease: ease, to: lineAlpha, ct: 0, d: duration, from: o.lineAlpha, prop: 'lineAlpha', request: rqlineAlpha, target: o};
+            twnobj['lineAlpha'] = {
+                ease: ease,
+                to: lineAlpha,
+                ct: 0,
+                d: duration,
+                from: o.lineAlpha,
+                prop: 'lineAlpha',
+                request: rqlineAlpha,
+                target: o
+            };
         }
         var onStart = args['onStart'] ? args['onStart'] : null;
         var onTween = args['onTween'] ? args['onTween'] : null;
         var onEnd = args['onEnd'] ? args['onEnd'] : null;
 
-        twnobj.state = {start: true, tweening: false, end: false, onStart: onStart, onTween: onTween, onEnd: onEnd, target: o, duration: duration, delay: delay, data: data};
+        twnobj.state = {
+            start: true,
+            tweening: false,
+            end: false,
+            onStart: onStart,
+            onTween: onTween,
+            onEnd: onEnd,
+            target: o,
+            duration: duration,
+            delay: delay,
+            data: data
+        };
 
         if (delay > 0) {
-            this._delayFun(this.children,twnobj,o.id,delay);
+            this._delayFun(this.children, twnobj, o.id, delay);
         } else {
-            this._startFun(this.children,twnobj,o.id);
+            this._startFun(this.children, twnobj, o.id);
         }
     },
-    _delayFun: function(c,o,id,d){
-        var that=this;
-        setTimeout(function(){
-            that._startFun(c,o,id);
+    _delayFun: function(c, o, id, d) {
+        var that = this;
+        setTimeout(function() {
+            that._startFun(c, o, id);
         }, d);
     },
-    _startFun: function(c,o,id){
-        c[id]=o;
-        window[Canvas2d.wn+'rqanim'].addLoop(this, this._callTween);
+    _startFun: function(c, o, id) {
+        c[id] = o;
+        window[Canvas2d.wn + 'rqanim'].addLoop(this, this._callTween);
     },
     /**
      * removeTweener - Tweener - remove an object from the animation cicle list
@@ -3469,7 +3846,8 @@ Canvas2d.Tweener.prototype = {
         return array;
     },
     _callTween: function(that) {
-        var tree = {}, n, obj;
+        var tree = {},
+            n, obj;
         for (var o in that.children) {
             if (that.children[o].state.start) {
                 that._states(that.children[o].state);
@@ -3481,10 +3859,9 @@ Canvas2d.Tweener.prototype = {
                     delete that.children[o];
 
                     that._states(obj);
-                    for (n in that.children) {
-                    }
+                    for (n in that.children) {}
                     if (!that.children[o] && !that.children[n]) {
-                        window[Canvas2d.wn+'rqanim'].removeLoop(that);
+                        window[Canvas2d.wn + 'rqanim'].removeLoop(that);
                     }
                     continue;
                 } else {
@@ -3494,7 +3871,7 @@ Canvas2d.Tweener.prototype = {
             that._states(that.children[o].state);
             for (var oo in that.children[o]) {
                 if (oo !== 'state') {
-                    var ct = window[Canvas2d.wn+'rqanim'].getTimeInterval();
+                    var ct = window[Canvas2d.wn + 'rqanim'].getTimeInterval();
                     if (oo === 'rgb' || oo === 'rgbl') {
                         that.children[o][oo].ct += ct;
                         that._tweenColor(that.children[o][oo], that.children[o].state);
@@ -3634,16 +4011,16 @@ Canvas2d.Tweener.prototype = {
         }
 
     },
-//////////////////////////////////////////////
-//Equations - From Caurina Tweener
-//
-//author Zeh Fernando, Nate Chatellier
-//v1.0.2
-//Open source under the BSD License.
-//Copyright © 2001 Robert Penner
-//
-//http://code.google.com/p/tweener/
-/////////////////////////////////////////////
+    //////////////////////////////////////////////
+    //Equations - From Caurina Tweener
+    //
+    //author Zeh Fernando, Nate Chatellier
+    //v1.0.2
+    //Open source under the BSD License.
+    //Copyright © 2001 Robert Penner
+    //
+    //http://code.google.com/p/tweener/
+    /////////////////////////////////////////////
     /**
      * easeNone
      * @type static method Tweener
@@ -4649,7 +5026,7 @@ var Colors = {
      * RandomRgb - Tweener - return a random rgb array value in range [0,255]
      * @type static method Colors
      * @description return a random rgb array value in range [0,255]
-     * @param {string} type string that rapresent the desired returned format value; string or array; default string
+     * @param {string} type string that represent the desired returned format value; string or array; default string
      * @example var myValue= Colors.RandomRgb('array');
      * @returns {mixed} rgb in string or array format; 'rgb(n, n, n)' or [r, g, b]
      * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
@@ -4665,7 +5042,6 @@ var Colors = {
         } else {
             return 'rgb(' + r + ',' + g + ',' + b + ')';
         }
-
     },
     /**
      * PraseColor - Colors - return a rgb string
@@ -4680,7 +5056,7 @@ var Colors = {
     ParseColor: function(color) {
         if (!color) {
             console.log(color, ' isn\'t a valid value.');
-            return undefined;
+            return null;
         }
         if (typeof color === 'string') {
             var result = color.replace(/\s/g, "").toLowerCase();
@@ -4694,12 +5070,12 @@ var Colors = {
                 re = /[hsla\(\)]/g;
                 ar = result.replace(re, '').split(',');
                 var hsl = this.HslToRgb(parseFloat(ar[0]) / 360, parseFloat(ar[1]) / 100, parseFloat(ar[2]) / 100);
-                return 'rgb(' + hsl[0] + ',' + hsl[1] + ',' + hsl[2] + ')';
+                return 'rgb' + this._isSet(ar, 'a') + '(' + hsl[0] + ',' + hsl[1] + ',' + hsl[2] + this._isSet(ar, ',') + ')';
             } else if (result.indexOf('hsv') > -1) {
-                re = /[hsv\(\)]/g;
+                re = /[hsva\(\)]/g;
                 ar = result.replace(re, '').split(',');
                 var hsv = this.HsvToRgb(parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3]));
-                return 'rgb(' + hsv[0] + ',' + hsv[1] + ',' + hsv[2] + ')';
+                return 'rgb' + this._isSet(ar, 'a') + '(' + hsv[0] + ',' + hsv[1] + ',' + hsv[2] + this._isSet(ar, ',') + ')';
             } else if (result in this.namedColor) {
                 ar = this.namedColor[result][1];
                 return 'rgb(' + ar[0] + ',' + ar[1] + ',' + ar[2] + ')';
@@ -4707,9 +5083,14 @@ var Colors = {
                 console.log(color, ' isn\'t a valid value.');
                 return 'rgb(0,0,0)';
             }
+        } else if (Array.isArray(color)) {
+            return 'rgb' + this._isSet(color, 'a') + '(' + color[0] + ',' + color[1] + ',' + color[2] + this._isSet(color, ',') + ')';
         } else {
-            return 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+            return color;
         }
+    },
+    _isSet: function(a, b) {
+        return a.length > 3 ? b + (b === ',' ? a[3] : '') : '';
     },
     _parseColor: function(color) {
         if (!color) {
@@ -4741,8 +5122,10 @@ var Colors = {
             } else {
                 return [0, 0, 0];
             }
-        } else {
+        } else if (Array.isArray(color)) {
             return color;
+        } else {
+            throw 'You are attempting to translate an INVALID color: ' + color;
         }
     },
     Invert: function(args) {

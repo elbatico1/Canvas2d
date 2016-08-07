@@ -8,6 +8,7 @@ Browser Support
 
 Canvas2d has been tested and should work in
 - Internet Explorer 9+
+- Edge
 - Safari
 - Firefox
 - Chrome
@@ -40,6 +41,7 @@ and a separated object **Colors** in wich are placed some utils for converting a
 **Sprite** basically the layer ( _HTML5 canvas context 2d_ ) with an optional parameter.
 
 * name - The name given to the element
+* enableevent - A boolean defining if enable the loop listener for interaction
 
 **DisplayObjects** is where the actual drawing it's made. It has several methods and constructor for managing the basics shapes and picture.
 
@@ -52,7 +54,7 @@ and a separated object **Colors** in wich are placed some utils for converting a
 * img - an image
 * clip - a collection of cut from a given image
 
-**Tweener** is a collection of methods useful for move in time every property of basic shape, sprite and stage.
+**Tweener** is a collection of methods useful to edit in time every property of basic shapes, sprite and stage.
 
 * addTweener - the main method, takes the target element _required_ , the parameters to transition and a few optional parameters.
 
