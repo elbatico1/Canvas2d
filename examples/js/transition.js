@@ -347,8 +347,8 @@ Transition.prototype={
         }
         if('backgroundColor' in args){
             if(!o.style.backgroundColor){o.style.backgroundColor=this.browser === 'msie'?o.currentStyle['background-color']:document.defaultView.getComputedStyle(o, null).getPropertyValue('background-color');}
-            colorReq=Colors.ParseColor(args.backgroundColor);
-            colorSrc=Colors.ParseColor(o.style.backgroundColor);
+            colorReq=Colors_trans.ParseColor(args.backgroundColor);
+            colorSrc=Colors_trans.ParseColor(o.style.backgroundColor);
             r=colorReq[0]-colorSrc[0];
             g=colorReq[1]-colorSrc[1];
             b=colorReq[2]-colorSrc[2];
@@ -356,8 +356,8 @@ Transition.prototype={
         }
         if('color' in args){
             if(!o.style.color){o.style.color=this.browser === 'msie'?o.currentStyle['color']:document.defaultView.getComputedStyle(o, null).getPropertyValue('color');}
-            colorReq=Colors.ParseColor(args.color);
-            colorSrc=Colors.ParseColor(o.style.color);
+            colorReq=Colors_trans.ParseColor(args.color);
+            colorSrc=Colors_trans.ParseColor(o.style.color);
             r=colorReq[0]-colorSrc[0];
             g=colorReq[1]-colorSrc[1];
             b=colorReq[2]-colorSrc[2];
@@ -1175,19 +1175,19 @@ Transition.prototype={
     }
 };
 //////////////////////////////////////////////////////////////
-//Colors - list of function to manage colors
+//Colors_trans - list of function to manage colors
 //Rgb - return an array of length 3 digits corresponding to red green and blue values - required a color hex string
 //Hex - return a color hex string and require an array of length 3 digits corrensponding to red green and blue values
 //RandomRgb - return an array rgb of random value
 //namedColor - an object of 1567 entries of colors by name with a corresponding value rgb and hex
 //////////////////////////////////////////////////////////////
-var Colors = {
+var Colors_trans = {
     /**
-     * Rgb - Colors - return a rgb array value from an hex color format
-     * @type static method Colors
+     * Rgb - Colors_trans - return a rgb array value from an hex color format
+     * @type static method Colors_trans
      * @description return a rgb array value from an hex color format
      * @param {string} hex the color in hex format
-     * @example var myValue= Colors.Rgb('#FF00FF');
+     * @example var myValue= Colors_trans.Rgb('#FF00FF');
      * @returns {array} rgb the RGB representation in set [0, 255]; [r, g, b]
      * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
@@ -1208,11 +1208,11 @@ var Colors = {
         return (h.charAt(0) === "#") ? h.substring(1, 7) : h;
     },
     /**
-     * Hex - Colors - return a hex string value from an rgb array color format
-     * @type static method Colors
+     * Hex - Colors_trans - return a hex string value from an rgb array color format
+     * @type static method Colors_trans
      * @description return a hex string value from an rgb array color format
      * @param {array} rgb the color in rgb array format
-     * @example var myValue= Colors.Hex([r, g, b]);
+     * @example var myValue= Colors_trans.Hex([r, g, b]);
      * @returns {string} hex the HEX representation in string color format; '#value
      * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
@@ -1232,13 +1232,13 @@ var Colors = {
         return "0123456789ABCDEF".charAt((N - N % 16) / 16) + "0123456789ABCDEF".charAt(N % 16);
     },
     /**
-     * RgbToHsl - Colors -
-     * @type static method Colors
+     * RgbToHsl - Colors_trans -
+     * @type static method Colors_trans
      * @description Converts an RGB color value to HSL. Assumes r, g, and b are contained in the set [0, 255] and returns h, s, and l in the set [0, 1].
      * @param {number} r number The red color value 
      * @param {number} g number The green color value
      * @param {number} b number The blue color value
-     * @example var myValue= Colors.RgbToHsl([r, g, b]);
+     * @example var myValue= Colors_trans.RgbToHsl([r, g, b]);
      * @returns {array} hsl The HSL representation in the set [0, 1]; [ h, s, l]
      * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
      * @see text
@@ -1270,13 +1270,13 @@ var Colors = {
         return [h, s, l];
     },
     /**
-     * HslToRgb - Colors -
-     * @type static method Colors
+     * HslToRgb - Colors_trans -
+     * @type static method Colors_trans
      * @description Converts an HSL color value to RGB. Assumes h, s, and l are contained in the set [0, 1] and returns r, g, and b in the set [0, 255].
      * @param {number} h Number The hue 
      * @param {number} s Number The saturation 
      * @param {number} l Number The lightness
-     * @example var myValue= Colors.HslToRgb([h, s, l]);
+     * @example var myValue= Colors_trans.HslToRgb([h, s, l]);
      * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
      * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
      * @see text
@@ -1311,13 +1311,13 @@ var Colors = {
         return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
     },
     /**
-     * RgbToHsv - Colors -
-     * @type static method Colors
+     * RgbToHsv - Colors_trans -
+     * @type static method Colors_trans
      * @description Converts an RGB color value to HSV. Assumes r, g, and b are contained in the set [0, 255] and returns h, s, and v in the set [0, 1].
      * @param {number} r Number The red color value
      * @param {number} g Number The green color value
      * @param {number} b Number The blue color value
-     * @example var myValue= Colors.RgbToHsv([r, g, b]);
+     * @example var myValue= Colors_trans.RgbToHsv([r, g, b]);
      * @returns {array} hsv The HSV representation in the set [0, 1]; [h, s, v]
      * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
      * @see text
@@ -1350,13 +1350,13 @@ var Colors = {
         return [h, s, v];
     },
     /**
-     * HsvToRgb - Colors -
-     * @type static method Colors
+     * HsvToRgb - Colors_trans -
+     * @type static method Colors_trans
      * @description Converts an HSV color value to RGB. Assumes h, s, and v are contained in the set [0, 1] and returns r, g, and b in the set [0, 255].
      * @param {number} h Number The hue
      * @param {number} s Number The saturation
      * @param {number} v Number The value
-     * @example var myValue= Colors.HsvToRgb([h, s, v]);
+     * @example var myValue= Colors_trans.HsvToRgb([h, s, v]);
      * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
      * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
      * @see text
@@ -1395,10 +1395,10 @@ var Colors = {
     },
     /**
      * RandomRgb - Tweener - return a random rgb array value in range [0,255]
-     * @type static method Colors
+     * @type static method Colors_trans
      * @description return a random rgb array value in range [0,255]
      * @param {string} type string that rapresent the desired returned format value; string or array; default string
-     * @example var myValue= Colors.RandomRgb('array');
+     * @example var myValue= Colors_trans.RandomRgb('array');
      * @returns {mixed} rgb in string or array format; 'rgb(n, n, n)' or [r, g, b]
      * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
@@ -1416,11 +1416,11 @@ var Colors = {
 
     },
     /**
-     * PraseColor - Colors - return a rgb array 
-     * @type static method Colors
+     * PraseColor - Colors_trans - return a rgb array 
+     * @type static method Colors_trans
      * @description return a rgb array from any kind of accepted color formats
      * @param {mixed} color any kind of accepted color formats; string, name, hex, array
-     * @example var myValue= Colors.ParseColor(myObject.color);
+     * @example var myValue= Colors_trans.ParseColor(myObject.color);
      * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
      * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
@@ -1480,10 +1480,10 @@ var Colors = {
         return h;
     },
     /**
-     * namedColor - Colors -
-     * @type object Colors
+     * namedColor - Colors_trans -
+     * @type object Colors_trans
      * @description an object containing all the color's name accordingly to the specification css; name:[hex value, array rgb]
-     * @example var myValue= Colors.namedColor('azure'); resulting in ["#f0ffff", [240, 255, 255]]
+     * @example var myValue= Colors_trans.namedColor('azure'); resulting in ["#f0ffff", [240, 255, 255]]
      * @returns {undefined} none none
      * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
      * @see text
