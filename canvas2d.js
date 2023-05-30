@@ -1,38 +1,23 @@
 /**
- * Canvas2d JavaScript Library v1.3.2
- * http://www.somethinglikethis.it/canvas2d/
- * Copyright 2012, Fabio Fantini
- * Licensed under the MIT or GPL Version 2 licenses.
- * Date: Aug 28 2016
- *
- * Copyright (C) 2011 - 2016 by Fabio Fantini
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ *  Copyright 2011 Fabio Fantini
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
  */
-///////////////////////////////////////////////////////////////
-//Global Object
-//globalId  - sequence of unique id number for all the objects
-//evtType   - list of all events type assigned
-//evtList   - method of evtType to take track of all events type
-//container - global container - div element -
-//////////////////////////////////////////////////////////////
-var Canvas2d = {
+/**
+ * Canvas2d - Javascipt library
+ * version v1.3.2
+ */
+const Canvas2d = {
     'globalId': 1,
     'container': {
         'id': 0,
@@ -44,36 +29,32 @@ var Canvas2d = {
     wn: null
 };
 /**
- * Stage
+ * Stage - Main element
  * @type constructor Stage
- * @description create the first instance of Stage
- * @property {div DOMElement} container div element that will contained all the canvas's elements
- * @property {number} width Stage width
- * @property {number} height Stage height
- * @property {number} x horizontal coordinate
- * @property {number} y vertical coordinate
+ * @description Instance an HTML DIV element that act as the main container
+ * @property {div DOMElement} conatainer div element
+ * @property {Point} size Point; Point, Array, Number
+ * @property {Point} position Point; Point, Array, Number
+ * @property {Point} scale Point; Point, Array, Number
  * @property {number} alpha opacity value in range 0-1
- * @property {number} scaleX horizontal scale
- * @property {number} scaleY vertival scale
+ * @property {boolean} visible object visibility
  * @property {number} rotation rotation expressed in degrees
- * @property {boolean} visible visibility of the object
- * @property {string} className class name of the object
- * @property {number} id indentifier of the objet
- * @property {string} name name of the object
- * @property {array} children all the nested elements
- * @property {date} date the creation date of the object
+ * @property {string} className object class name
+ * @property {number} id object indentifier
+ * @property {string} name object name
+ * @property {array} children all the nested Layer elements
+ * @property {date} date object creation date
  * @property {boolean} enableEvent enable/disable event listener
  * @property {string} agent navigator user agent
  * @param {div Element} container div element
- * @param {number} width stage width
- * @param {number} height stage height
- * @param {boolean} enableevent listen to events
- * @example var myStage=new Canvas2d.Stage('container',800,520,true);
- * @returns {Stage Element} Stage it self
+ * @param {Point} size Point; Point, Array, Number
+ * @param {boolean} enableevent event listener true false
+ * @example var myStage=new Canvas2d.Stage('container',[800,520],true);
+ * @returns {Stage Element} this Stage
  * @see link
  * @link text
  */
-Canvas2d.Stage = function(container, width, height, enableevent) {
+Canvas2d.Stage = function(container, p, enableevent) {
     this.enabledEvent = enableevent === false ? enableevent : true;
     this.className = "Stage";
     this.visible = true;
@@ -81,29 +62,44 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
     this.name = "Stage_" + this.date.getTime().toString();
     this.indexCount = 0;
     this.container = typeof container === 'string' ? document.getElementById(container) : container;
-    this.container.style.width = width + 'px';
-    this.container.style.height = height + 'px';
+    if (typeof p === 'string') {
+        let body=document.body;
+        let html=body.parentNode;
+        body.style.margin=html.style.margin='0';
+        body.style.padding=html.style.padding='0';
+        html.style.height='100%';
+        if (p === 'full') {
+            body.style.height='100%';
+        }else{
+            let result = p.replace(/\s/g, "").toLowerCase();
+            let ra = result.split(',');
+            // console.log(result,ra);
+            body.style.width=ra[0];
+            body.style.height=ra[1];
+        }
+        this.size = new Canvas2d.Point([body.clientWidth,body.clientHeight]);
+    }else{
+        this.size = new Canvas2d.Point(p);
+    }
+    this.container.style.width = this.size.x + 'px';
+    this.container.style.height = this.size.y + 'px';
     this.container.style.position = 'absolute';
     this.container.style.margin = '0 auto';
     this.container.onmousedown = function() {
         //return false;
     };
     Canvas2d.container.id = container;
-    Canvas2d.container.width = width;
-    Canvas2d.container.height = height;
+    Canvas2d.container.width = this.size.x;
+    Canvas2d.container.height = this.size.y;
     Canvas2d.container.element = this.container;
     this.fakeCanvas = document.createElement('canvas');
-    this.fakeCanvas.width = width;
-    this.fakeCanvas.height = height;
+    this.fakeCanvas.width = this.size.x;
+    this.fakeCanvas.height = this.size.y;
     this.fakeCtx = this.fakeCanvas.getContext("2d");
     Canvas2d.fakeCtx = this.fakeCtx;
-    this.width = width;
-    this.height = height;
-    this.x = 0;
-    this.y = 0;
+    this.position = new Canvas2d.Point();
+    this.scale = new Canvas2d.Point(1);
     this.alpha = 1;
-    this.scaleX = 1;
-    this.scaleY = 1;
     this.rotation = 0;
     this.id = container;
     this.index = 0;
@@ -169,7 +165,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
                 this.timeInterval = thisTime - this.lastTime;
                 this.time += this.timeInterval;
                 this.lastTime = thisTime;
-                for (var i = 0; i < this.loop.length; i++) {
+                for (let i = 0; i < this.loop.length; i++) {
                     var illo = this.loop[i];
                     illo.func.apply(illo.target, [illo.target]);
                 }
@@ -179,7 +175,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             }
         },
         start: function() {
-            if (!this.animating) {
+            if (!this.animating && this.loop.length > 0) {
                 var date = new Date();
                 this.startTime = date.getTime();
                 this.lastTime = this.startTime;
@@ -204,7 +200,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
             var id = true;
             if (target.className === 'DisplayObjects') {
                 id = target.parent.parent.wn === Canvas2d.wn ? true : false;
-            } else if (target.className === 'Sprite') {
+            } else if (target.className === 'Layer') {
                 id = target.parent.wn === Canvas2d.wn ? true : false;
             } else if (target.className === 'Stage') {
                 id = target.wn === Canvas2d.wn ? true : false;
@@ -223,7 +219,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
         },
         isChild: function(target) {
             var id = false;
-            for (var i = 0; i < this.loop.length; i++) {
+            for (let i = 0; i < this.loop.length; i++) {
                 if (this.loop[i].target === target) {
                     id = true;
                     break;
@@ -233,7 +229,7 @@ Canvas2d.Stage = function(container, width, height, enableevent) {
         },
         removeLoop: function(target) {
             var id = -1;
-            for (var i = 0; i < this.loop.length; i++) {
+            for (let i = 0; i < this.loop.length; i++) {
                 if (this.loop[i].id === target.PRID) {
                     id = i;
                     break;
@@ -259,9 +255,9 @@ Canvas2d.Stage.prototype = {
     /**
      *enableEvt - Stage - enable detection events in stage.
      * @type method Stage
-     *@description enable detection events in stage
-     *@example mystage.disableEvt();
-     *@returns {void} enableEvt none
+     * @description enable detection events in stage
+     * @example mystage.disableEvt();
+     * @returns {void} enableEvt none
      */
     enableEvt: function() {
         if ("ontouchstart" in window) {
@@ -274,11 +270,11 @@ Canvas2d.Stage.prototype = {
     /**
      *disableEvt - Stage - disable detection events in stage.
      * @type method Stage
-     *@description disable detection events in stage
-     *@example mystage.disableEvt();
-     *@returns {void} enableEvt none
-     *@see text
-     *@link text
+     * @description disable detection events in stage
+     * @example mystage.disableEvt();
+     * @returns {void} enableEvt none
+     * @see text
+     * @link text
      */
     disableEvt: function() {
         if ("ontouchstart" in window) {
@@ -303,8 +299,8 @@ Canvas2d.Stage.prototype = {
      * @param {function} func function to be excecuted
      * @example mystage.addLoop(my object,myFunction);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     addLoop: function(target, func) {
         window[Canvas2d.wn + 'rqanim'].addLoop(target, func);
@@ -312,12 +308,12 @@ Canvas2d.Stage.prototype = {
     /**
      *removeLoop - Stage - set the main function for animation.
      * @type method Stage
-     *@description remove a function to the animation cicle
-     *@param {element object} target element of interest
-     *@example mystage.removeLoop(my object);
-     *@returns {undefined} none none
-     *@see text
-     *@link text
+     * @description remove a function to the animation cicle
+     * @param {element object} target element of interest
+     * @example mystage.removeLoop(my object);
+     * @returns {undefined} none none
+     * @see text
+     * @link text
      */
     removeLoop: function(target) {
         window[Canvas2d.wn + 'rqanim'].removeLoop(target);
@@ -328,8 +324,8 @@ Canvas2d.Stage.prototype = {
      * @description start the animation cicle
      * @example stage.start();
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     start: function() {
         window[Canvas2d.wn + 'rqanim'].start();
@@ -340,8 +336,8 @@ Canvas2d.Stage.prototype = {
      * @description reset the animation cicle
      * @example stage.reset();
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     reset: function() {
         window[Canvas2d.wn + 'rqanim'].reset();
@@ -352,8 +348,8 @@ Canvas2d.Stage.prototype = {
      * @description reset di animation cicle
      * @example stage.stop();
      * @returns {undefined} non none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     stop: function() {
         window[Canvas2d.wn + 'rqanim'].animating = false;
@@ -364,8 +360,8 @@ Canvas2d.Stage.prototype = {
      * @description get the current increasing number of frame fired.
      * @example stage.getFrame();
      * @returns {number} frame number of frame executed
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     getFrame: function() {
         return window[Canvas2d.wn + 'rqanim'].getFrame();
@@ -376,8 +372,8 @@ Canvas2d.Stage.prototype = {
      * @description get the current increasing number of millisecond
      * @example stage.getTime();
      * @returns {number} time millisecons
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     getTime: function() {
         return window[Canvas2d.wn + 'rqanim'].getTime();
@@ -385,11 +381,11 @@ Canvas2d.Stage.prototype = {
     /**
      *getFps - Stage - get the current number of frame per seconds
      * @type method Stage
-     *@description get the current number of frame per seconds
-     *@example stage.getFps();
-     *@returns {number} fps frame per seconds
-     *@see text
-     *@link text
+     * @description get the current number of frame per seconds
+     * @example stage.getFps();
+     * @returns {number} fps frame per seconds
+     * @see text
+     * @link text
      */
     getFps: function() {
         return window[Canvas2d.wn + 'rqanim'].getFps();
@@ -400,8 +396,8 @@ Canvas2d.Stage.prototype = {
      * @description get the actual delay in millisecond between cicle loops
      * @example stage.getTimeInterval();
      * @returns {number} float milliseconds
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     getTimeInterval: function() {
         return window[Canvas2d.wn + 'rqanim'].getTimeInterval();
@@ -412,8 +408,8 @@ Canvas2d.Stage.prototype = {
      * @description get a list of all the element in the loop cicle
      * @example stage.getLoopList();
      * @returns {array} loop element list
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     getLoopList: function() {
         return window[Canvas2d.wn + 'rqanim'].loop;
@@ -424,8 +420,8 @@ Canvas2d.Stage.prototype = {
      * @description get a true/false value indicating the activiti of the animation cicle loop
      * @example stage.isAnimating();
      * @returns {boolean} animating true/false
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     isAnimating: function() {
         return window[Canvas2d.wn + 'rqanim'].animating;
@@ -433,13 +429,13 @@ Canvas2d.Stage.prototype = {
     /**
      *getDataURL - Stage - take a screen shot of stage
      * @type method Stage
-     *@description take a screen shot of stage
-     *@param {string} type a type of image image/jpeg-png
-     *@param {number} quality a value rapresenting the quality of the returned image in range 0-10
-     *@example image.src=stage.getDataURL('image/png',8);
-     *@returns {image data} data image
-     *@see text
-     *@link text
+     * @description take a screen shot of stage
+     * @param {string} type a type of image image/jpeg-png
+     * @param {number} quality a value rapresenting the quality of the returned image in range 0-10
+     * @example image.src=stage.getDataURL('image/png',8);
+     * @returns {image data} data image
+     * @see text
+     * @link text
      */
     getDataURL: function(type, quality) {
         var t = type ? type : 'image/jpeg';
@@ -448,7 +444,7 @@ Canvas2d.Stage.prototype = {
         this.draw(this.fakeCtx);
         this.fakeCtx.restore();
         var data = this.fakeCanvas.toDataURL(t, q);
-        this.fakeCtx.clearRect(0, 0, this.width, this.height);
+        this.fakeCtx.clearRect(0, 0, this.size.x, this.size.y);
         var img = document.createElement('img');
         img.src = data;
         return img;
@@ -461,8 +457,8 @@ Canvas2d.Stage.prototype = {
      * @param {function} func function to be call
      * @example myObject.addEvent('click',myFunction);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     addEvent: function(type, func) {
         if (type in this.evtListeners) {
@@ -475,18 +471,18 @@ Canvas2d.Stage.prototype = {
     },
     /**
      *removeEvent - Stage - remove a preexistent event from the listening cicle
-     *@type method Stage
-     *@description remove a preexistence event from the listening cicle
+     * @type method Stage
+     * @description remove a preexistence event from the listening cicle
      * @param {event string} type event listener type
      * @param {function} func function to be call
-     *@example myObject.removeEvent('click');
-     *@returns {undefined} none none
-     *@see text
-     *@link text
+     * @example myObject.removeEvent('click');
+     * @returns {undefined} none none
+     * @see text
+     * @link text
      */
     removeEvent: function(type, func) {
         if (type in this.evtListeners) {
-            for (var i = 0; i < this.evtListeners[type].func.length; i++) {
+            for (let i = 0; i < this.evtListeners[type].func.length; i++) {
                 if (this.evtListeners[type].func[i] === func) {
                     this.evtListeners[type].func.splice(i, 1);
                     break;
@@ -501,32 +497,46 @@ Canvas2d.Stage.prototype = {
      * add - Stage - add an element into the list of nested objects
      * @type method Stage
      * @description add an element into the list of nested objects
-     * @param {element object} child Sprite
-     * @example stage.add(Sprite);
+     * @param {element object} child Layer
+     * @example stage.add(Layer);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    add: function(child) {
-        if (child.parent || child.className === "DisplayObjects") {
-            return;
+    add: function(...child) {
+        if (arguments.length > 1) {
+            for (let i = 0; i < arguments.length; i++) {
+                if (arguments[i].parent || arguments[i].className === 'DisplayObjects') {
+                    return;
+                }
+                arguments[i].parent = this;
+                arguments[i].index = this.indexCount;
+                this._setContainer(arguments[i], this);
+                this.children.push(arguments[i]);
+                this.indexCount++;
+            }
+            this._orderCanvases();
+        }else{
+            if (arguments[0].parent || arguments[0].className === 'DisplayObjects') {
+                return;
+            }
+            arguments[0].parent = this;
+            arguments[0].index = this.indexCount;
+            this._setContainer(arguments[0], this);
+            this.children.push(arguments[0]);
+            this.indexCount++;
+            this._orderCanvases();
         }
-        child.index = this.indexCount;
-        child.parent = this;
-        this._setContainer(child, this);
-        this.children.push(child);
-        this.indexCount++;
-        this._orderCanvases();
     },
     /**
      * remove - Stage - remove a preexistence object from the nested objects
      * @type method Stage
      * @description remove a preexistence object from the nested objects
-     * @param {element object} child Sprite
-     * @example stage.remove(Sprite);
+     * @param {element object} child Layer
+     * @example stage.remove(Layer);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     remove: function(child) {
         if (child.parent !== this) {
@@ -536,21 +546,21 @@ Canvas2d.Stage.prototype = {
         this.children.splice(child.index, 1);
         this.container.removeChild(child.canvas);
         this.indexCount--;
-        for (var i = 0; i < this.children.length; i++) {
+        for (let i = 0; i < this.children.length; i++) {
             this.children[i].index = i;
         }
         this._orderCanvases();
     },
     /**
-     * zOrder - Stage - change the order of a nested Sprite object passing either a index number or a string 'top' or 'bottom'
+     * zOrder - Stage - change the order of a nested Layer object passing either a index number or a string 'top' or 'bottom'
      * @type method Stage
-     * @description change the order of a nested Sprite object passing either a index number or a string 'top' or 'bottom'
-     * @param {element object} child Sprite
+     * @description change the order of a nested Layer object passing either a index number or a string 'top' or 'bottom'
+     * @param {element object} child Layer
      * @param {number string} n index
-     * @example stage.zOrder(Sprite,'top');
+     * @example stage.zOrder(Layer,'top');
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     zOrder: function(child, n) {
         if (child.parent !== this) {
@@ -561,7 +571,7 @@ Canvas2d.Stage.prototype = {
             var el = n === 'top' ? len - 1 : n === 'bottom' ? 0 : len - 1;
             this.children.splice(child.index, 1);
             this.children.splice(el, 0, child);
-            for (var i = 0; i < len; i++) {
+            for (let i = 0; i < len; i++) {
                 this.children[i].index = i;
             }
             this._orderCanvases();
@@ -569,30 +579,83 @@ Canvas2d.Stage.prototype = {
             if (n in this.children) {
                 this.children.splice(child.index, 1);
                 this.children.splice(n, 0, child);
-                for (var i = 0; i < this.children.length; i++) {
+                for (let i = 0; i < this.children.length; i++) {
                     this.children[i].index = i;
                 }
                 this._orderCanvases();
             }
         }
     },
+    /**
+     * getAlignement - Stage - get position relative to the Stage dimension
+     * @type method Stage
+     * @description get a position relative to Stage dimension passing a string base coordinate or a number ranging from 0 to 8; top-left 0, top-center 1, top-right 2, left 3, center 4, right 5, bottom-left 6, bottom-center 7, and bottom-right 8;
+     * @param {number string} args number or string value
+     * @example myObject.getAlignement('center' || 4);
+     * @returns {array} position [x,y] in Array form
+     * @see text
+     * @link text
+     */
+    getAlignement: function(args){
+        switch(args){
+        case 0:
+        case 'top-left':
+            return [0,0];
+            break
+        case 1:
+        case 'top-center':
+            return [this.size.x/2,0];
+            break
+        case 2:
+        case 'top-right':
+            return [this.size.x,0];
+            break
+        case 3:
+        case 'left':
+            return [0,this.size.y/2];
+            break;
+        case 4:
+        case 'center':
+            return [this.size.x/2,this.size.y/2];
+            break;
+        case 5:
+        case 'right':
+            return [this.size.x,0];
+            break;
+        case 6:
+        case 'bottom-left':
+            return [0,this.size.y];
+            break;
+        case 7:
+        case 'bottom-center':
+            return [this.size.x/2,this.size.y];
+            break;
+        case 8:
+        case 'bottom-right':
+            return [this.size.x,this.size.y];
+            break;
+        default:
+            break;
+        }
+    },
     _setContainer: function(child, parent) {
-        child.width = parent.width;
-        child.height = parent.height;
+        // child.width = parent.width;
+        // child.height = parent.height;
+        child.size.set(parent.size);
         child.stage = parent.container;
-        child.canvas.width = parent.width;
-        child.canvas.height = parent.height;
+        child.canvas.width = parent.size.x;
+        child.canvas.height = parent.size.y;
         child.ctx = child.canvas.getContext('2d');
     },
     /**
-     *_orderCanvases - Stage - internal function - reorder the canvases (Sprite) elements.
+     *_orderCanvases - Stage - internal function - reorder the canvases (Layer) elements.
      */
     _orderCanvases: function() {
         var that = this;
 
         function _childRecursion(child) {
-            for (var i = 0; i < child.length; i++) {
-                if (child[i].className === "Sprite") {
+            for (let i = 0; i < child.length; i++) {
+                if (child[i].className === "Layer") {
                     that.container.appendChild(child[i].canvas);
                 } else {
                     _childRecursion(child[i].children);
@@ -605,18 +668,16 @@ Canvas2d.Stage.prototype = {
      * resize - Stage - Manage resizing of Stage and recurively all his children
      * @type method Stage
      * @description Manage resizing of Stage and recurively all his children
-     * @param {number} w new stage width
-     * @param {number} h new stage height
+     * @param {Point} new size; Point, Array, Number
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    resize: function(w, h) {
+    resize: function(p) {
         this.container.style.width = w + "px";
         this.container.style.height = h + "px";
-        this.width = w;
-        this.height = h;
-        for (var i = 0; i < this.children.length; i++) {
+        this.size.set(p);
+        for (let i = 0; i < this.children.length; i++) {
             this._setContainer(this.children[i], this);
         }
     },
@@ -714,16 +775,16 @@ Canvas2d.Stage.prototype = {
 
             if (dstart && ptarget) {
                 var mp = that._parentOffset(testTouch(e), ptarget.parent);
-                poffx = mp.ox - (ptarget.x);
-                poffy = mp.oy - (ptarget.y);
+                poffx = mp.ox - (ptarget.position.x);
+                poffy = mp.oy - (ptarget.position.y);
                 _dragShandler(e, ptarget, mp);
             } else if (ddrag && ptarget) {
                 _draghandler(testTouch(e), ptarget, e, poffx, poffy);
             }
             if (dstart && target) {
                 var mt = that._parentOffset(testTouch(e), target.parent);
-                offx = mt.ox - (target.x);
-                offy = mt.oy - (target.y);
+                offx = mt.ox - (target.position.x);
+                offy = mt.oy - (target.position.y);
                 _dragShandler(e, target, mt);
             } else if (ddrag && target) {
                 _draghandler(testTouch(e), target, e, offx, offy);
@@ -804,7 +865,7 @@ Canvas2d.Stage.prototype = {
             m2 = that._parentOffset(e.touches[1], p);
             radius = Math.sqrt(Math.pow(m1.x - m2.x, 2) + Math.pow(m1.y - m2.y, 2));
             angle = Math.atan2(m1.y - m2.y, m1.x - m2.x) - target.rotation;
-            scale = (target.scaleX + target.scaleY) / 2;
+            scale = (target.scale.x + target.scale.y) / 2;
             if ('gesturestart' in target.evtListeners) {
                 m1['mouse2'] = m2;
                 m1['scale'] = scale;
@@ -1021,8 +1082,8 @@ Canvas2d.Stage.prototype = {
         function _testdragP(e) {
             if (dstart && ptarget) {
                 var mp = that._parentOffset(e, ptarget.parent);
-                poffx = mp.ox - (ptarget.x);
-                poffy = mp.oy - (ptarget.y);
+                poffx = mp.ox - (ptarget.position.x);
+                poffy = mp.oy - (ptarget.position.y);
                 _dragShandler(e, ptarget, mp);
             } else if (ddrag && ptarget) {
                 _draghandler(e, ptarget, poffx, poffy);
@@ -1035,8 +1096,8 @@ Canvas2d.Stage.prototype = {
         function _testdrag(e) {
             if (dstart && target) {
                 var mt = that._parentOffset(e, target.parent);
-                offx = mt.ox - (target.x);
-                offy = mt.oy - (target.y);
+                offx = mt.ox - (target.position.x);
+                offy = mt.oy - (target.position.y);
                 _dragShandler(e, target, mt);
             } else if (ddrag && target) {
                 _draghandler(e, target, offx, offy);
@@ -1213,8 +1274,8 @@ Canvas2d.Stage.prototype = {
         x = e.pageX - (Math.floor(b.left) + window.pageXOffset);
         y = e.pageY - (Math.floor(b.top) + window.pageYOffset);
         g = child.parent._global();
-        x1 = child.className === 'Sprite' ? x / g.scaleX : x;
-        y1 = child.className === 'Sprite' ? y / g.scaleY : y;
+        x1 = child.className === 'Layer' ? x / g.scaleX : x;
+        y1 = child.className === 'Layer' ? y / g.scaleY : y;
         r = Math.sqrt(Math.pow(x1 - g.x, 2) + Math.pow(y1 - g.y, 2));
         a = Math.atan2(y - g.y, x - g.x) - g.rotation;
         cos = Math.cos(a) * r;
@@ -1246,8 +1307,8 @@ Canvas2d.Stage.prototype = {
         g = child._global();
         x = e.pageX - (Math.floor(b.left) + window.pageXOffset);
         y = e.pageY - (Math.floor(b.top) + window.pageYOffset);
-        x1 = child.className === 'Sprite' ? x / g.scaleX : x;
-        y1 = child.className === 'Sprite' ? y / g.scaleY : y;
+        x1 = child.className === 'Layer' ? x / g.scaleX : x;
+        y1 = child.className === 'Layer' ? y / g.scaleY : y;
         r = Math.sqrt(Math.pow(x1 - g.x, 2) + Math.pow(y1 - g.y, 2));
         a = Math.atan2(y - g.y, x - g.x) - g.rotation;
         cos = Math.cos(a) * r;
@@ -1266,10 +1327,10 @@ Canvas2d.Stage.prototype = {
     },
     _global: function() {
         return {
-            'x': this.x,
-            'y': this.y,
-            'scaleX': this.scaleX,
-            'scaleY': this.scaleY,
+            'x': this.position.x,
+            'y': this.position.y,
+            'scaleX': this.scale.x,
+            'scaleY': this.scale.y,
             'rotation': this.rotation,
             'alpha': this.alpha,
             'visible': this.visible
@@ -1281,67 +1342,66 @@ Canvas2d.Stage.prototype = {
      * @description clear the stage from all objects
      * @example stage.clear();
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     clear: function() {
-        for (var i = 0; i < this.children.length; i++) {
+        for (let i = 0; i < this.children.length; i++) {
             this.children[i].clear();
         }
     },
     /**
      *draw - Stage - draw all the elements object nested in Stage
-     *@type method Stage
-     *@description draw all the elements object nested in Stage
-     *@param {context 2d} ctx NOT REQUIRED
-     *@example stage.draw();
-     *@returns {undefined} none none
-     *@see text
-     *@link text
+     * @type method Stage
+     * @description draw all the elements object nested in Stage
+     * @param {context 2d} ctx NOT REQUIRED
+     * @example stage.draw();
+     * @returns {undefined} none none
+     * @see text
+     * @link text
      */
     draw: function(ctx) {
-        for (var i = 0; i < this.children.length; i++) {
+        for (let i = 0; i < this.children.length; i++) {
             this.children[i].draw(ctx);
         }
     }
 };
 /**
- * Sprite - container for all type of DisplayObjects
- * @type constructor Sprite
+ * Layer - container for all type of DisplayObjects
+ * @type constructor Layer
  * @description container for all type of DisplayObjects
- * @property {number} width Stage width
- * @property {number} height Stage height
- * @property {number} x horizontal coordinate
- * @property {number} y vertical coordinate
+ * @property {point} size Point; Point, Array, Number
+ * @property {point} scale Point; Point, Array, Number
+ * @property {Point} position Point; Point, Array, Number
  * @property {number} alpha opacity value in range 0-1
- * @property {number} scaleX horizontal scale
- * @property {number} scaleY vertival scale
- * @property {number} rotation rotation expressed in degrees
- * @property {boolean} visible visibility of the object
- * @property {string} className class name of the object
- * @property {number} id indentifier of the objet
- * @property {string} name name of the object
+ * @property {number} rotation expressed in degrees
+ * @property {boolean} visible object visibility 
+ * @property {string} className object class name 
+ * @property {number} id object indentifier 
+ * @property {string} name object name 
  * @property {array} children all the nested elements
- * @property {date} date the creation date of the object
+ * @property {date} date object creation date 
  * @property {object element} parent parent child
- * @param {string} name name of the object
+ * @property {string} blending layer type
+ * @param {string} name object name 
  * @param {boolean} enableevent enable/disable event listeners; default true
- * @example var myObject= new Canvas2d.Sprite('name optional');
- * @returns {Sprite Element} Sprite it self
- *@see text
- *@link text
+ * @example var myObject= new Canvas2d.Layer('name optional');
+ * @returns {Layer Element} this Layer
+ * @see text
+ * @link text
  */
-Canvas2d.Sprite = function(name, enableevent) {
+Canvas2d.Layer = function(name, enableevent) {
     this.enabledEvent = enableevent === false ? enableevent : true;
     this.visible = true;
     this.name = name ? name : '';
-    this.id = "sprite_" + (Canvas2d.globalId++).toString() + "_" + this.name;
+    this.id = "layer_" + (Canvas2d.globalId++).toString() + "_" + this.name;
     var globalContainer = Canvas2d.container;
-    this.width = globalContainer.width;
-    this.height = globalContainer.height;
+    // this.width = globalContainer.width;
+    // this.height = globalContainer.height;
+    this.size = new Canvas2d.Point(globalContainer.width,globalContainer.height);
     var container = document.createElement('canvas');
-    container.width = this.width;
-    container.height = this.height;
+    container.width = this.size.x;
+    container.height = this.size.y;
     container.id = this.id;
     container.style.position = 'absolute';
     container.style.top = '0px';
@@ -1349,40 +1409,39 @@ Canvas2d.Sprite = function(name, enableevent) {
     this.canvas = container;
     this.ctx = container.getContext('2d');
     this.stage = globalContainer.element;
-    this.className = "Sprite";
+    this.className = "Layer";
     this.indexCount = 0;
     this.date = new Date();
     this.children = [];
     this.index = 0;
     this.parent = null;
-    this.x = 0;
-    this.y = 0;
     this.alpha = 1;
-    this.scaleX = 1;
-    this.scaleY = 1;
     this.rotation = 0;
     this.evtListeners = {};
+    this.position = new Canvas2d.Point();
+    this.scale = new Canvas2d.Point(1);
+    this.blending="source-over"
 };
 
-function _setContainer(child, parent) {
-    child.width = parent.width;
-    child.height = parent.height;
-    child.stage = parent.container;
-    child.canvas.width = parent.width;
-    child.canvas.height = parent.height;
-    child.ctx = child.canvas.getContext('2d');
-}
-Canvas2d.Sprite.prototype = {
+// function _setContainer(child, parent) {
+//     child.width = parent.width;
+//     child.height = parent.height;
+//     child.stage = parent.container;
+//     child.canvas.width = parent.width;
+//     child.canvas.height = parent.height;
+//     child.ctx = child.canvas.getContext('2d');
+// }
+Canvas2d.Layer.prototype = {
     /**
-     * addEvent - Sprite - add an event into the listening cicle
-     * @type method Sprite
+     * addEvent - Layer - add an event into the listening cicle
+     * @type method Layer
      * @description add an event into the listening cicle
      * @param {event string} type event listener type
      * @param {function} func function to be call
      * @example myObject.addEvent('click',myFunction);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     addEvent: function(type, func) {
         if (type in this.evtListeners) {
@@ -1394,19 +1453,19 @@ Canvas2d.Sprite.prototype = {
         }
     },
     /**
-     * removeEvent - Sprite - remove a preexistent event from the listening cicle
-     * @type method Sprite
+     * removeEvent - Layer - remove a preexistent event from the listening cicle
+     * @type method Layer
      * @description remove a preexistence event from the listening cicle
      * @param {event string} type event listener type
      * @param {type} func function to be remove
      * @example myObject.removeEvent('click');
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     removeEvent: function(type, func) {
         if (type in this.evtListeners) {
-            for (var i = 0; i < this.evtListeners[type].func.length; i++) {
+            for (let i = 0; i < this.evtListeners[type].func.length; i++) {
                 if (this.evtListeners[type].func[i] === func) {
                     this.evtListeners[type].func.splice(i, 1);
                     break;
@@ -1418,33 +1477,45 @@ Canvas2d.Sprite.prototype = {
         }
     },
     /**
-     * add - Sprite - add an element into the list of nested objects
-     * @type method Sprite
+     * add - Layer - add an element into the list of nested objects
+     * @type method Layer
      * @description add an element into the list of nested objects
-     * @param {element object} child Sprite
-     * @example sprite.add(DisplayObjects);
+     * @param {element object} child Layer
+     * @example layer.add(DisplayObjects);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    add: function(child) {
-        if (child.parent || child.className !== 'DisplayObjects') {
-            return;
+    add: function(...child) {
+        if (arguments.length > 1) {
+            for (let i = 0; i < arguments.length; i++) {
+                if (arguments[i].parent || arguments[i].className !== 'DisplayObjects') {
+                    return;
+                }
+                arguments[i].parent = this;
+                arguments[i].index = this.indexCount;
+                this.indexCount++;
+                this.children.push(arguments[i]);
+            }
+        }else{
+            if (arguments[0].parent || arguments[0].className !== 'DisplayObjects') {
+                return;
+            }
+            arguments[0].parent = this;
+            arguments[0].index = this.indexCount;
+            this.indexCount++;
+            this.children.push(arguments[0]);
         }
-        child.parent = this;
-        child.index = this.indexCount;
-        this.indexCount++;
-        this.children.push(child);
     },
     /**
-     * remove - Sprite - remove a preexistence object from the nested objects
-     * @type method Sprite
+     * remove - Layer - remove a preexistence object from the nested objects
+     * @type method Layer
      * @description remove a preexistence object from the nested objects
-     * @param {element object} child Sprite
-     * @example sprite.remove(DisplayObjects);
+     * @param {element object} displayObjects children's layer
+     * @example layer.remove(DisplayObjects);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     remove: function(child) {
         if (child.parent !== this) {
@@ -1453,16 +1524,16 @@ Canvas2d.Sprite.prototype = {
         child.parent = undefined;
         this.children.splice(child.index, 1);
         this.indexCount--;
-        for (var i = 0; i < this.children.length; i++) {
+        for (let i = 0; i < this.children.length; i++) {
             this.children[i].index = i;
         }
     },
     /**
-     * getBound - Sprite -
-     * @type method Sprite
-     * @description get the actual measure based on all the childrens object
-     * @example var myValue= sprite.getBound(); result in {width:value,height:value}
-     * @returns {object} bounds width and hwight
+     * getBound - Layer -
+     * @type method Layer
+     * @description get the bounding box of all contained children
+     * @example var myValue= layer.getBound(); result in {width:value,height:value}
+     * @returns {object} bounds width and height
      * @see text
      * @link text
      */
@@ -1471,9 +1542,9 @@ Canvas2d.Sprite.prototype = {
             ay = [],
             aw = [],
             ah = [];
-        for (var i = 0; i < this.children.length; i++) {
-            ax.push(this.children[i].x + this.children[i].width);
-            ay.push(this.children[i].y + this.children[i].height);
+        for (let i = 0; i < this.children.length; i++) {
+            ax.push(this.children[i].position.x + this.children[i].size.x);
+            ay.push(this.children[i].position.y + this.children[i].size.y);
         }
 
         function compareNumbers(a, b) {
@@ -1487,14 +1558,14 @@ Canvas2d.Sprite.prototype = {
         };
     },
     /**
-     * zOrder - Sprite - change the order of a nested DisplayObjects passing either a index number or a string 'top' or 'bottom'
-     * @type method Sprite
+     * zOrder - Layer - change the order of a nested DisplayObjects passing either a index number or a string 'top' or 'bottom'
+     * @type method Layer
      * @description change the order of a nested DisplayObjects passing either a index number or a string 'top' or 'bottom'
      * @param {number string} n index
-     * @example sprite.zOrder('top');
+     * @example layer.zOrder('top');
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     zOrder: function(n) {
         if (typeof n === 'string') {
@@ -1502,7 +1573,7 @@ Canvas2d.Sprite.prototype = {
             var el = n === 'top' ? len - 1 : n === 'bottom' ? 0 : len - 1;
             this.parent.children.splice(this.index, 1);
             this.parent.children.splice(el, 0, this);
-            for (var i = 0; i < len; i++) {
+            for (let i = 0; i < len; i++) {
                 this.parent.children[i].index = i;
             }
             this.parent._orderCanvases();
@@ -1510,7 +1581,7 @@ Canvas2d.Sprite.prototype = {
             if (n in this.parent.children) {
                 this.parent.children.splice(this.index, 1);
                 this.parent.children.splice(n, 0, this);
-                for (var i = 0; i < this.parent.children.length; i++) {
+                for (let i = 0; i < this.parent.children.length; i++) {
                     this.parent.children[i].index = i;
                 }
                 this.parent._orderCanvases();
@@ -1518,65 +1589,67 @@ Canvas2d.Sprite.prototype = {
         }
     },
     /**
-     * clear - Stage - clear the stage from all objects
-     * @type method Stage
-     * @description clear the stage from all objects
-     * @example stage.clear();
+     * clear - Layer - clear the layer from all objects
+     * @type method Layer
+     * @description clear the layer from all nested objects
+     * @example layer.clear();
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     clear: function() {
-        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.ctx.clearRect(0, 0, this.size.x, this.size.y);
     },
     _global: function() {
         var g = this.parent._global(),
             cos, sin;
         if (this.parent.rotation !== 0) {
-            var a = Math.atan2(this.y, this.x) + this.parent.rotation;
-            var r = Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+            // var a = Math.atan2(this.y, this.x) + this.parent.rotation;
+            var a = this.position.angle() + this.parent.rotation;
+            // var r = Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+            var r = this.position.length();
             cos = r * Math.cos(a);
             sin = r * Math.sin(a);
         } else {
-            cos = this.x;
-            sin = this.y;
+            cos = this.position.x;
+            sin = this.position.y;
         }
         return {
             'x': g.x + cos,
             'y': g.y + sin,
-            'scaleX': g.scaleX * this.scaleX,
-            'scaleY': g.scaleY * this.scaleY,
+            'scaleX': g.scaleX * this.scale.x,
+            'scaleY': g.scaleY * this.scale.y,
             'rotation': g.rotation + this.rotation,
             'alpha': g.alpha < 1 ? this.alpha * g.alpha : this.alpha,
             'visible': g.visible ? this.visible : false
         };
     },
     /**
-     * clone - Sprite - clone a Sprite object returning a new one
-     * @type method Sprite
-     * @description clone a Sprite object returning a new one
-     * @example var newObject=sprite.clone();
-     * @returns {element object} newElement Sprite
-     *@see text
-     *@link text
+     * clone - Layer - clone a Layer object returning a new one
+     * @type method Layer
+     * @description clone a Layer object returning a new one
+     * @example var newObject=layer.clone();
+     * @returns {element object} newElement Layer
+     * @see text
+     * @link text
      */
     clone: function() {
-        var e = new Canvas2d.Sprite();
-        for (var i = 0; i < this.children.length; i++) {
+        var e = new Canvas2d.Layer();
+        for (let i = 0; i < this.children.length; i++) {
             var c = this.children[i].clone(this.children[i].name);
             e.add(c);
         }
         return e;
     },
     /**
-     *draw - Sprite - draw all the elements object nested in Sprite
-     *@type method Sprite
-     *@description draw all the elements object nested in Sprite
-     *@param {context 2d} ctx NOT REQUIRED
-     *@example sprite.draw();
-     *@returns {undefined} none none
-     *@see text
-     *@link text
+     *draw - Layer - draw all the elements object nested in Layer
+     * @type method Layer
+     * @description draw all the elements object nested in Layer
+     * @param {context 2d} ctx NOT REQUIRED
+     * @example layer.draw();
+     * @returns {undefined} none none
+     * @see text
+     * @link text
      */
     draw: function(ctx) {
         if (!this.visible) {
@@ -1589,41 +1662,159 @@ Canvas2d.Sprite.prototype = {
         }
         var g = this._global();
         c.save();
+        c.globalCompositeOperation=this.blending;
         c.translate(g.x, g.y);
         c.scale(g.scaleX, g.scaleY);
         c.rotate(g.rotation);
         c.globalAlpha = g.alpha;
-        for (var i = 0; i < this.children.length; i++) {
+        for (let i = 0; i < this.children.length; i++) {
             this.children[i].draw(c);
         }
         c.restore();
+    },
+    /**
+     *blend - Layer - Set blending canvas mode
+     * @type method Layer
+     * @description blending type setting for all Layer's nested elements
+     * @param {number} n index Array blending methods
+     * @example layer.blend(number);
+     * @returns {param} layer blending=type;
+     * @see text
+     * @link text
+     */
+    blend: function(n){
+        var blend=[
+/**
+* This is the default setting and draws new shapes on top of the existing canvas content.
+*/
+"source-over",
+/**
+* The new shape is drawn only where both the new shape and the destination canvas overlap. Everything else is made transparent.
+*/
+"source-in",
+/**
+* The new shape is drawn where it doesn't overlap the existing canvas content.
+*/
+"source-out",
+/**
+* The new shape is only drawn where it overlaps the existing canvas content.
+*/
+"source-atop",
+/**
+* New shapes are drawn behind the existing canvas content.
+*/
+"destination-over",
+/**
+* The existing canvas content is kept where both the new shape and existing canvas content overlap. Everything else is made transparent.
+*/
+"destination-in",
+/**
+* The existing content is kept where it doesn't overlap the new shape.
+*/
+"destination-out",
+/**
+* The existing canvas is only kept where it overlaps the new shape. The new shape is drawn behind the canvas content.
+*/
+"destination-atop",
+/**
+* Where both shapes overlap the color is determined by adding color values.
+*/
+"lighter",
+/**
+* Only the new shape is shown.
+*/
+"copy",
+/**
+* Shapes are made transparent where both overlap and drawn normal everywhere else.
+*/
+"xor",
+/**
+* The pixels of the top layer are multiplied with the corresponding pixel of the bottom layer. A darker picture is the result.
+*/
+"multiply",
+/**
+* The pixels are inverted, multiplied, and inverted again. A lighter picture is the result (opposite of multiply)
+*/
+"screen",
+/**
+* A combination of multiply and screen. Dark parts on the base layer become darker, and light parts become lighter.
+*/
+"overlay",
+/**
+* Retains the darkest pixels of both layers.
+*/
+"darken",
+/**
+* Retains the lightest pixels of both layers.
+*/
+"lighten",
+/**
+* Divides the bottom layer by the inverted top layer.
+*/
+"color-dodge",
+/**
+* Divides the inverted bottom layer by the top layer, and then inverts the result.
+*/
+"color-burn",
+/**
+* A combination of multiply and screen like overlay, but with top and bottom layer swapped.
+*/
+"hard-light",
+/**
+* A softer version of hard-light. Pure black or white does not result in pure black or white.
+*/
+"soft-light",
+/**
+* Subtracts the bottom layer from the top layer or the other way round to always get a positive value.
+*/
+"difference",
+/**
+* Like difference, but with lower contrast.
+*/
+"exclusion",
+/**
+* Preserves the luma and chroma of the bottom layer, while adopting the hue of the top layer.
+*/
+"hue",
+/**
+* Preserves the luma and hue of the bottom layer, while adopting the chroma of the top layer.
+*/
+"saturation",
+/**
+* Preserves the luma of the bottom layer, while adopting the hue and chroma of the top layer.
+*/
+"color",
+/**
+* Preserves the hue and chroma of the bottom layer, while adopting the luma of the top layer.
+*/
+"luminosity"];
+        return this.blending=blend[n];
     }
 };
 /**
  * DisplayObjects - object constructor of all shapes, texts, images and clips
  * @type constructor DisplayObjects
  * @description object constructor of all shapes, texts, images and clips
- * @property {number} width Stage width
- * @property {number} height Stage height
- * @property {number} x horizontal coordinate
- * @property {number} y vertical coordinate
+ * @property {point} object Size; Point, Array, Number
+ * @property {Point} object Position; Point, Array, Number
+ * @property {Point} object Pivot; Point, Array, Number
+ * @property {point} object Scale; Point, Array, Number
  * @property {number} alpha opacity value in range 0-1
- * @property {number} scaleX horizontal scale
- * @property {number} scaleY vertival scale
  * @property {number} rotation rotation expressed in degrees
- * @property {boolean} visible visibility of the object
- * @property {string} className class name of the object
- * @property {number} id indentifier of the objet
- * @property {string} name name of the object
+ * @property {boolean} visible object visibility
+ * @property {string} className object class name
+ * @property {number} id object indentifier
+ * @property {string} name object name
  * @property {array} children all the nested elements
- * @property {date} date the creation date of the object
- * @property {object element} parent parent child
- * @param {string} name name of the object
+ * @property {date} date object creation date
+ * @property {object element} parent child parent
+ * @property {Color} clr Color Object; Contaning Color's methods
+ * @param {string} name object name
  * @param {boolean} enableevent enable/disable event listeners; default true
  * @example var myObject= new Canvas2d.DisplayObjects('name optional');
- * @returns {DisplayObjects Element} DisplayObjects it self
- *@see text
- *@link text
+ * @returns {DisplayObjects Element} this DisplayObjects
+ * @see text
+ * @link text
  */
 Canvas2d.DisplayObjects = function(name, enableevent) {
     this.enabledEvent = enableevent === false ? enableevent : true;
@@ -1635,14 +1826,8 @@ Canvas2d.DisplayObjects = function(name, enableevent) {
     this.id = "displayObjects_" + (Canvas2d.globalId++).toString() + "_" + this.name;
     this.index = 0;
     this.type = '';
-    this.x = 0;
-    this.y = 0;
-    this.width = 0;
-    this.height = 0;
-    this.localX = 0;
-    this.localY = 0;
-    this.scaleX = 1;
-    this.scaleY = 1;
+    this.size = new Canvas2d.Point();
+    this.scale = new Canvas2d.Point(1);
     this.rotation = 0;
     this.alpha = 1;
     this.lineAlpha = 1;
@@ -1662,6 +1847,9 @@ Canvas2d.DisplayObjects = function(name, enableevent) {
     };
     this.doneimage = false;
     this.currentFilter = null;
+    this.clr = new Canvas2d.Colors();
+    this.position = null;
+    this.pivot = new Canvas2d.Point();
 };
 Canvas2d.DisplayObjects.prototype = {
     txt: '',
@@ -1715,11 +1903,11 @@ Canvas2d.DisplayObjects.prototype = {
      * @type method DisplayObjects
      * @description add an event into the listening cicle
      * @param {event string} type event listener type
-     * @param {function} func function to be call
+     * @param {function} func function to be called
      * @example myObject.addEvent('click',myFunction);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     addEvent: function(type, func) {
         if (type in this.evtListeners) {
@@ -1738,12 +1926,12 @@ Canvas2d.DisplayObjects.prototype = {
      * @param {type} func function to be remove
      * @example myObject.removeEvent('click', myFunc);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     removeEvent: function(type, func) {
         if (type in this.evtListeners) {
-            for (var i = 0; i < this.evtListeners[type].func.length; i++) {
+            for (let i = 0; i < this.evtListeners[type].func.length; i++) {
                 if (this.evtListeners[type].func[i] === func) {
                     this.evtListeners[type].func.splice(i, 1);
                     break;
@@ -1761,8 +1949,8 @@ Canvas2d.DisplayObjects.prototype = {
      * @param {number string} n index
      * @example myObject.zOrder('top');
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     zOrder: function(n) {
         if (typeof n === 'string') {
@@ -1770,17 +1958,69 @@ Canvas2d.DisplayObjects.prototype = {
             var el = n === 'top' ? len - 1 : n === 'bottom' ? 0 : len - 1;
             this.parent.children.splice(this.index, 1);
             this.parent.children.splice(el, 0, this);
-            for (var i = 0; i < len; i++) {
+            for (let i = 0; i < len; i++) {
                 this.parent.children[i].index = i;
             }
         } else {
             if (n in this.parent.children) {
                 this.parent.children.splice(this.index, 1);
                 this.parent.children.splice(n, 0, this);
-                for (var i = 0; i < this.parent.children.length; i++) {
+                for (let i = 0; i < this.parent.children.length; i++) {
                     this.parent.children[i].index = i;
                 }
             }
+        }
+    },
+    /**
+     * setPivot - DisplayObjects - set the object origin point
+     * @type method DisplayObjects
+     * @description set the object origin point passing a string base coordinate or a number ranging from 0 to 8; top-left 0, top-center 1, top-right 2, left 3, center 4, right 5, bottom-left 6, bottom-center 7, and bottom-right 8;
+     * @param {number string} args number or string value
+     * @example myObject.setPivot('center' || 4);
+     * @returns {undefined} none none
+     * @see text
+     * @link text
+     */
+    setPivot: function(args){
+        switch(args){
+        case 0:
+        case 'top-left':
+            this.pivot.set(0);
+            break;
+        case 1:
+        case 'top-center':
+            this.pivot.set([-(this.size.x/2),0]);
+            break;
+        case 2:
+        case 'top-right':
+            this.pivot.set([-(this.size.x),0]);
+            break;
+        case 3:
+        case 'left':
+            this.pivot.set([0,-(this.size.y/2)]);
+            break;
+        case 4:
+        case 'center':
+            this.pivot.set([-(this.size.x/2),-(this.size.y/2)]);
+            break;
+        case 5:
+        case 'right':
+            this.pivot.set([-(this.size.x),-(this.size.y/2)]);
+            break;
+        case 6:
+        case 'bottom-left':
+            this.pivot.set([0,-(this.size.y)]);
+            break;
+        case 7:
+        case 'bottom-center':
+            this.pivot.set([-(this.size.x/2),-(this.size.y)]);
+            break;
+        case 8:
+        case 'bottom-right':
+            this.pivot.set([-(this.size.x),-(this.size.y)]);
+            break;
+        default:
+            break;
         }
     },
     /**
@@ -1789,13 +2029,12 @@ Canvas2d.DisplayObjects.prototype = {
      * @description get the current object's fill color as requested format
      * @param {string} type request format
      * @example myObjects.getColor('rgb');
-     * @returns {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
-     *@see text
-     *@link text
+     * @returns {mixed} string color value; hex, name, array, string; rgb, hsl, hsv
+     * @see text
+     * @link text
      */
     getColor: function(type) {
-        var t = type ? type : 'rgb';
-        return this._parseGetColor(this.color, t);
+        return this.clr._parseGetColor(this.color, type);
     },
     /**
      * getLineColor - DisplayObjects - get the current object's line color as requested format
@@ -1803,120 +2042,22 @@ Canvas2d.DisplayObjects.prototype = {
      * @description get the current object's line color as requested format
      * @param {string} type request format
      * @example myObjects.getLineColor('rgb');
-     * @returns {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
-     *@see text
-     *@link text
+     * @returns {mixed} string color value; hex, name, array, string; rgb, hsl, hsv
+     * @see text
+     * @link text
      */
     getLineColor: function(type) {
-        var t = type ? type : 'rgb';
-        return this._parseGetColor(this.lineColor, t);
+        return this.clr._parseGetColor(this.lineColor, type);
     },
-    //////////
-    ///internal - return a rgb string from any kind of accepted color formats
-    ///color formats: string, name, hex, array
-    _parseColor: function(color) {
-        if (!color) {
-            console.log(color, ' isn\'t a valid value.');
-            return null;
-        }
-        if (typeof color === 'string') {
-            var result = color.replace(/\s/g, "").toLowerCase();
-            var re, ar;
-            if (result.indexOf('rgb') > -1) {
-                return result;
-            } else if (result.indexOf('#') > -1) {
-                var hex = Colors.Rgb(result);
-                return 'rgb(' + hex[0] + ',' + hex[1] + ',' + hex[2] + ')';
-            } else if (result.indexOf('hsl') > -1) {
-                re = /[hsla\(\)]/g;
-                ar = result.replace(re, '').split(',');
-                var hsl = Colors.HslToRgb(parseFloat(ar[0]) / 360, parseFloat(ar[1]) / 100, parseFloat(ar[2]) / 100);
-                return 'rgb' + this._isSet(ar, 'a') + '(' + hsl[0] + ',' + hsl[1] + ',' + hsl[2] + this._isSet(ar, ',') + ')';
-            } else if (result.indexOf('hsv') > -1) {
-                re = /[hsva\(\)]/g;
-                ar = result.replace(re, '').split(',');
-                var hsv = Colors.HsvToRgb(parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3]));
-                return 'rgb' + this._isSet(ar, 'a') + '(' + hsv[0] + ',' + hsv[1] + ',' + hsv[2] + this._isSet(ar, ',') + ')';
-            } else if (result in Colors.namedColor) {
-                ar = Colors.namedColor[result][1];
-                return 'rgb(' + ar[0] + ',' + ar[1] + ',' + ar[2] + ')';
-            } else {
-                console.log(color, ' isn\'t a valid value.');
-                return 'rgb(0,0,0)';
-            }
-        } else if (Array.isArray(color)) {
-            return 'rgb' + this._isSet(color, 'a') + '(' + color[0] + ',' + color[1] + ',' + color[2] + this._isSet(color, ',') + ')';
-        } else {
-            return color;
-        }
-    },
-    ///////////
-    ///internal - if we have a third value then it has alpha
-    _isSet: function(a, b) {
-        return a.length > 3 ? b + (b === ',' ? a[3] : '') : '';
-    },
-    ///////////
-    ///internal - evaluate if color is array then parse it otherwise return color
-    _parseC: function(color) {
-        return Array.isArray(color) ? this._parseColor(color) : color;
-    },
-    //////////
-    //internal - switch the current color and return what specified as type - 'hex' 'rgb' 'hsl' 'hsv' 'name'
-    _parseGetColor: function(color, type) {
-        if (!color) {
-            console.log(color, ' isn\'t a valid value.');
-            return 'rgb(0,0,0)';
-        }
-        var co = this._parseColor(color);
-        var re = /[rgbhslva\(\)]/g;
-        var arc = co.replace(re, '').split(',');
-        var ar = [parseInt(arc[0]), parseInt(arc[1]), parseInt(arc[2])];
-        var r, cl = ar;
-        switch (type) {
-            case 'hex':
-                cl = Colors.Hex(cl);
-                break;
-            case 'rgb':
-                cl = co;
-                break;
-            case 'hsl':
-                r = Colors.RgbToHsl(ar[0], ar[1], ar[2]);
-                cl = 'hsl(' + r[0] * 360 + ',' + r[1] * 100 + '%,' + r[2] * 100 + '%)';
-                break;
-            case 'hsv':
-                r = Colors.RgbToHsv(ar[0], ar[1], ar[2]);
-                cl = 'hsv(' + r[0] * 360 + ',' + r[1] * 100 + '%,' + r[2] * 100 + '%)';
-                break;
-            case 'name':
-                function approx(a, b, c) {
-                    var d = (b - c <= a && b + c >= a) ? true : false;
-                    return d;
-                }
-                var ap = 2;
-                for (var i in Colors.namedColor) {
-                    if (approx(Colors.namedColor[i][1][0], cl[0], ap) && approx(Colors.namedColor[i][1][1], cl[1], ap) && approx(Colors.namedColor[i][1][2], cl[2], ap)) {
-                        cl = i;
-                        break;
-                    }
-                }
-                break;
-            case 'array':
-                cl = ar;
-                break;
-            default:
-                cl = co;
-                break;
-        }
-        return cl;
-    },
+    
     /**
      * cacheAsBitmap - DisplayObjects - render an object as image
      * @type method DisplayObjects
      * @description render an object as an image replacing the origin object
      * @example myObject.cacheAsBitmap();
      * @returns {void} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     cacheAsBitmap: function() {
         var types = {
@@ -1933,45 +2074,47 @@ Canvas2d.DisplayObjects.prototype = {
             return;
         }
         var fc = document.createElement("canvas"),
-            ox = this.x,
-            oy = this.y,
+            ox = this.position.x,
+            oy = this.position.y,
             or = this.rotation;
         var img = new Image();
-        fc.width = this.width + this.lineWidth * 2;
-        fc.height = this.height + this.lineWidth * 2;
+        fc.width = this.size.x + this.lineWidth * 2;
+        fc.height = this.size.y + this.lineWidth * 2;
         var xc = fc.getContext("2d");
         if (this.type === "polygon" || this.type === "shape") {
-            ox = this.x - this.width / 2;
-            oy = this.y - this.height / 2;
-            this.x = Math.abs(this._coord.x[0]) + this.lineWidth;
-            this.y = Math.abs(this._coord.y[0]) + this.lineWidth;
+            ox = this.position.x - this.size.x / 2;
+            oy = this.position.y - this.size.y / 2;
+            this.position.x = Math.abs(this._coord.x[0]) + this.lineWidth;
+            this.position.y = Math.abs(this._coord.y[0]) + this.lineWidth;
         } else {
-            this.x = 0;
-            this.y = 0;
+            this.position.x = 0;
+            this.position.y = 0;
         }
         this.rotation = 0;
         this.draw(xc);
         var data = fc.toDataURL("image/png", 10);
         img.src = data;
         this.img(0, 0, img, true);
-        this.x = ox;
-        this.y = oy;
+        this.position.x = ox;
+        this.position.y = oy;
         this.rotation = or;
     },
     /**
-     * clone - DisplayObjects - clone a DisplayObjects element returning a new one
+     * clone - DisplayObjects - clone this DisplayObjects
      * @type method DisplayObjects
-     * @description clone a DisplayObjects element returning a new one
-     * @param {object element} n DisplayObjects type element
-     * @example var newObject=displayObject.clone(object);
-     * @returns {element object} newElement DisplayObjects
-     *@see text
-     *@link text
+     * @description clone this DisplayObjects and let pass a second argument as {key:value} to overide properties
+     * @param {object this} n this DisplayObjects
+     * @param {object} key value properties to overide OPTIONAL
+     * @example var newObject=this.clone(this,{name:new name,...});
+     * @returns {object this} new DisplayObjects
+     * @see text
+     * @link text
      */
     clone: function(n) {
-        var c = new Canvas2d.DisplayObjects(n);
+        var c = new Canvas2d.DisplayObjects();
         var ts = Object.prototype.toString;
         for (var o in this) {
+            // console.log(this[o]);
             if (ts.call(this[o]) !== "[object Function]") {
                 switch (o) {
                     case "id":
@@ -1994,118 +2137,91 @@ Canvas2d.DisplayObjects.prototype = {
                 }
             }
         }
+        if (arguments.length === 2) {
+            let args=arguments[1]
+            for (let o in args) {
+                c[o]=args[o];
+            }
+        }
         return c;
     },
     /**
      * rect - DisplayObjects - create a rectangle
      * @type constructor rect DisplayObjects
      * @description create a rectangle
-     * @param {number} x LOCAL horizontal coordinate
-     * @param {number} y LOCAL vertical coordinate
-     * @param {number} width object width
-     * @param {number} height object height
+     * @param {point} position LOCAL object coordinate; Point, Array, Number
+     * @param {point} object Size; Point, Array, Number
      * @param {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
      * @param {mixed} linecolor color value; hex, name, array, string; rgb, hsl, hsv
      * @param {number} linewidth weight of line
-     * @example myObject.rect(0,0,100,100,'rgb(255,230,120)','hsl(230,100%,50%)',2);
+     * @example myObject.rect([0,0],point,'rgb(255,230,120)','hsl(230,100%,50%)',2);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    rect: function(x, y, width, height, color, linecolor, linewidth) {
+    rect: function(p, size, color, linecolor, linewidth) {
         this.type = 'rect';
-        this.x = this.localX = x;
-        this.y = this.localY = y;
-        this.width = width;
-        this.height = height;
+        this.position = new Canvas2d.Point(p);
+        this.size.set(size);
         this._setStyle(color, linecolor, linewidth);
     },
     /**
      * rectRound - DisplayObjects - create a rectangle with rounded corner
      * @type constructor rectRound DisplayObjects
      * @description create a rectangle width rounded corner
-     * @param {number} x LOCAL horizontal coordinate
-     * @param {number} y LOCAL vertical coordinate
+     * @param {point} position LOCAL object coordinate; Point, Array, Number
+     * @param {point} object Size; Point, Array, Number
      * @param {number} radius radius of corners
-     * @param {number} width object width
-     * @param {number} height object height
      * @param {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
      * @param {mixed} linecolor color value; hex, name, array, string; rgb, hsl, hsv
      * @param {number} linewidth weight of line
-     * @example myObject.rectRound(0,0,100,100,10,'rgb(255,230,120)','hsl(230,100%,50%)',2);
+     * @example myObject.rectRound([0,0],p,10,'rgb(255,230,120)','hsl(230,100%,50%)',2);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    rectRound: function(x, y, width, height, radius, color, linecolor, linewidth) {
+    rectRound: function(p, size, radius, color, linecolor, linewidth) {
         this.type = 'rectround';
-        this.x = this.localX = x;
-        this.y = this.localY = y;
-        this.width = width;
-        this.height = height;
-        this.radius = radius;
+        this.position = new Canvas2d.Point(p);
+        this.size.set(size);
+        this.radius = radius ? radius : 0;
         this._setStyle(color, linecolor, linewidth);
     },
     /**
      * polygon - DisplayObjects - create a polygon
      * @type constructor polygon DisplayObjects
      * @description create a polygon
-     * @param {number} x LOCAL horizontal coordinate
-     * @param {number} y LOCAL vertical coordinate
+     * @param {point} position LOCAL object coordinate; Point, Array, Number
      * @param {array} points a collection of two points coordinates [[x,y],..]
      * @param {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
      * @param {mixed} linecolor color value; hex, name, array, string; rgb, hsl, hsv
      * @param {number} linewidth weight of line
      * @param {boolean} close close/leave open the shape
-     * @example myObject.polygon(0,0,[[0,0],[50,100],[-50,100]],'red','blue',true);
+     * @example myObject.polygon(p,[[0,0],[50,100],[-50,100]],'red','blue',true);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    polygon: function(x, y, points, color, linecolor, linewidth, close) {
+    polygon: function(p, points, color, linecolor, linewidth, close) {
         this.type = 'polygon';
         this.close = close === false ? close : true;
-        this.x = this.localX = x;
-        this.y = this.localY = y;
-        this.points = points;
+        this.position = new Canvas2d.Point(p);
+        this.points = points ? points : [];
         this._setStyle(color, linecolor, linewidth);
-        var pX = [],
-            pY = [];
-        for (var i = 0; i < this.points.length; i++) {
-            pX.push(this.points[i][0] + this.localX);
-            pY.push(this.points[i][1] + this.localY);
+        let bx=by=ax=ay=0;
+        for (let i = 0; i < this.points.length; i++) {
+            bx=bx>=this.points[i][0]?this.points[i][0]:bx;
+            by=by>=this.points[i][1]?this.points[i][1]:by;
+            ax=ax<=this.points[i][0]?this.points[i][0]:ax;
+            ay=ay<=this.points[i][1]?this.points[i][1]:ay;
         }
-
-        function compareNumbers(a, b) {
-            return a - b;
-        }
-        pX.sort(compareNumbers);
-        pY.sort(compareNumbers);
-
-        function sum(a, b) {
-            if (a > 0) {
-                return b - a;
-            } else {
-                if (b < 0) {
-                    return Math.abs(a + b);
-                } else {
-                    return Math.abs(a) + b;
-                }
-            }
-        }
-        this.width = sum(pX[0], pX[pX.length - 1]);
-        this.height = sum(pY[0], pY[pY.length - 1]);
-        this._coord = {
-            x: pX,
-            y: pY
-        };
+        this.size.set([Math.sqrt(Math.pow(bx - ax,2)),Math.sqrt(Math.pow(by - ay,2))]);
     },
     /**
      * shape - DisplayObjects - create a shape
      * @type constructor shape DisplayObjects
      * @description create a shape
-     * @param {number} x LOCAL horizontal coordinate
-     * @param {number} y LOCAL vertical coordinate
+     * @param {point} position LOCAL object coordinate; Point, Array, Number
      * @param {array} obj a collection of objects key-value; [{moveTo:[..]},{lineTo:[..]},{quadraticCurveTo:[....]},{bezierCurveTo:[....]},{arcTo:[...]}]
      * @param {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
      * @param {mixed} linecolor color value; hex, name, array, string; rgb, hsl, hsv
@@ -2113,168 +2229,122 @@ Canvas2d.DisplayObjects.prototype = {
      * @param {boolean} close close/leave open the shape
      * @example myObject.shape(0,0,[{moveTo:[0,0]},{lineTo:[100,100]},{quadraticCurveTo:[50,50,10,10]},..],'red','blue',true);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    shape: function(x, y, obj, color, linecolor, linewidth, close) {
+    shape: function(p, obj, color, linecolor, linewidth, close) {
         this.type = 'shape';
         this.close = close === false ? close : true;
-        this.x = this.localX = x;
-        this.y = this.localY = y;
-        this.obj = obj;
+        this.position = new Canvas2d.Point(p);
+        this.obj = obj ? obj : [];
         this._setStyle(color, linecolor, linewidth);
-        var pX = [],
-            pY = [];
-        for (var i = 0; i < this.obj.length; i++) {
+        let bx=by=ax=ay=0;
+        for (let i = 0; i < this.obj.length; i++) {
             for (var o in this.obj[i]) {
-                var obj1 = this.obj[i][o];
+                var obj = this.obj[i][o];
                 switch (o) {
+                    case 'm':
                     case 'moveTo':
-                        pX.push(this.localX + obj1[0]);
-                        pY.push(this.localY + obj1[1]);
+                        bx=bx>=obj[0]?obj[0]:bx;
+                        by=by>=obj[1]?obj[1]:by;
+                        ax=ax<=obj[0]?obj[0]:ax;
+                        ay=ay<=obj[1]?obj[1]:ay;
                         break;
+                    case 'l':
                     case 'lineTo':
-                        pX.push(this.localX + obj1[0]);
-                        pY.push(this.localY + obj1[1]);
+                        bx=bx>=obj[0]?obj[0]:bx;
+                        by=by>=obj[1]?obj[1]:by;
+                        ax=ax<=obj[0]?obj[0]:ax;
+                        ay=ay<=obj[1]?obj[1]:ay;
                         break;
+                    case 'q':
                     case 'quadraticCurveTo':
-                        pX.push(this.localX + obj1[0]);
-                        pY.push(this.localY + obj1[1]);
-                        pX.push(this.localX + obj1[2]);
-                        pY.push(this.localY + obj1[3]);
+                        bx=bx>=obj[0]?obj[0]:bx;
+                        by=by>=obj[1]?obj[1]:by;
+                        ax=ax<=obj[0]?obj[0]:ax;
+                        ay=ay<=obj[1]?obj[1]:ay;
+                        bx=bx>=obj[2]?obj[2]:bx;
+                        by=by>=obj[3]?obj[3]:by;
+                        ax=ax<=obj[2]?obj[2]:ax;
+                        ay=ay<=obj[3]?obj[3]:ay;
                         break;
+                    case 'c':
                     case 'bezierCurveTo':
-                        pX.push(this.localX + obj1[0]);
-                        pY.push(this.localY + obj1[1]);
-                        pX.push(this.localX + obj1[2]);
-                        pY.push(this.localY + obj1[3]);
-                        pX.push(this.localX + obj1[4]);
-                        pY.push(this.localY + obj1[5]);
+                        bx=bx>=obj[4]?obj[4]:bx;
+                        by=by>=obj[5]?obj[5]:by;
+                        ax=ax<=obj[4]?obj[4]:ax;
+                        ay=ay<=obj[5]?obj[5]:ay;
                         break;
+                    case 'a':
                     case 'arcTo':
-                        pX.push(this.localX + obj1[0]);
-                        pY.push(this.localY + obj1[1]);
-                        pX.push(this.localX + obj1[2]);
-                        pY.push(this.localY + obj1[3]);
+                        bx=bx>=obj[2]?obj[2]:bx;
+                        by=by>=obj[3]?obj[3]:by;
+                        ax=ax<=obj[2]?obj[2]:ax;
+                        ay=ay<=obj[3]?obj[3]:ay;
                         break;
                     default:
                         break;
                 }
             }
         }
-
-        function compareNumbers(a, b) {
-            return a - b;
-        }
-        pX.sort(compareNumbers);
-        pY.sort(compareNumbers);
-
-        function sum(a, b) {
-            if (a > 0) {
-                return b - a;
-            } else {
-                if (b < 0) {
-                    return Math.abs(a + b);
-                } else {
-                    return Math.abs(a) + b;
-                }
-            }
-        };
-        this.width = sum(pX[0], pX[pX.length - 1]);
-        this.height = sum(pY[0], pY[pY.length - 1]);
-        this._coord = {
-            x: pX,
-            y: pY
-        };
+        this.size.set([Math.sqrt(Math.pow(bx - ax,2)),Math.sqrt(Math.pow(by - ay,2))]);
     },
     /**
      * line - DisplayObjects - creatye a line
      * @type constructor line DisplayObjects
      * @description create a line
      * @property {array} points contain two array corresponding to the coordinates x,y of [x0,y0],[x1,y1]
-     * @param {number} x LOCAL horizontal coordinate
-     * @param {number} y LOCAL vertical coordinate
-     * @param {number} x0 starting horizontal coordinate
-     * @param {number} y0 starting vertical coordinate
-     * @param {number} x1 ending horizontal coordinate
-     * @param {number} y1 ending vertical coordinate
+     * @param {point} position LOCAL object coordinate; Point, Array, Number
+     * @param {point} Start Local Position; Point, Array, Number
+     * @param {point} End Local Position; Point, Array, Number
      * @param {type} linecolor color value; hex, name, array, string; rgb, hsl, hsv
      * @param {number} linewidth weight of line
      * @param {type} lineCap style of edge of line; butt, round, square; default butt
      * @param {type} lineJoin style of joining lines; bevel, round, miter; default miter
      * @param {number} lineMiter amount of exiding weight of line
-     * @example myObject.line(0,0,-10,0,10,0,'blue',2,'round','miter',10);
+     * @example myObject.line(p,[-10,0],[10,0],'blue',2,'round','miter',10);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    line: function(x, y, x0, y0, x1, y1, linecolor, linewidth, lineCap, lineJoin, lineMiter) {
+    line: function(p, start, end, linecolor, linewidth, lineCap, lineJoin, lineMiter) {
         this.type = 'line';
-        this.x = this.localX = x;
-        this.y = this.localY = y;
+        this.position = new Canvas2d.Point(p);
+        this.start = new Canvas2d.Point(start);
+        this.end = new Canvas2d.Point(end);
         this.points = [
-            [x0, y0],
-            [x1, y1]
+            [this.start.x,this.start.y],
+            [this.end.x,this.end.y]
         ];
-        var pX = [],
-            pY = [];
-        for (var i = 0; i < this.points.length; i++) {
-            pX.push(this.points[i][0] + this.localX);
-            pY.push(this.points[i][1] + this.localY);
-        }
-
-        function compareNumbers(a, b) {
-            return a - b;
-        }
-        pX.sort(compareNumbers);
-        pY.sort(compareNumbers);
-        this.width = sum(pX[0], pX[pX.length - 1]);
-        this.height = sum(pY[0], pY[pY.length - 1]);
-
-        function sum(a, b) {
-            if (a > 0) {
-                return b - a;
-            } else {
-                if (b < 0) {
-                    return Math.abs(a + b);
-                } else {
-                    return Math.abs(a) + b;
-                }
-            }
-        }
-        this._coord = {
-            x: pX,
-            y: pY
-        };
-        this.len = Math.sqrt(Math.pow(x0 + x1, 2) + Math.pow(y0 + y1, 2));
+        this.size.set([Math.sqrt(Math.pow(this.start.x - this.end.x,2)),Math.sqrt(Math.pow(this.start.y - this.end.y,2))]);
+        this.len = this.start.distance(this.end);
         this._setStyle(null, linecolor, linewidth, lineCap, lineJoin, lineMiter);
     },
     /**
      * circle - DisplayObjects - create a crcle
      * @type constructor circle DisplayObjects
      * @description create a circle
-     * @param {type} x LOCAL horizontal coordinate
-     * @param {type} y LOCAL vertical coordinate
-     * @param {type} radius radius width
-     * @param {type} startAngle starting point angle in degrees
-     * @param {type} endAngle ending point angle in degrees
-     * @param {type} color color value; hex, name, array, string; rgb, hsl, hsv
-     * @param {type} linecolor color value; hex, name, array, string; rgb, hsl, hsv
-     * @param {type} linewidth weight of line
-     * @example myObject.circle(0,0,50,0,Math.PI*2,[0,0,0],[255,255,255],2);
+     * @param {point} position LOCAL object coordinate; Point, Array, Number
+     * @param {number} radius radius width
+     * @param {radians} startAngle starting point angle in degrees
+     * @param {radians} endAngle ending point angle in degrees
+     * @param {color} color color value; hex, name, array, string; rgb, hsl, hsv
+     * @param {color} linecolor color value; hex, name, array, string; rgb, hsl, hsv
+     * @param {number} linewidth weight of line
+     * @example myObject.circle(p,50,0,Math.PI*2,[0,0,0],[255,255,255],2);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    circle: function(x, y, radius, startAngle, endAngle, color, linecolor, linewidth) {
+    circle: function(p, radius, startAngle, endAngle, color, linecolor, linewidth) {
         this.type = 'circle';
-        this.x = this.localX = x;
-        this.y = this.localY = y;
-        this.width = radius * 2;
-        this.height = radius * 2;
-        this.radius = radius;
-        this.startAngle = startAngle;
-        this.endAngle = endAngle;
+        this.position = new Canvas2d.Point(p);
+        this.size.set(radius*2);
+        this.width = radius? radius * 2 : 0;
+        this.height = radius? radius * 2 : 0;
+        this.radius = radius ? radius : 0;
+        this.startAngle = startAngle ? startAngle : 0;
+        this.endAngle = endAngle ? endAngle : 0;
         this._setStyle(color, linecolor, linewidth);
     },
     /**
@@ -2282,57 +2352,54 @@ Canvas2d.DisplayObjects.prototype = {
      * @type constructor text DisplayObjects
      * @description create a text field
      * @param {string} txt the text to use for text field
-     * @param {number} x LOCAL horizontal coordinate
-     * @param {number} y LOCAL vertical coordinate
+     * @param {point} position LOCAL object coordinate; Point, Array, Number
      * @param {string} fontweigth style of weight text field; normal, bold, italic, bold italic; default normal
      * @param {number} fontsize the size of font
      * @param {string} font the font-family type to use for the text fiel; default Verdana, multiple value are allowed
      * @param {mixed} color color value; hex, name, array, string; rgb, hsl, hsv
      * @param {object} background an object rapresenting the style of the twxt field background; {color:..,linecolor:..,linewidth:..}
      * @param {string} align the horizontal alignment of the text field; start, end, left, right, center; default left
-     * @param {string} baseline the vertical alignment of text field; top, hanging, middle, alphabetic, ideographic, bottom; default alphabetic
-     * @example myObject.text('testo da inserire',0,0,'normal',18,'Verdana,Helvetica,Sans-serife',{color:'red'},'center','bottom');
+     * @param {string} baseLine the vertical alignment of text field; top, hanging, middle, alphabetic, ideographic, bottom; default alphabetic
+     * @example myObject.text('testo da inserire',[0,0],'normal',18,'Verdana,Helvetica,Sans-serife',{color:'red'},'center','bottom');
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    text: function(txt, x, y, fontweigth, fontsize, font, color, background, align, baseline) {
+    text: function(txt, p, fontweigth, fontsize, font, color, background, align, baseLine) {
         this.type = 'text';
-        this.x = this.localX = x;
-        this.y = this.localY = y;
+        this.position = new Canvas2d.Point(p);
         var ctx = Canvas2d.fakeCtx;
-        this.height = fontsize ? fontsize : 10;
+        // this.height = fontsize ? fontsize : 10;
         this.txt = txt ? txt : '';
         this.backGround = background ? background : null;
-        this._setFont(fontweigth, fontsize, font, align, baseline);
+        this._setFont(fontweigth, fontsize, font, align, baseLine);
         this._setStyle(color);
         ctx.font = this.fontStyle;
         ctx.textAlign = this.align;
         ctx.textBaseline = this.baseLine;
-        this.width = ctx.measureText(txt).width;
+        var txtMatrix = ctx.measureText(txt);
+        this.size.set([txtMatrix.actualBoundingBoxRight+txtMatrix.actualBoundingBoxLeft,txtMatrix.actualBoundingBoxAscent+txtMatrix.actualBoundingBoxDescent]);
         delete ctx;
     },
     /**
      * img - DisplayObjects - create an image
      * @type constructor img DisplayObjects
      * @description create an image
-     * @param {number} x LOCAL horizontal coordinate
-     * @param {number} y LOCAL vertical coordinate
+     * @param {point} position LOCAL object coordinate; Point, Array, Number
      * @param {mixed} source img DOM Element or string url
      * @param {boolean} show determin if manage directly or automatically the process of loading
      * @param {mixed} color color applied to the background value; hex, name, array, string; rgb, hsl, hsv
      * @param {number} paddingleft left right amount of border
      * @param {number} paddingtop top bottom amount of border
      * @param {object} crop an object list of point for display just a section of the image; {dx:0,dy:0,dw:100,dh:100}
-     * @example myObject.img(0,0,'images/myimage.jpg',true,'black',10,10,{dx:0,dy:0,dw:100,dh:100});
+     * @example myObject.img([0,0],'images/myimage.jpg',true,'black',10,10,{dx:0,dy:0,dw:100,dh:100});
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    img: function(x, y, source, show, color, paddingleft, paddingtop, crop) {
+    img: function(p, source, show, color, paddingleft, paddingtop, crop) {
         this.type = 'img';
-        this.x = this.localX = x;
-        this.y = this.localY = y;
+        this.position = new Canvas2d.Point(p);
         this.paddingLeft = paddingleft ? paddingleft : 0;
         this.paddingTop = paddingtop ? paddingtop : 0;
         this._setStyle(color);
@@ -2346,20 +2413,18 @@ Canvas2d.DisplayObjects.prototype = {
      * clip - DisplayObjects - create a clip
      * @type constructor clip DisplayObjects
      * @description create a clip
-     * @param {number} x LOCAL horizontal coordinate
-     * @param {number} y LOCAL vertical coordinate
+     * @param {point} position LOCAL object coordinate; Point, Array, Number
      * @param {mixed} source img DOM Element or string url
      * @param {array} framelist a list of object that specified the sequence of image to cut;[{x,..,y:..,map:{x:..,y:..,width:..,height:..},...]
      * @param {type} show determin if manage directly or automatically the process of loading
-     * @example myObject.clip(0,0,'images/myimage.png',[{x,..,y:..,map:{x:..,y:..,width:..,height:..},...],true);
+     * @example myObject.clip(p,'images/myimage.png',[{x,..,y:..,map:{x:..,y:..,width:..,height:..},...],true);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
-    clip: function(x, y, source, framelist, show) {
+    clip: function(p, source, framelist, show) {
         this.type = 'clip';
-        this.x = this.localX = x;
-        this.y = this.localY = y;
+        this.position = new Canvas2d.Point(p);
         this.source = source ? source : null;
         this.frameList = framelist ? framelist : this.frameList;
         if (show) {
@@ -2367,13 +2432,14 @@ Canvas2d.DisplayObjects.prototype = {
         }
     },
     /**
+     * TO ELIMINATE NOT USED INTERNALLY
      * restore - DisplayObjects - restore the original image
      * @type method DisplayObjects
      * @description restore the original image
      * @example myObject.restore();
      * @returns {undefined} doneimage booleane
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     restore: function() {
         this.doneimage = false;
@@ -2385,8 +2451,8 @@ Canvas2d.DisplayObjects.prototype = {
      * @param {object} args an object list of point for display just a section of the image; {dx:0,dy:0,dw:100,dh:100}
      * @example myObject.setCrop({dx:0,dy:0,dw:100,dh:100});
      * @returns {unresolved} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     setCrop: function(args) {
         if (!args) {
@@ -2395,6 +2461,7 @@ Canvas2d.DisplayObjects.prototype = {
         for (var i in this.imageCrop) {
             this.imageCrop[i] = args[i] ? args[i] : this.imageCrop[i];
         }
+        this.size.set([this.imageCrop.dw,this.imageCrop.dh]);
         this.doneimage = false;
     },
     roulette: function(stator, rotor, rotorOffset, multyplier, step, rType) {
@@ -2436,19 +2503,19 @@ Canvas2d.DisplayObjects.prototype = {
      * @param {array} args list of rgb color [...,...,...]
      * @example myObject.filter('hsl',[250,100,50]);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     filter: function(type, args) {
         if (this.backUpImage) {
             this.imageData = this.backUpImage;
         }
         var c = document.createElement("canvas");
-        c.width = this.width;
-        c.height = this.height;
+        c.width = this.size.x;
+        c.height = this.size.y;
         var cx = c.getContext("2d");
-        cx.drawImage(this.imageData, 0, 0, this.width, this.height);
-        var data = cx.getImageData(0, 0, this.width, this.height);
+        cx.drawImage(this.imageData, 0, 0, this.size.x, this.size.y);
+        var data = cx.getImageData(0, 0, this.size.x, this.size.y);
         switch (type) {
             case "invert":
                 data = this._filterInvert(data);
@@ -2468,7 +2535,7 @@ Canvas2d.DisplayObjects.prototype = {
                 break;
             case "cut":
                 var range = args[1];
-                args = args.length === 4 ? args : Colors._parseColor(args[0]);
+                args = args.length === 4 ? args : this.clr._fromStringToArrayRgb(args[0]);
                 data = this._filterCut(data, args, range);
                 this.currentFilter = "cut";
                 break;
@@ -2482,7 +2549,7 @@ Canvas2d.DisplayObjects.prototype = {
     },
     _filterPixelated: function(data, args, c) {
         var d = data.data;
-        var value = args ? args[0] : 2;
+        var value = args ? args[0] < 2 ? 2 : args[0] : 2;
         for (var y = 0; y < c.height; y += value) {
             for (var x = 0; x < c.width; x += value) {
                 var r = d[((c.width * y) + x) * 4];
@@ -2503,7 +2570,7 @@ Canvas2d.DisplayObjects.prototype = {
     },
     _filterGrayscale: function(data) {
         var d = data.data;
-        for (var i = 0; i < d.length; i += 4) {
+        for (let i = 0; i < d.length; i += 4) {
             var br = 0.34 * d[i] + 0.5 * d[i + 1] + 0.16 * d[i + 2];
             d[i] = br; //red
             d[i + 1] = br; //green
@@ -2513,7 +2580,7 @@ Canvas2d.DisplayObjects.prototype = {
     },
     _filterInvert: function(data) {
         var d = data.data;
-        for (var i = 0; i < d.length; i += 4) {
+        for (let i = 0; i < d.length; i += 4) {
             d[i] = 255 - d[i]; //red
             d[i + 1] = 255 - d[i + 1]; //green
             d[i + 2] = 255 - d[i + 2]; //blue
@@ -2528,7 +2595,7 @@ Canvas2d.DisplayObjects.prototype = {
             //return (c >= a - b) && (c <= a + b) ? true : false;
             return (c >= a - b) && (c <= a + b) ? Math.floor(255 * Math.abs((a - c) / r)) : 255;
         }
-        for (var i = 0; i < d.length; i += 4) {
+        for (let i = 0; i < d.length; i += 4) {
             //d[i + 3] = (d[i] + d[i + 1] + d[i + 2]) >= (args * 3) ? 0 : d[i + 3]; //alpha
             //d[i + 3] = raise(d[i], r, args[0]) && raise(d[i + 1], r, args[1]) && raise(d[i + 2], r, args[2]) ? 0 : d[i + 3]; //alpha
             t = raise(d[i], r, args[0]) + raise(d[i + 1], r, args[1]) + raise(d[i + 2], r, args[2]);
@@ -2538,12 +2605,13 @@ Canvas2d.DisplayObjects.prototype = {
     },
     _filterHsl: function(data, args) {
         var d = data.data;
-        for (var i = 0; i < d.length; i += 4) {
-            var hsl = Colors.RgbToHsl(d[i], d[i + 1], d[i + 2]);
-            var h = hsl[0] + (args[0] / 100) <= 0 ? 0 : hsl[0] + (args[0] / 100) >= 120 ? 120 : hsl[0] + (args[0] / 100);
-            var s = hsl[1] + (args[1] / 100) <= 0 ? 0 : hsl[1] + (args[1] / 100) >= 100 ? 100 : hsl[1] + (args[1] / 100);
-            var l = hsl[2] + (args[2] / 100) <= 0 ? 0 : hsl[2] + (args[2] / 100) >= 100 ? 100 : hsl[2] + (args[2] / 100);
-            var rgb = Colors.HslToRgb(h, s, l);
+        for (let i = 0; i < d.length; i += 4) {
+            var hsl = this.clr._rgbToHsl([d[i], d[i + 1], d[i + 2]]);
+            var h = (hsl[0]+args[0])%360;
+            var s = (hsl[1]+args[1])%360;
+            var l = (hsl[2]+args[2])%360;
+            var rgb = this.clr._hslToRgb([h, s, l]);
+            // console.log(rgb);
             d[i] = rgb[0]; //red
             d[i + 1] = rgb[1]; //green
             d[i + 2] = rgb[2]; //blue
@@ -2560,8 +2628,8 @@ Canvas2d.DisplayObjects.prototype = {
      * @param {boolean} show determin if show the loaded image just after the completed process
      * @example myObject.loadImage(myObject.source,progress function, complete function,true);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     loadImage: function(source, progressaction, completeaction, show) {
         this._progressEvent = progressaction;
@@ -2569,8 +2637,9 @@ Canvas2d.DisplayObjects.prototype = {
         this.source = source ? source : this.source;
         if (typeof this.source === 'object') {
             this.image = this.source;
-            this.width = this.image.width;
-            this.height = this.image.height;
+            this.size.set([this.image.width,this.image.height])
+            // this.width = this.image.width;
+            // this.height = this.image.height;
             this.isLoading = false;
             this.loadComplete = true;
             if (this.type === 'clip') {
@@ -2590,6 +2659,7 @@ Canvas2d.DisplayObjects.prototype = {
     _load: function(show) {
         var nav = navigator.userAgent.toLowerCase();
         var b = /msie\s\d+\.\d+/;
+        // console.log(b.test(nav));
         if (b.test(nav)) {
             var img = new Image();
             img['caller'] = this;
@@ -2611,8 +2681,10 @@ Canvas2d.DisplayObjects.prototype = {
     },
     _loadStart: function() {
         this.loadComplete = false;
+        // console.log('load start');
     },
     _loadProgress: function(e) {
+        // console.log('load progress');
         if (this.caller._progressEvent) {
             this.caller._progressEvent.apply(this.caller, [e]);
         }
@@ -2620,6 +2692,7 @@ Canvas2d.DisplayObjects.prototype = {
         this.caller.loadComplete = false;
     },
     _loadComplete: function(e) {
+        // console.log('load complete');
         var nav = navigator.userAgent.toLowerCase();
         var b = /msie\s\d+\.\d+/;
         if (b.test(nav)) {
@@ -2645,6 +2718,7 @@ Canvas2d.DisplayObjects.prototype = {
     },
     // This encoding function is from Philippe Tenenhaus's example at http://www.philten.com/us-xmlhttprequest-image/
     _base64Encode: function(inputStr, caller, show) {
+        // console.log('base 64');
         var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
         var outputStr = "";
         var i = 0;
@@ -2680,8 +2754,7 @@ Canvas2d.DisplayObjects.prototype = {
                 var img = new Image();
                 img.onload = function() {
                     caller.image = img;
-                    caller.width = caller.image.width;
-                    caller.height = caller.image.height;
+                    caller.size.set([caller.image.width,caller.image.height]);
                     caller.isLoading = false;
                     caller.loadComplete = true;
                     if (caller.type === 'clip') {
@@ -2703,7 +2776,7 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_setFrames - DisplayObjects INTERNAL ONLY
-     *@param {boolean} show dethermin if the image as to be shown as soon as ready
+     * @param {boolean} show dethermin if the image as to be shown as soon as ready
      */
     _setFrames: function(show) {
         if (!this.frameList || this.type !== 'clip') {
@@ -2741,16 +2814,16 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_setStyle - DisplayObjects INTERNAL ONLY - set the constructor style
-     *@param {color} color { a color as array rgb hex string or name }
-     *@param linecolor { a color as array rgb or hex string or name }
-     *@param linewidth { the width of the stroke }
-     *@param linecap { string - 'butt' or 'round' or 'square' - default 'butt' }
-     *@param linejoin {strin - 'bevel' or 'round' or 'miter' - default 'miter' }
-     *@param miterlimit { number - default 10 }
+     * @param {color} color { a color as array rgb hex string or name }
+     * @param linecolor { a color as array rgb or hex string or name }
+     * @param linewidth { the width of the stroke }
+     * @param linecap { string - 'butt' or 'round' or 'square' - default 'butt' }
+     * @param linejoin {strin - 'bevel' or 'round' or 'miter' - default 'miter' }
+     * @param miterlimit { number - default 10 }
      */
     _setStyle: function(color, linecolor, linewidth, linecap, linejoin, miterlimit) {
-        this.color = this._parseC(color);
-        this.lineColor = this._parseC(linecolor);
+        this.color = this.clr._parseC(color);
+        this.lineColor = this.clr._parseC(linecolor);
         this.lineCap = (this._capList[linecap]) ? linecap : 'butt';
         this.lineJoin = (this._joinList[linejoin]) ? linejoin : 'miter';
         this.lineWidth = (linewidth) ? linewidth : 1.0;
@@ -2758,7 +2831,7 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_setLineStyle - DisplayObjects INTERNAL ONLY - set the line style when drawning
-     *@param {context} ctx
+     * @param {context} ctx
      */
     _setLineStyle: function(ctx) {
         if (this.lineGradient) {
@@ -2768,7 +2841,7 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.lineCap = this.lineCap;
                 ctx.lineJoin = this.lineJoin;
                 ctx.miterLimit = this.lineMiter;
-                ctx.shadowColor = this._parseC(this.lineShadow.color);
+                ctx.shadowColor = this.clr._parseC(this.lineShadow.color);
                 ctx.shadowOffsetX = this.lineShadow.offsetX;
                 ctx.shadowOffsetY = this.lineShadow.offsetY;
                 ctx.shadowBlur = this.lineShadow.blur;
@@ -2788,13 +2861,13 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.lineCap = this.lineCap;
                 ctx.lineJoin = this.lineJoin;
                 ctx.miterLimit = this.lineMiter;
-                ctx.shadowColor = this._parseC(this.lineShadow.color);
+                ctx.shadowColor = this.clr._parseC(this.lineShadow.color);
                 ctx.shadowOffsetX = this.lineShadow.offsetX;
                 ctx.shadowOffsetY = this.lineShadow.offsetY;
                 ctx.shadowBlur = this.lineShadow.blur;
                 if (this.lineColor) {
                     ctx.globalAlpha = this._g.lineAlpha;
-                    ctx.strokeStyle = this._parseC(this.lineColor);
+                    ctx.strokeStyle = this.clr._parseC(this.lineColor);
                     ctx.stroke();
                 }
                 ctx.restore();
@@ -2805,7 +2878,7 @@ Canvas2d.DisplayObjects.prototype = {
                 ctx.miterLimit = this.lineMiter;
                 if (this.lineColor) {
                     ctx.globalAlpha = this._g.lineAlpha;
-                    ctx.strokeStyle = this._parseC(this.lineColor);
+                    ctx.strokeStyle = this.clr._parseC(this.lineColor);
                     ctx.stroke();
                 }
             }
@@ -2813,13 +2886,13 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_setFillStyle - DisplayObjects INTERNAL ONLY - set the fill style when drawning
-     *@param {context} ctx
+     * @param {context} ctx
      */
     _setFillStyle: function(ctx) {
         if (this.gradient) {
             if (this.shadow) {
                 ctx.save();
-                ctx.shadowColor = this._parseC(this.shadow.color);
+                ctx.shadowColor = this.clr._parseC(this.shadow.color);
                 ctx.shadowOffsetX = this.shadow.offsetX;
                 ctx.shadowOffsetY = this.shadow.offsetY;
                 ctx.shadowBlur = this.shadow.blur;
@@ -2832,18 +2905,18 @@ Canvas2d.DisplayObjects.prototype = {
         } else {
             if (this.shadow) {
                 ctx.save();
-                ctx.shadowColor = this._parseC(this.shadow.color);
+                ctx.shadowColor = this.clr._parseC(this.shadow.color);
                 ctx.shadowOffsetX = this.shadow.offsetX;
                 ctx.shadowOffsetY = this.shadow.offsetY;
                 ctx.shadowBlur = this.shadow.blur;
                 if (this.color) {
-                    ctx.fillStyle = this._parseC(this.color);
+                    ctx.fillStyle = this.clr._parseC(this.color);
                     ctx.fill();
                 }
                 ctx.restore();
             } else {
                 if (this.color) {
-                    ctx.fillStyle = this._parseC(this.color);
+                    ctx.fillStyle = this.clr._parseC(this.color);
                     ctx.fill();
                 }
             }
@@ -2851,11 +2924,11 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_setFont - DisplayObjects INTERNAL ONLY - set the constructor text fonts properties
-     *@param fontweight { string - font weigth 'bold', 'italic', 'normal' etc.. - default 'normal' }
-     *@param fontsize { number - font width in pixel - default 10 }
-     *@param font { string - type font - default 'Verdana'}
-     *@param align { string - 'start' or 'end' or 'left' or 'right' or 'center' - default 'start' }
-     *@param base { string - 'top' or 'hanging' or 'middle' or 'alphabetic' or 'ideographic' or 'bottom' - default 'alphabetic' }
+     * @param fontweight { string - font weigth 'bold', 'italic', 'normal' etc.. - default 'normal' }
+     * @param fontsize { number - font width in pixel - default 10 }
+     * @param font { string - type font - default 'Verdana'}
+     * @param align { string - 'start' or 'end' or 'left' or 'right' or 'center' - default 'start' }
+     * @param base { string - 'top' or 'hanging' or 'middle' or 'alphabetic' or 'ideographic' or 'bottom' - default 'alphabetic' }
      */
     _setFont: function(fontweight, fontsize, font, align, base) {
         this.fontWeight = fontweight ? fontweight : this.fontWeight;
@@ -2867,11 +2940,11 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_setShadow - DisplayObjects INTERNAL ONLY - set the fill shadow style when drawning
-     *@param {context} ctx
+     * @param {context} ctx
      */
     _setShadow: function(ctx) {
         if (this.shadow) {
-            ctx.shadowColor = this._parseC(this.shadow.color);
+            ctx.shadowColor = this.clr._parseC(this.shadow.color);
             ctx.shadowOffsetX = this.shadow.offsetX;
             ctx.shadowOffsetY = this.shadow.offsetY;
             ctx.shadowBlur = this.shadow.blur;
@@ -2879,11 +2952,11 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_setLineShadow - DisplayObjects INTERNAL ONLY - set the stroke shadow style when drawning
-     *@param {context} ctx
+     * @param {context} ctx
      */
     _setLineShadow: function(ctx) {
         if (this.lineShadow) {
-            ctx.shadowColor = this._parseC(this.lineShadow.color);
+            ctx.shadowColor = this.clr._parseC(this.lineShadow.color);
             ctx.shadowOffsetX = this.lineShadow.offsetX;
             ctx.shadowOffsetY = this.lineShadow.offsetY;
             ctx.shadowBlur = this.lineShadow.blur;
@@ -2891,65 +2964,65 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_setGradient - DisplayObjects INTERNAL ONLY - set the fill gradient style when drawning
-     *@example var linearGradient={'offset':[0,1],'color':[color,color],'type':'linear','coord':{'x0':0,'y0':0,'x1':30,'y1':30}};
+     * @example var linearGradient={'offset':[0,1],'color':[color,color],'type':'linear','coord':{'x0':0,'y0':0,'x1':30,'y1':30}};
      *var radialGradient={'offset':[0,1],'color':[color,color],'type':'radial','coord':{'x0':0,'y0':0,'r0':0,'x1':30,'y1':30,'r1':15}};
      *all REQUIRED
      *linear: two array with 'offset' number [0,1] and 'color' [color,color],
      *an object 'coord' { x0 y0 - stating point, x1 y1 - ending point }
      *for radial 'coord' { x0 y0 r0- stating point and radius, x1 y1 r1 - ending point and radius }
-     *@param {context} ctx
+     * @param {context} ctx
      */
     _setGradient: function(ctx) {
         var gradient;
         var g = this.gradient;
         if (g.type === 'linear') {
-            gradient = ctx.createLinearGradient(g.coord.x0, g.coord.y0, g.coord.x1, g.coord.y1);
+            gradient = ctx.createLinearGradient(g.coord[0], g.coord[1], g.coord[2], g.coord[3]);
         } else if (g.type === 'radial') {
-            gradient = ctx.createRadialGradient(g.coord.x0, g.coord.y0, g.coord.r0, g.coord.x1, g.coord.y1, g.coord.r1);
+            gradient = ctx.createRadialGradient(g.coord[0], g.coord[1], g.coord[2], g.coord[3], g.coord[4], g.coord[5]);
         }
-        for (var i = 0; i < g.color.length; i++) {
-            gradient.addColorStop(g.offset[i], this._parseC(g.color[i]));
+        for (let i = 0; i < g.color.length; i++) {
+            gradient.addColorStop(g.offset[i], this.clr._parseC(g.color[i]));
         }
         ctx.fillStyle = gradient;
         ctx.fill();
     },
     /**
      *_setLineGradient - DisplayObjects INTERNAL ONLY - set the stroke gradient style when drawning
-     *@example var linearGradient={'offset':[0,1],'color':[color,color],'type':'linear','coord':{'x0':0,'y0':0,'x1':30,'y1':30}};
+     * @example var linearGradient={'offset':[0,1],'color':[color,color],'type':'linear','coord':{'x0':0,'y0':0,'x1':30,'y1':30}};
      *var radialGradient={'offset':[0,1],'color':[color,color],'type':'radial','coord':{'x0':0,'y0':0,'r0':0,'x1':30,'y1':30,'r1':15}};
      *all REQUIRED
      *linear: two array with 'offset' number [0,1] and 'color' [color,color],
      *an object 'coord' { x0 y0 - stating point, x1 y1 - ending point }
      *for radial 'coord' { x0 y0 r0- stating point and radius, x1 y1 r1 - ending point and radius }
-     *@param {context} ctx
+     * @param {context} ctx
      */
     _setLineGradient: function(ctx) {
         var gradient;
         var g = this.lineGradient;
         if (g.type === 'linear') {
-            gradient = ctx.createLinearGradient(g.coord.x0, g.coord.y0, g.coord.x1, g.coord.y1);
+            gradient = ctx.createLinearGradient(g.coord[0], g.coord[1], g.coord[2], g.coord[3]);
         } else if (g.type === 'radial') {
-            gradient = ctx.createRadialGradient(g.coord.x0, g.coord.y0, g.coord.r0, g.coord.x1, g.coord.y1, g.coord.r1);
+            gradient = ctx.createRadialGradient(g.coord[0], g.coord[1], g.coord[2], g.coord[3], g.coord[4], g.coord[5]);
         }
-        for (var i = 0; i < g.color.length; i++) {
-            gradient.addColorStop(g.offset[i], this._parseC(g.color[i]));
+        for (let i = 0; i < g.color.length; i++) {
+            gradient.addColorStop(g.offset[i], this.clr._parseC(g.color[i]));
         }
         ctx.stokeStyle = gradient;
         ctx.stroke();
     },
     /**
      *_drawRect - DisplayObjects INTERNAL ONLY -
-     *@param {context} ctx
-     *@param {context} buffer
+     * @param {context} ctx
+     * @param {context} buffer
      */
     _drawRect: function(ctx, buffer) {
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.position.x, this.position.y);
+        ctx.scale(this.scale.x, this.scale.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         ctx.beginPath();
-        ctx.rect(this.localX, this.localY, this.width, this.height);
+        ctx.rect(this.pivot.x, this.pivot.y, this.size.x, this.size.y);
         ctx.closePath();
         if (!buffer) {
             this._setFillStyle(ctx);
@@ -2962,30 +3035,25 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_drawRoundRect - DisplayObjects INTERNAL ONLY -
-     *@param {context} ctx
-     *@param {context} buffer
+     * @param {context} ctx
+     * @param {context} buffer
      */
     _drawRoundRect: function(ctx, buffer) {
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.position.x, this.position.y);
+        ctx.scale(this.scale.x, this.scale.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         ctx.beginPath();
-        var lx, mx, ly, my;
-        lx = this.localX + (this.width - this.radius);
-        mx = this.localX + this.width;
-        ly = this.localY + (this.height - this.radius);
-        my = this.localY + this.height;
-        ctx.moveTo(this.localX + this.radius, this.localY);
-        ctx.lineTo(lx, this.localY);
-        ctx.quadraticCurveTo(mx, this.localY, mx, this.localY + this.radius);
-        ctx.lineTo(this.localX + this.width, ly);
-        ctx.quadraticCurveTo(mx, my, lx, this.localY + this.height);
-        ctx.lineTo(this.localX + this.radius, my);
-        ctx.quadraticCurveTo(this.localX, my, this.localX, ly);
-        ctx.lineTo(this.localX, this.localY + this.radius);
-        ctx.quadraticCurveTo(this.localX, this.localY, this.localX + this.radius, this.localY);
+        ctx.moveTo(this.pivot.x+this.radius,this.pivot.y);
+        ctx.lineTo(this.pivot.x+(this.size.x-this.radius),this.pivot.y);
+        ctx.quadraticCurveTo(this.pivot.x+this.size.x,this.pivot.y,this.pivot.x+this.size.x,this.pivot.y+this.radius);
+        ctx.lineTo(this.pivot.x+this.size.x,this.pivot.y+(this.size.y-this.radius));
+        ctx.quadraticCurveTo(this.pivot.x+this.size.x,this.pivot.y+this.size.y,this.pivot.x+(this.size.x-this.radius),this.pivot.y+this.size.y);
+        ctx.lineTo(this.pivot.x+this.radius,this.pivot.y+this.size.y);
+        ctx.quadraticCurveTo(this.pivot.x,this.pivot.y+this.size.y,this.pivot.x,this.pivot.y+(this.size.y-this.radius));
+        ctx.lineTo(this.pivot.x,this.pivot.y+this.radius);
+        ctx.quadraticCurveTo(this.pivot.x,this.pivot.y,this.pivot.x+this.radius,this.pivot.y);
         ctx.closePath();
         if (!buffer) {
             this._setFillStyle(ctx);
@@ -2998,26 +3066,27 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_drawPolygon - DisplayObjects INTERNAL ONLY -
-     *@param {context} ctx
-     *@param {context} buffer
+     * @param {context} ctx
+     * @param {context} buffer
      */
     _drawPolygon: function(ctx, buffer) {
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.position.x, this.position.y);
+        ctx.scale(this.scale.x, this.scale.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         ctx.beginPath();
-        var pX = [],
-            pY = [];
-        for (var i = 0; i < this.points.length; i++) {
+        let bx=by=ax=ay=0;
+        for (let i = 0; i < this.points.length; i++) {
             if (i === 0) {
-                ctx.moveTo(this.localX + this.points[i][0], this.localY + this.points[i][1]);
+                ctx.moveTo(this.pivot.x + this.points[i][0], this.pivot.y + this.points[i][1]);
             } else {
-                ctx.lineTo(this.points[i][0] + this.localX, this.points[i][1] + this.localY);
+                ctx.lineTo(this.points[i][0] + this.pivot.x, this.points[i][1] + this.pivot.y);
             }
-            pX.push(this.points[i][0] + this.localX);
-            pY.push(this.points[i][1] + this.localY);
+            bx=bx>=this.points[i][0]?this.points[i][0]:bx;
+            by=by>=this.points[i][1]?this.points[i][1]:by;
+            ax=ax<=this.points[i][0]?this.points[i][0]:ax;
+            ay=ay<=this.points[i][1]?this.points[i][1]:ay;
         }
         if (this.close) {
             ctx.closePath();
@@ -3025,30 +3094,7 @@ Canvas2d.DisplayObjects.prototype = {
         if (!buffer) {
             this._setFillStyle(ctx);
             this._setLineStyle(ctx);
-
-            function sum(a, b) {
-                if (a > 0) {
-                    return b - a;
-                } else {
-                    if (b < 0) {
-                        return Math.abs(a + b);
-                    } else {
-                        return Math.abs(a) + b;
-                    }
-                }
-            }
-            pX.sort(function(a, b) {
-                return a - b;
-            });
-            pY.sort(function(a, b) {
-                return a - b;
-            });
-            this.width = sum(pX[0], pX[pX.length - 1]);
-            this.height = sum(pY[0], pY[pY.length - 1]);
-            this._coord = {
-                x: pX,
-                y: pY
-            };
+            this.size.set([Math.sqrt(Math.pow(bx - ax,2)),Math.sqrt(Math.pow(by - ay,2))]);
         }
         ctx.restore();
         if (this.mask) {
@@ -3057,54 +3103,65 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_drawShape - DisplayObjects INTERNAL ONLY -
-     *@param {context} ctx
-     *@param {context} buffer
+     * @param {context} ctx
+     * @param {context} buffer
      */
     _drawShape: function(ctx, buffer) {
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.position.x, this.position.y);
+        ctx.scale(this.scale.x, this.scale.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         ctx.beginPath();
-        var pX = [],
-            pY = [];
-        for (var i = 0; i < this.obj.length; i++) {
+        let bx=by=ax=ay=0;
+        for (let i = 0; i < this.obj.length; i++) {
             for (var o in this.obj[i]) {
                 var obj = this.obj[i][o];
                 switch (o) {
+                    case 'm':
                     case 'moveTo':
-                        ctx.moveTo(this.localX + obj[0], this.localY + obj[1]);
-                        pX.push(this.localX + obj[0]);
-                        pY.push(this.localY + obj[1]);
+                        ctx.moveTo(this.pivot.x + obj[0], this.pivot.y + obj[1]);
+                        bx=bx>=obj[0]?obj[0]:bx;
+                        by=by>=obj[1]?obj[1]:by;
+                        ax=ax<=obj[0]?obj[0]:ax;
+                        ay=ay<=obj[1]?obj[1]:ay;
                         break;
+                    case 'l':
                     case 'lineTo':
-                        ctx.lineTo(this.localX + obj[0], this.localY + obj[1]);
-                        pX.push(this.localX + obj[0]);
-                        pY.push(this.localY + obj[1]);
+                        ctx.lineTo(this.pivot.x + obj[0], this.pivot.y + obj[1]);
+                        bx=bx>=obj[0]?obj[0]:bx;
+                        by=by>=obj[1]?obj[1]:by;
+                        ax=ax<=obj[0]?obj[0]:ax;
+                        ay=ay<=obj[1]?obj[1]:ay;
                         break;
+                    case 'q':
                     case 'quadraticCurveTo':
-                        ctx.quadraticCurveTo(this.localX + obj[0], this.localY + obj[1], this.localX + obj[2], this.localY + obj[3]);
-                        pX.push(this.localX + obj[0]);
-                        pY.push(this.localY + obj[1]);
-                        pX.push(this.localX + obj[2]);
-                        pY.push(this.localY + obj[3]);
+                        ctx.quadraticCurveTo(this.pivot.x + obj[0], this.pivot.y + obj[1], this.pivot.x + obj[2], this.pivot.y + obj[3]);
+                        bx=bx>=obj[0]?obj[0]:bx;
+                        by=by>=obj[1]?obj[1]:by;
+                        ax=ax<=obj[0]?obj[0]:ax;
+                        ay=ay<=obj[1]?obj[1]:ay;
+                        bx=bx>=obj[2]?obj[2]:bx;
+                        by=by>=obj[3]?obj[3]:by;
+                        ax=ax<=obj[2]?obj[2]:ax;
+                        ay=ay<=obj[3]?obj[3]:ay;
                         break;
+                    case 'c':
                     case 'bezierCurveTo':
-                        ctx.bezierCurveTo(this.localX + obj[0], this.localY + obj[1], this.localX + obj[2], this.localY + obj[3], this.localX + obj[4], this.localY + obj[5]);
-                        pX.push(this.localX + obj[0]);
-                        pY.push(this.localY + obj[1]);
-                        pX.push(this.localX + obj[2]);
-                        pY.push(this.localY + obj[3]);
-                        pX.push(this.localX + obj[4]);
-                        pY.push(this.localY + obj[5]);
+                        ctx.bezierCurveTo(this.pivot.x + obj[0], this.pivot.y + obj[1], this.pivot.x + obj[2], this.pivot.y + obj[3], this.pivot.x + obj[4], this.pivot.y + obj[5]);
+                        bx=bx>=obj[4]?obj[4]:bx;
+                        by=by>=obj[5]?obj[5]:by;
+                        ax=ax<=obj[4]?obj[4]:ax;
+                        ay=ay<=obj[5]?obj[5]:ay;
                         break;
+                    case 'a':
                     case 'arcTo':
-                        ctx.arcTo(this.localX + obj[0], this.localY + obj[1], this.localX + obj[2], this.localY + obj[3], obj[4]);
-                        pX.push(this.localX + obj[0]);
-                        pY.push(this.localY + obj[1]);
-                        pX.push(this.localX + obj[2]);
-                        pY.push(this.localY + obj[3]);
+                        console.log(o);
+                        ctx.arcTo(this.pivot.x + obj[0], this.pivot.y + obj[1], this.pivot.x + obj[2], this.pivot.y + obj[3], obj[4]);
+                        bx=bx>=obj[2]?obj[2]:bx;
+                        by=by>=obj[3]?obj[3]:by;
+                        ax=ax<=obj[2]?obj[2]:ax;
+                        ay=ay<=obj[3]?obj[3]:ay;
                         break;
                     default:
                         break;
@@ -3117,30 +3174,7 @@ Canvas2d.DisplayObjects.prototype = {
         if (!buffer) {
             this._setFillStyle(ctx);
             this._setLineStyle(ctx);
-
-            function sum(a, b) {
-                if (a > 0) {
-                    return b - a;
-                } else {
-                    if (b < 0) {
-                        return Math.abs(a + b);
-                    } else {
-                        return Math.abs(a) + b;
-                    }
-                }
-            }
-            pX.sort(function(a, b) {
-                return a - b;
-            });
-            pY.sort(function(a, b) {
-                return a - b;
-            });
-            this.width = sum(pX[0], pX[pX.length - 1]);
-            this.height = sum(pY[0], pY[pY.length - 1]);
-            this._coord = {
-                x: pX,
-                y: pY
-            };
+            this.size.set([Math.sqrt(Math.pow(bx - ax,2)),Math.sqrt(Math.pow(by - ay,2))]);
         }
         ctx.restore();
         if (this.mask) {
@@ -3149,66 +3183,37 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_drawLine - DisplayObjects INTERNAL ONLY -
-     *@param {context} ctx
-     *@param {context} buffer
+     * @param {context} ctx
+     * @param {context} buffer
      */
     _drawLine: function(ctx, buffer) {
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.position.x, this.position.y);
+        ctx.scale(this.scale.x, this.scale.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         ctx.beginPath();
-        ctx.moveTo(this.points[0][0] + this.localX, this.points[0][1] + this.localY);
-        ctx.lineTo(this.points[1][0] + this.localX, this.points[1][1] + this.localY);
+        ctx.moveTo(this.start.x, this.start.y);
+        ctx.lineTo(this.end.x, this.end.y);
         ctx.closePath();
         this._setLineStyle(ctx);
-        var pX = [],
-            pY = [];
-        for (var i = 0; i < this.points.length; i++) {
-            pX.push(this.points[i][0] + this.localX);
-            pY.push(this.points[i][1] + this.localY);
-        }
-
-        function compareNumbers(a, b) {
-            return a - b;
-        }
-        pX.sort(compareNumbers);
-        pY.sort(compareNumbers);
-        this.width = sum(pX[0], pX[pX.length - 1]);
-        this.height = sum(pY[0], pY[pY.length - 1]);
-
-        function sum(a, b) {
-            if (a > 0) {
-                return b - a;
-            } else {
-                if (b < 0) {
-                    return Math.abs(a + b);
-                } else {
-                    return Math.abs(a) + b;
-                }
-            }
-        }
-        this._coord = {
-            x: pX,
-            y: pY
-        };
-        this.len = Math.sqrt(Math.pow(pX[0] + pX[1], 2) + Math.pow(pY[0] + pY[1], 2));
+        this.size.set([Math.sqrt(Math.pow(this.start.x - this.end.x,2)),Math.sqrt(Math.pow(this.start.y - this.end.y,2))]);
+        this.len = this.start.distance(this.end);
         ctx.restore();
     },
     /**
      *_drawCircle - DisplayObjects INTERNAL ONLY -
-     *@param {context} ctx
-     *@param {context} buffer
+     * @param {context} ctx
+     * @param {context} buffer
      */
     _drawCircle: function(ctx, buffer) {
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.position.x, this.position.y);
+        ctx.scale(this.scale.x, this.scale.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         ctx.beginPath();
-        ctx.arc(this.localX, this.localY, this.radius, this.startAngle, this.endAngle, false);
+        ctx.arc(this.pivot.x, this.pivot.y, this.radius, this.startAngle, this.endAngle, false);
         ctx.closePath();
         if (!buffer) {
             this._setFillStyle(ctx);
@@ -3218,16 +3223,17 @@ Canvas2d.DisplayObjects.prototype = {
         if (this.mask) {
             ctx.clip();
         }
+        this.size.set(this.radius*2);
     },
     /**
      *_drawText - DisplayObjects INTERNAL ONLY -
-     *@param {context} ctx
-     *@param {context} buffer
+     * @param {context} ctx
+     * @param {context} buffer
      */
     _drawText: function(ctx, buffer) {
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.position.x, this.position.y);
+        ctx.scale(this.scale.x, this.scale.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         this.fontStyle = this.fontWeight + ' ' + this.fontSize + 'px ' + this.fontType;
@@ -3235,56 +3241,78 @@ Canvas2d.DisplayObjects.prototype = {
         ctx.textAlign = this.align;
         ctx.textBaseline = this.baseLine;
 
-        var offsetY = this.height / 7;
-        var offsetX = 0;
-        switch (this.baseLine) {
-            case 'top':
-                offsetY = -(this.height / 7);
-                break;
-            case 'hanging':
-                offsetY = -(this.height / 7);
-                break;
-            case 'middle':
-                offsetY = (this.height / 7) * 3.5;
-                break;
-            case 'alphabetic':
-                offsetY = (this.height / 7) * 5.8;
-                break;
-            case 'ideographic':
-                offsetY = this.height;
-                break;
-            case 'bottom':
-                offsetY = this.height;
-                break;
-            default:
-                offsetY = 0;
-                break;
-        }
-        var measure = ctx.measureText(this.txt);
-        this.width = measure.width + this.paddingLeft;
+        // var offsetY = this.height / 7;
+        // var offsetX = 0;
+        // switch (this.baseLine) {
+        //     case 'top':
+        //         offsetY = -(this.height / 7);
+        //         break;
+        //     case 'hanging':
+        //         offsetY = -(this.height / 7);
+        //         break;
+        //     case 'middle':
+        //         offsetY = (this.height / 7) * 3.5;
+        //         break;
+        //     case 'alphabetic':
+        //         offsetY = (this.height / 7) * 5.8;
+        //         break;
+        //     case 'ideographic':
+        //         offsetY = this.height;
+        //         break;
+        //     case 'bottom':
+        //         offsetY = this.height;
+        //         break;
+        //     default:
+        //         offsetY = 0;
+        //         break;
+        // }
+        // Canvas2d.fakeCtx.font=this.fontStyle;
+        // Canvas2d.fakeCtx.textAlign=this.align;
+        // Canvas2d.fakeCtx.textBaseline=this.baseLine;
+        // Canvas2d.fakeCtx.fillText(this.txt, this.pivot.x, this.pivot.y);
+        let txtMatrix = ctx.measureText(this.txt);
+        this.size.set([txtMatrix.actualBoundingBoxRight+txtMatrix.actualBoundingBoxLeft,txtMatrix.actualBoundingBoxAscent+txtMatrix.actualBoundingBoxDescent]);
+        let offsetX=0,offsetY=0,yrate=this.size.y/12;
         if (this.align === 'center') {
-            offsetX = this.width / 2;
+            offsetX = this.size.divide(2,true).x;
         } else if (this.align === 'right' || this.align === 'end') {
-            offsetX = this.width;
+            offsetX = this.size.x;
+        }
+        if (this.baseLine === 'hanging') {
+            offsetY=this.size.y/(yrate*2);
+        }else if (this.baseLine === 'middle') {
+            offsetY=this.size.y/2;
+        }else if (this.baseLine === 'alphabetic') {
+            offsetY=this.size.y-(yrate*3);
+        }else if (this.baseLine === 'ideographic') {
+            offsetY=this.size.y-(yrate);
+        }else if (this.baseLine === 'bottom') {
+            offsetY=this.size.y;
+        }else if (this.baseLine === 'top') {
+            offsetY=-(yrate);
         }
         ctx.beginPath();
-        ctx.rect(this.localX - offsetX - this.paddingLeft, this.localY - offsetY - this.paddingTop, this.width + (this.paddingLeft * 2), this.height + (this.paddingTop * 2));
+        ctx.rect((this.pivot.x - offsetX)- this.paddingLeft, (this.pivot.y - offsetY) - this.paddingTop, this.size.x + (this.paddingLeft * 2), this.size.y + (this.paddingTop * 2));
+        // ctx.strokeStyle = this.clr._parseC('red');
+        //             ctx.stroke();
         ctx.closePath();
         if (this.backGround) {
             if (!buffer) {
                 if (this.backGround.color) {
-                    ctx.fillStyle = this._parseC(this.backGround.color);
+                    ctx.fillStyle = this.clr._parseC(this.backGround.color);
                     ctx.fill();
                 }
                 if (this.backGround.lineColor) {
                     ctx.lineWidth = this.backGround.lineWidth ? this.backGround.lineWidth : 2;
-                    ctx.strokeStyle = this._parseC(this.backGround.lineColor);
+                    ctx.strokeStyle = this.clr._parseC(this.backGround.lineColor);
                     ctx.stroke();
                 }
             } else {
                 ctx.fill();
             }
         }
+        
+        
         if (!buffer) {
             ctx.beginPath();
             if (this.color) {
@@ -3294,15 +3322,15 @@ Canvas2d.DisplayObjects.prototype = {
                         this._setShadow(ctx);
                     }
                     this._setGradient(ctx);
-                    ctx.fillText(this.txt, this.localX, this.localY);
+                    ctx.fillText(this.txt, this.pivot.x, this.pivot.y);
                     ctx.restore();
                 } else {
                     ctx.save();
                     if (this.shadow) {
                         this._setShadow(ctx);
                     }
-                    ctx.fillStyle = this._parseC(this.color);
-                    ctx.fillText(this.txt, this.localX, this.localY);
+                    ctx.fillStyle = this.clr._parseC(this.color);
+                    ctx.fillText(this.txt, this.pivot.x, this.pivot.y);
                     ctx.restore();
                 }
             }
@@ -3318,21 +3346,20 @@ Canvas2d.DisplayObjects.prototype = {
                         this._setLineShadow(ctx);
                     }
                     this._setLineGradient(ctx);
-                    ctx.strokeText(this.txt, this.localX, this.localY);
+                    ctx.strokeText(this.txt, this.pivot.x, this.pivot.y);
                     ctx.restore();
                 } else {
                     ctx.save();
                     if (this.lineShadow) {
                         this._setLineShadow(ctx);
                     }
-                    ctx.strokeStyle = this._parseC(this.lineColor);
-                    ctx.strokeText(this.txt, this.localX, this.localY);
+                    ctx.strokeStyle = this.clr._parseC(this.lineColor);
+                    ctx.strokeText(this.txt, this.pivot.x, this.pivot.y);
                     ctx.restore();
                 }
             }
             ctx.closePath();
         }
-
         ctx.restore();
         if (this.mask) {
             ctx.clip();
@@ -3340,21 +3367,22 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_drawImage - DisplayObjects INTERNAL ONLY -
-     *@param {context} ctx
-     *@param {context} buffer
+     * @param {context} ctx
+     * @param {context} buffer
      */
     _drawImage: function(ctx, buffer) {
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.position.x, this.position.y);
+        ctx.scale(this.scale.x, this.scale.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
 
         if (this.loadComplete && this.image) {
-            this.width = this.imageCrop.dw === -1 ? this.width : this.imageCrop.dw;
-            this.height = this.imageCrop.dh === -1 ? this.height : this.imageCrop.dh;
+            this.size.x = this.imageCrop.dw === -1 ? this.size.x : this.imageCrop.dw;
+            this.size.y = this.imageCrop.dh === -1 ? this.size.y : this.imageCrop.dh;
+            // this.size.set([w,h]);
             ctx.beginPath();
-            ctx.rect(this.localX - (this.paddingLeft), this.localY - (this.paddingTop), this.width + (this.paddingLeft * 2), this.height + (this.paddingTop * 2));
+            ctx.rect(this.pivot.x - (this.paddingLeft), this.pivot.y - (this.paddingTop), this.size.x + (this.paddingLeft * 2), this.size.y + (this.paddingTop * 2));
             ctx.closePath();
             if (!buffer) {
 
@@ -3366,15 +3394,15 @@ Canvas2d.DisplayObjects.prototype = {
                     this.doneimage = true;
                     this.currentFilter = null;
                     var c = document.createElement("canvas");
-                    c.width = this.width;
-                    c.height = this.height;
+                    c.width = this.size.x;
+                    c.height = this.size.y;
                     var cx = c.getContext("2d");
-                    cx.drawImage(this.image, this.imageCrop.dx, this.imageCrop.dy, this.width, this.height, 0, 0, this.width, this.height);
+                    cx.drawImage(this.image, this.imageCrop.dx, this.imageCrop.dy, this.size.x, this.size.y, 0, 0, this.size.x, this.size.y);
                     this.imageData = c;
                     this.backUpImage = c;
 
                 }
-                ctx.drawImage(this.imageData, this.localX, this.localY, this.width, this.height);
+                ctx.drawImage(this.imageData, this.pivot.x, this.pivot.y, this.size.x, this.size.y);
                 ctx.closePath();
             }
         }
@@ -3382,28 +3410,29 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *_drawClip - DisplayObjects INTERNAL ONLY -
-     *@param {context} ctx
-     *@param {context} buffer
+     * @param {context} ctx
+     * @param {context} buffer
      */
     _drawClip: function(ctx, buffer) {
         if (!this.frameList) {
             return;
         }
         ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.scale(this.scaleX, this.scaleY);
+        ctx.translate(this.position.x, this.position.y);
+        ctx.scale(this.scale.x, this.scale.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this._g.alpha;
         if (this.loadComplete && this.image && this.frameList[this.currentFrame].data) {
             ctx.beginPath();
-            ctx.rect(this.localX, this.localY, this.frameList[this.currentFrame].map.width, this.frameList[this.currentFrame].map.height);
+            ctx.rect(this.pivot.x, this.pivot.y, this.frameList[this.currentFrame].map.width, this.frameList[this.currentFrame].map.height);
+            this.size.set([this.frameList[this.currentFrame].map.width, this.frameList[this.currentFrame].map.height])
             ctx.closePath();
             if (!buffer) {
                 this._setFillStyle(ctx);
                 this._setLineStyle(ctx);
                 this._setShadow(ctx);
                 ctx.beginPath();
-                ctx.drawImage(this.frameList[this.currentFrame].data, this.localX + this.frameList[this.currentFrame].x, this.localY + this.frameList[this.currentFrame].y);
+                ctx.drawImage(this.frameList[this.currentFrame].data, this.pivot.x + this.frameList[this.currentFrame].x, this.pivot.y + this.frameList[this.currentFrame].y);
                 ctx.closePath();
             }
         }
@@ -3412,10 +3441,10 @@ Canvas2d.DisplayObjects.prototype = {
     _global: function() {
         var g = this.parent._global();
         return {
-            'x': this.x,
-            'y': this.y,
-            'scaleX': this.scaleX,
-            'scaleY': this.scaleY,
+            'x': this.position.x,
+            'y': this.position.y,
+            'scaleX': this.scale.x,
+            'scaleY': this.scale.y,
             'rotation': g.rotation + this.rotation,
             'alpha': g.alpha < 1 ? this.alpha * g.alpha : this.alpha,
             'lineAlpha': g.alpha < 1 ? this.lineAlpha * g.alpha : this.lineAlpha,
@@ -3424,14 +3453,14 @@ Canvas2d.DisplayObjects.prototype = {
     },
     /**
      *draw - DisplayObjects - INTERNAL ONLY call instead myObject.parent.draw();
-     *@type method DisplayObjects
-     *@description INTERNAL ONLY call instead myObject.parent.draw();
-     *@param {context 2d} ctx NOT REQUIRED
-     *@param {boolean} buffer INTERNAL ONLY
-     *@example myObject.parent.draw();
-     *@returns {undefined} none none
-     *@see text
-     *@link text
+     * @type method DisplayObjects
+     * @description INTERNAL ONLY call instead myObject.parent.draw();
+     * @param {context 2d} ctx NOT REQUIRED
+     * @param {boolean} buffer INTERNAL ONLY
+     * @example myObject.parent.draw();
+     * @returns {undefined} none none
+     * @see text
+     * @link text
      */
     draw: function(ctx, buffer) {
         this._g = this._global();
@@ -3473,6 +3502,386 @@ Canvas2d.DisplayObjects.prototype = {
     }
 };
 /**
+ * Point - container for vector operations
+ * @type constructor Point
+ * @description container for all type of DisplayObjects
+ * @param {Point} x y vector, Point, Array, Number;
+ * @example var p= new Canvas2d.Point(p);
+ * @returns {Point Element} this
+ * @see text
+ * @link text
+ */
+Canvas2d.Point=function(p){
+    this.x = 0;
+    this.y = 0;
+    if(this.isPoint(p)){
+        this.x = p.x;
+        this.y = p.y;
+    }else if(p instanceof Array){
+        this.x = p[0];
+        this.y = p[1];
+    }else if(typeof p === "number"){
+        this.x = p;
+        this.y = p;
+    }
+    return this;
+};
+Canvas2d.Point.prototype={
+    /**
+     * setX - Point - set x coordinate.
+     * @type method Point
+     * @description set x coordinate
+     * @param {number} x horizontal coordinate
+     * @example p.setX(x);
+     * @returns {Point} this
+ * @see text
+ * @link text
+     */
+    setX: function(x) {
+        this.x = x;
+        return this;
+    },
+    /**
+     * setY - Point - set y coordinate.
+     * @type method Point
+     * @description set y coordinate
+     * @param {number} y horizontal coordinate
+     * @example p.setY(y);
+     * @returns {Point} this element
+     */
+    setY: function(y) {
+        this.y = y;
+        return this;
+    },
+    /**
+     * set - Point - set x and y coordinates.
+     * @type method Point
+     * @description set x and y coordinates
+     * @param {Point} x y vector, Point, Array, Number;
+     * @example p.set(x,y);
+     * @returns {Point} this
+     */
+    set: function(p) {
+        if(this.isPoint(p)){
+            this.x = p.x;
+            this.y = p.y;
+        }else if(p instanceof Array){
+            this.x = p[0];
+            this.y = p[1];
+        }else if(typeof p === "number"){
+            this.x = p;
+            this.y = p;
+        }
+        return this;
+    },
+    random: function(max,round) {
+        this.x = Math.random() * max;
+        this.y = Math.random() * max;
+        if (round !== null) {
+            this.round(round);
+        }
+        return this;
+    },
+    /**
+     * getPoint - Point - get a specific Point Element.
+     * @type method Point
+     * @description get a specific Point Element
+     * @param {Point} p Point Element
+     * @example p.getPoint(Point);
+     * @returns {Point} this
+     */
+    getPoint: function (p) {
+        return (p instanceof Canvas2d.Point)? p : new Canvas2d.Point();
+    },
+    /**
+     * isPoint - Point - evaluate if is a Point.
+     * @type method Point
+     * @description evaluate if is a Point
+     * @param {Point} p Point Element
+     * @example p.isPoint(Point);
+     * @returns {boolean} true or false
+     */
+    isPoint: function (p) {
+        return (p instanceof Canvas2d.Point)? true : false;
+    },
+    /**
+     * isEqual - Point - compare two Points for equality.
+     * @type method Point
+     * @description compare two Points for equality
+     * @param {Point} p Point Element
+     * @example p.isEqual(Point);
+     * @returns {boolean} true or false
+     */
+    isEqual: function(p) {
+        return (p.x === this.x && p.y === this.y);
+    },
+    /**
+     * add - Point - add two Points.
+     * @type method Point
+     * @description add two Points
+     * @param {Point} x y vector, Point, Array, Number;
+     * @example p.add(Point,Point);
+     * @returns {Point} this
+     */
+    add: function(p,n) {
+        if(this.isPoint(p)){
+            if (n) {return new Canvas2d.Point([this.x+p.x,this.y+p.y]);}
+            this.x += p.x;
+            this.y += p.y;
+        }else if(p instanceof Array){
+            if (n) {return new Canvas2d.Point([this.x+p[0],this.y+p[1]]);}
+            this.x += p[0];
+            this.y += p[1];
+        }else if(typeof p === "number"){
+            if (n) {return new Canvas2d.Point([this.x+p,this.y+p]);}
+            this.x += p;
+            this.y += p;
+        }
+        return this;
+    },
+    /**
+     * subtract - Point - subtract two Points.
+     * @type method Point
+     * @description subtract two Points
+     * @param {Point} x y vector, Point, Array, Number;
+     * @example p.subtract(Point,Point);
+     * @returns {Point} this
+     */
+    subtract: function(p,n) {
+        if(this.isPoint(p)){
+            if (n) {return new Canvas2d.Point([this.x-p.x,this.y-p.y]);}
+            this.x -= p.x;
+            this.y -= p.y;
+        }else if(p instanceof Array){
+            if (n) {return new Canvas2d.Point([this.x-p[0],this.y-p[1]]);}
+            this.x -= p[0];
+            this.y -= p[1];
+        }else if(typeof p === "number"){
+            if (n) {return new Canvas2d.Point([this.x-p,this.y-p]);}
+            this.x -= p;
+            this.y -= p;
+        }
+        return this;
+    },
+    /**
+     * multiply - Point - multiply two Points.
+     * @type method Point
+     * @description multiply two Points
+     * @param {Point} x y vector, Point, Array, Number;
+     * @example p.multiply(Point,Point);
+     * @returns {Point} this
+     */
+    multiply: function(p,n) {
+        if(this.isPoint(p)){
+            if (n) {return new Canvas2d.Point([this.x*p.x,this.y*p.y]);}
+            this.x *= p.x;
+            this.y *= p.y;
+        }else if(p instanceof Array){
+            if (n) {return new Canvas2d.Point([this.x*p[0],this.y*p[1]]);}
+            this.x *= p[0];
+            this.y *= p[1];
+        }else if(typeof p === "number"){
+            if (n) {return new Canvas2d.Point([this.x*p,this.y*p]);}
+            this.x *= p;
+            this.y *= p;
+        }
+        return this;
+    },
+    /**
+     * divide - Point - divide two Points.
+     * @type method Point
+     * @description divide two Points
+     * @param {Point} x y vector, Point, Array, Number;
+     * @example p.divide(Point,Point);
+     * @returns {Point} this
+     */
+    divide: function(p,n) {
+        if(this.isPoint(p)){
+            if (n) {return new Canvas2d.Point([this.x/p.x,this.y/p.y]);}
+            this.x /= p.x;
+            this.y /= p.y;
+        }else if(p instanceof Array){
+            if (n) {return new Canvas2d.Point([this.x/p[0],this.y/p[1]]);}
+            this.x /= p[0];
+            this.y /= p[1];
+        }else if(typeof p === "number"){
+            if (n) {return new Canvas2d.Point([this.x/p,this.y/p]);}
+            this.x /= p;
+            this.y /= p;
+        }
+        return this;
+    },
+    /**
+     * length - Point - length between two points.
+     * @type method Point
+     * @description length between two points
+     * @example p.length();
+     * @returns {Number} length
+     */
+    length: function() {
+        return Math.sqrt(Math.pow(this.x,2) + Math.pow(this.y,2));
+    },
+    /**
+     * lengthSqrt - Point - lengthSqrt between two points.
+     * @type method Point
+     * @description lengthSqrt between two points
+     * @example p.lengthSqrt();
+     * @returns {Number} lengthSqrt
+     */
+    lengthSqrt: function() {
+        return Math.pow(this.x,2) + Math.pow(this.y,2);
+    },
+    /**
+     * normalize - Point - normalize vector.
+     * @type method Point
+     * @description normalize vector
+     * @example p.normalize();
+     * @returns {Point} this
+     */
+    normalize: function() {
+        var length = this.length();
+        if (length === 0) {
+            this.x = 1;
+            this.y = 0;
+        } else {
+            this.divide([length, length]);
+        }
+        return this;
+    },
+    /**
+     * angle - Point - angle of a given Point.
+     * @type method Point
+     * @description angle of a given Point
+     * @example p.angle();
+     * @returns {Number} angle
+     */
+    angle: function () {
+        return Math.atan2(this.y,this.x);
+    },
+    /**
+     * angleCross - Point - angleCross between two points.
+     * @type method Point
+     * @description angleCross between two points
+     * @param {Point} p Point Element
+     * @example p.angleCross(p);
+     * @returns {Number} angleCross
+     */
+    angleCross: function (p) {
+        return Math.atan2(p.y-this.y,p.x-this.x);
+    },
+    /**
+     * distance - Point - distance between two points.
+     * @type method Point
+     * @description distance between two points
+     * @param {Point} p Point Element
+     * @example p.distance(p);
+     * @returns {Number} distance
+     */
+    distance: function (p) {
+        return Math.sqrt(Math.pow(this.x - p.x,2) + Math.pow(this.y - p.y,2));
+    },
+    /**
+     * dot - Point - dot product between two points.
+     * @type method Point
+     * @description dot product between two points
+     * @param {Point} p Point Element
+     * @example p.dot(p);
+     * @returns {Number} dot
+     */
+    dot: function(p) {
+        return (p.x * this.x) + (p.y * this.y);
+    },
+    /**
+     * cross - Point - cross product between two points.
+     * @type method Point
+     * @description cross product between two points
+     * @param {Point} p Point Element
+     * @example p.cross(p);
+     * @returns {Number} cross
+     */
+    cross: function(p) {
+        return ((this.x * p.y) - (this.y * p.x));
+    },
+    /**
+     * abs - Point - abs convert Point to positive.
+     * @type method Point
+     * @description abs convert Point to positive
+     * @example p.abs();
+     * @returns {Point} this
+     */
+    abs: function() {
+        this.x = Math.abs(this.x);
+        this.y = Math.abs(this.y);
+        return this;
+    },
+    /**
+     * getQuadrant - Point - getQuadrant as 0,1,2,3.
+     * @type method Point
+     * @description getQuadrant as 0,1,2,3
+     * @example p.getQuadrant();
+     * @returns {Number} getQuadrant
+     */
+    getQuadrant: function() {
+        return this.x >= 0 ? this.y >= 0 ? 1 : 4 : this.y >= 0 ? 2 : 3;
+    },
+    _precision: [1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000,10000000000],
+    /**
+     * round - Point - round a Point to a specific degree of precision.
+     * @type method Point
+     * @description round a Point to a specific degree of precision
+     * @param {number} n Array Index
+     * @example p.round(n); n > 0 < 10
+     * @returns {Point} this
+     */
+    round: function(n) {
+        if (n === 0) {
+            this.x = Math.ceil(this.x);
+            this.y = Math.ceil(this.y);
+            return this;
+        }
+        n = n || 2;
+        var p = this._precision[n];
+        this.x = ((0.5 + (this.x * p)) << 0) / p;
+        this.y = ((0.5 + (this.y * p)) << 0) / p;
+        return this;
+    },
+    /**
+     * toRad - Point - toRad convert degrees angle to radians.
+     * @type method Point
+     * @description toRad convert degrees angle to radians
+     * @param {number} deg 0 to 360
+     * @example p.toRad(deg);
+     * @returns {Number} toRad
+     */
+    toRad: function(deg) {
+        return deg * 180 / Math.PI;
+    },
+    /**
+     * toDeg - Point - toDeg convert radians angle to degree.
+     * @type method Point
+     * @description toDeg convert radians angle to degree
+     * @param {number} deg 0 to 360
+     * @example p.toDeg(deg);
+     * @returns {Number} toDeg
+     */
+    toDeg: function(rad) {
+        return rad / Math.PI * 180;
+    },
+    /**
+     * rotate - Point - rotate vecotr to radians.
+     * @type method Point
+     * @description rotate vecotr to radians
+     * @param {number} rad 0 to PI*2
+     * @example p.rotate(Math.PI/2);
+     * @returns {Point} this
+     */
+    rotate: function (a) {
+        this.x = (this.x * Math.cos(a)) - (this.y * Math.sin(a));
+        this.y = (this.x * Math.sin(a)) + (this.y * Math.cos(a));
+        return this;
+    }
+};
+/**
  * Tweener - Canvas2d prototype
  * @type constructor Tweener
  * @description create a tweener object that animate a certain property through time
@@ -3480,14 +3889,15 @@ Canvas2d.DisplayObjects.prototype = {
  * @property {object element} parent parent child
  * @example var myTween=new Canvas2d.Tweener();
  * @returns {void} Tweener current tweening object
- *@see text
- *@link text
+ * @see text
+ * @link text
  */
 Canvas2d.Tweener = function() {
     this.className = 'Tweener';
     this.children = {};
     this._tempChildren = {};
     this.charList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ',', '"', '\'', ',', ':', ';', '(', ')', '[', ']', '{', '}', '*', '@', '.', '!', '?', '\\', '/', '<', '>', '#', '+', '-', '_', '=', '^', 'ì', 'è', 'é', 'ò', 'à', 'ù', '&', '$', '£', '|', '∞', '°', 'ç'];
+    this.clr = new Canvas2d.Colors();
 };
 Canvas2d.Tweener.prototype = {
     /**
@@ -3496,8 +3906,8 @@ Canvas2d.Tweener.prototype = {
      * @description get the current increasing number of frame fired.
      * @example myTween.getFrame();
      * @returns {number} frame number of frame executed
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     getFrame: function() {
         return window[Canvas2d.wn + 'rqanim'].getFrame();
@@ -3517,11 +3927,11 @@ Canvas2d.Tweener.prototype = {
     /**
      *getFps - Tweener - get the current number of frame per seconds
      * @type method Tweener
-     *@description get the current number of frame per seconds
-     *@example myTween.getFps();
-     *@returns {number} fps frame per seconds
-     *@see text
-     *@link text
+     * @description get the current number of frame per seconds
+     * @example myTween.getFps();
+     * @returns {number} fps frame per seconds
+     * @see text
+     * @link text
      */
     getFps: function() {
         return window[Canvas2d.wn + 'rqanim'].getFps();
@@ -3532,8 +3942,8 @@ Canvas2d.Tweener.prototype = {
      * @description get the actual delay in millisecond between cicle loops
      * @example myTween.getTimeInterval();
      * @returns {number} float milliseconds
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     getTimeInterval: function() {
         return window[Canvas2d.wn + 'rqanim'].getTimeInterval();
@@ -3542,12 +3952,12 @@ Canvas2d.Tweener.prototype = {
      * addTweener - Tweener - Add an objects with parameter to be transitioned
      * @type method Tweener
      * @description add an objects with parameters to be translated in time
-     * @param {object} o a Sprite or DisplayObjects element
+     * @param {object} o a Layer or DisplayObjects element
      * @param {object} args a list of parameter
      * @example myTween.addTweener(myObject,{params:values,...,duration:milliseconds,ease:easeType});
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     addTweener: function(o, args) {
         if (o.parent === null || o.parent === undefined) {
@@ -3555,7 +3965,7 @@ Canvas2d.Tweener.prototype = {
             return;
         }
         var twnobj = {};
-        var properties = ['x', 'y', 'width', 'height', 'rotation', 'scaleX', 'scaleY', 'lineWidth', 'fontSize', 'radius', 'startAngle', 'endAngle'];
+        var properties = ['rotation', 'lineWidth', 'fontSize', 'radius', 'startAngle', 'endAngle'];
         var x, colorReq, r, g, b, rqAlpha, rqlineAlpha, alpha, lineAlpha, colorSrc, data = args.data ? args.data : null;
         var delay = args['delay'] ? args['delay'] : 0;
         var ease = args['ease'] ? args['ease'] : 'easeNone';
@@ -3576,6 +3986,106 @@ Canvas2d.Tweener.prototype = {
                     };
                 }
             }
+        }
+        if ('pivot' in args) {
+            var x,y;
+            if (o.pivot.isPoint(args['pivot'])) {
+                x=args['pivot'].x;
+                y=args['pivot'].y;
+            }else if(args['pivot'] instanceof Array){
+                x = args['pivot'][0];
+                y = args['pivot'][1];
+            }else if(typeof args['pivot'] === "number"){
+                x = args['pivot'];
+                y = args['pivot'];
+            }
+            twnobj['point'] = {
+                ease: ease,
+                tox: (x>o.pivot.x?x-o.pivot.x:-(o.pivot.x-x)),
+                toy: (y>o.pivot.y?y-o.pivot.y:-(o.pivot.y-y)),
+                ct: 0,
+                d: duration,
+                fromx: o.pivot.x,
+                fromy: o.pivot.y,
+                prop: 'pivot',
+                request: 'pivot',
+                target: o
+            };
+        }
+        if ('size' in args) {
+            var x,y;
+            if (o.size.isPoint(args['size'])) {
+                x=args['size'].x;
+                y=args['size'].y;
+            }else if(args['size'] instanceof Array){
+                x = args['size'][0];
+                y = args['size'][1];
+            }else if(typeof args['size'] === "number"){
+                x = args['size'];
+                y = args['size'];
+            }
+            twnobj['point'] = {
+                ease: ease,
+                tox: (x>o.size.x?x-o.size.x:-(o.size.x-x)),
+                toy: (y>o.size.y?y-o.size.y:-(o.size.y-y)),
+                ct: 0,
+                d: duration,
+                fromx: o.size.x,
+                fromy: o.size.y,
+                prop: 'size',
+                request: 'size',
+                target: o
+            };
+        }
+        if ('scale' in args) {console.log(args);
+            var x,y;
+            if (o.scale.isPoint(args['scale'])) {
+                x=args['scale'].x;
+                y=args['scale'].y;
+            }else if(args['scale'] instanceof Array){
+                x = args['scale'][0];
+                y = args['scale'][1];
+            }else if(typeof args['scale'] === "number"){
+                x = args['scale'];
+                y = args['scale'];
+            }
+            twnobj['point'] = {
+                ease: ease,
+                tox: (x>o.scale.x?x-o.scale.x:-(o.scale.x-x)),
+                toy: (y>o.scale.y?y-o.scale.y:-(o.scale.y-y)),
+                ct: 0,
+                d: duration,
+                fromx: o.scale.x,
+                fromy: o.scale.y,
+                prop: 'scale',
+                request: 'scale',
+                target: o
+            };
+        }
+        if ('position' in args) {
+            var x,y;
+            if (o.position.isPoint(args['position'])) {
+                x=args['position'].x;
+                y=args['position'].y;
+            }else if(args['position'] instanceof Array){
+                x = args['position'][0];
+                y = args['position'][1];
+            }else if(typeof args['position'] === "number"){
+                x = args['position'];
+                y = args['position'];
+            }
+            twnobj['point'] = {
+                ease: ease,
+                tox: (x>o.position.x?x-o.position.x:-(o.position.x-x)),
+                toy: (y>o.position.y?y-o.position.y:-(o.position.y-y)),
+                ct: 0,
+                d: duration,
+                fromx: o.position.x,
+                fromy: o.position.y,
+                prop: 'position',
+                request: 'position',
+                target: o
+            };
         }
         if ('obj' in args) {
             if (!o['obj']) {
@@ -3660,8 +4170,8 @@ Canvas2d.Tweener.prototype = {
             };
             for (var io in args['shadow']) {
                 if (io === "color") {
-                    colorReq = Colors._parseColor(args['shadow'][io]);
-                    colorSrc = Colors._parseColor(o['shadow'][io]);
+                    colorReq = this.clr._fromStringToArrayRgb(args['shadow'][io]);
+                    colorSrc = this.clr._fromStringToArrayRgb(o['shadow'][io]);
                     r = colorReq[0] - colorSrc[0];
                     g = colorReq[1] - colorSrc[1];
                     b = colorReq[2] - colorSrc[2];
@@ -3696,8 +4206,8 @@ Canvas2d.Tweener.prototype = {
             };
             for (var oi in args['lineShadow']) {
                 if (oi === "color") {
-                    colorReq = Colors._parseColor(args['lineShadow'][oi]);
-                    colorSrc = Colors._parseColor(o['lineShadow'][oi]);
+                    colorReq = this.clr._fromStringToArrayRgb(args['lineShadow'][oi]);
+                    colorSrc = this.clr._fromStringToArrayRgb(o['lineShadow'][oi]);
                     r = colorReq[0] - colorSrc[0];
                     g = colorReq[1] - colorSrc[1];
                     b = colorReq[2] - colorSrc[2];
@@ -3716,8 +4226,8 @@ Canvas2d.Tweener.prototype = {
             }
         }
         if ('color' in args) {
-            colorReq = Colors._parseColor(args['color']);
-            colorSrc = Colors._parseColor(o.color);
+            colorReq = this.clr._fromStringToArrayRgb(args['color']);
+            colorSrc = this.clr._fromStringToArrayRgb(o.color);
             r = colorReq[0] - colorSrc[0];
             g = colorReq[1] - colorSrc[1];
             b = colorReq[2] - colorSrc[2];
@@ -3737,8 +4247,8 @@ Canvas2d.Tweener.prototype = {
             };
         }
         if ('lineColor' in args) {
-            colorReq = Colors._parseColor(args['lineColor']);
-            colorSrc = Colors._parseColor(o.lineColor);
+            colorReq = this.clr._fromStringToArrayRgb(args['lineColor']);
+            colorSrc = this.clr._fromStringToArrayRgb(o.lineColor);
             r = colorReq[0] - colorSrc[0];
             g = colorReq[1] - colorSrc[1];
             b = colorReq[2] - colorSrc[2];
@@ -3817,16 +4327,17 @@ Canvas2d.Tweener.prototype = {
     _startFun: function(c, o, id) {
         c[id] = o;
         window[Canvas2d.wn + 'rqanim'].addLoop(this, this._callTween);
+        window[Canvas2d.wn + 'rqanim'].start();
     },
     /**
      * removeTweener - Tweener - remove an object from the animation cicle list
      * @type method Tweener
      * @description remove an object from the animation cicle list
-     * @param {object element} child a target Sprite or DisplayObjects element
+     * @param {object element} child a target Layer or DisplayObjects element
      * @example myTween.removeTweener(myObject);
      * @returns {undefined} none none
-     *@see text
-     *@link text
+     * @see text
+     * @link text
      */
     removeTweener: function(child) {
         if (child.id in this._tempChildren) {
@@ -3868,6 +4379,7 @@ Canvas2d.Tweener.prototype = {
                     that.children[o].state.tweening = true;
                 }
             }
+            // console.log(that.children[o].state);
             that._states(that.children[o].state);
             for (var oo in that.children[o]) {
                 if (oo !== 'state') {
@@ -3884,6 +4396,9 @@ Canvas2d.Tweener.prototype = {
                     } else if (oo === 'txt') {
                         that.children[o][oo].ct += ct;
                         that._tweenT(that.children[o][oo], that.children[o].state);
+                    } else if (oo === 'point') {
+                        that.children[o][oo].ct += ct;
+                        that._tweenP(that.children[o][oo], that.children[o].state);
                     } else {
                         that.children[o][oo].ct += ct;
                         that._tween(that.children[o][oo], that.children[o].state);
@@ -3913,6 +4428,17 @@ Canvas2d.Tweener.prototype = {
         g = this[args.ease](args['ct'], args['fromg'], args['tog'], args['d']);
         b = this[args.ease](args['ct'], args['fromb'], args['tob'], args['d']);
         args['target'][args['prop']] = 'rgb(' + Math.round(r) + ',' + Math.round(g) + ',' + Math.round(b) + ')';
+    },
+    _tweenP: function(args, ctrl) {
+        if ((args['ct'] / args['d']) >= 1) {
+            args['ct'] = 1;
+            args['d'] = 1;
+            ctrl.end = true;
+        }
+        var x,y;
+        x = this[args.ease](args['ct'], args['fromx'], args['tox'], args['d']);
+        y = this[args.ease](args['ct'], args['fromy'], args['toy'], args['d']);
+        args['target'][args['prop']].set([x,y]); 
     },
     _tween: function(args, ctrl) {
         if ((args['ct'] / args['d']) >= 1) {
@@ -3974,7 +4500,7 @@ Canvas2d.Tweener.prototype = {
                 args['target'][args['prop']] = args.text.substr(0, args.to - n);
                 break;
             case 'matrix':
-                for (var i = 0; i < args.subprop.length; i++) {
+                for (let i = 0; i < args.subprop.length; i++) {
                     n = Math.floor(this[args.ease](args['ct'], 0, args.subprop[i], args['d']));
                     n = n > this.charList.length - 1 ? n - this.charList.length : n;
                     args.request += args.charlist[n];
@@ -4808,19 +5334,376 @@ Canvas2d.Tweener.prototype = {
  * @link text
  * @see text
  */
-var Colors = {
+Canvas2d.Colors = function(){
+    return this;
+}
+Canvas2d.Colors.prototype = {
     /**
-     * Rgb - Colors - return a rgb array value from an hex color format
+     * randomRgb - Colors - return a random rgb array value in range [0,255]
      * @type static method Colors
-     * @description return a rgb array value from an hex color format
-     * @param {string} hex the color in hex format
-     * @example var myValue= Colors.Rgb('#FF00FF');
-     * @returns {array} rgb the RGB representation in set [0, 255]; [r, g, b]
-     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
+     * @description return a random rgb array value in range [0,255]
+     * @param {string} type string that represent the desired returned format value; string or array; default string
+     * @example var myValue= Colors.randomRgb('array');
+     * @returns {mixed} rgb in string or array format; 'rgb(n, n, n)' or [r, g, b]
+     * @link https://www.w3.org/TR/css-color-3/
      * @see text
      */
-    Rgb: function(hex) {
-        return [this._toR(hex), this._toG(hex), this._toB(hex)];
+    randomRgb: function(type) {
+        var t = type ? type : 'string';
+        var r = Math.round(Math.random() * 255);
+        var g = Math.round(Math.random() * 255);
+        var b = Math.round(Math.random() * 255);
+        if (t === 'array') {
+            return [Math.round(Math.random() * 255), Math.round(Math.random() * 255), Math.round(Math.random() * 255)];
+        } else {
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+    },
+    /**
+     * invert - Colors - return an inverted rgb array
+     * @type static method Colors
+     * @description return an inverted rgb array color
+     * @param {color} color to be inverted; any color format
+     * @example var myValue= Colors.invert([12,23,34]);
+     * @returns {mixed} rgb in string format; 'rgb(n, n, n)'
+     * @link https://www.w3.org/TR/css-color-3/
+     * @see text
+     */
+    invert: function(color) {
+        let c = this._fromStringToArrayRgb(color);
+        return 'rgb('+(255 - c[0])+','+(255 - c[1])+','+(255 - c[2])+')';
+    },
+    /**
+     * complementary - Colors - return a complementary rgb array color
+     * @type static method Colors
+     * @description return a complementary rgb array color
+     * @param {color} color to be parsed; any color format
+     * @example var myValue= Colors.complementary([12,23,34]);
+     * @returns {mixed} rgb in string format; 'rgb(n, n, n)'
+     * @link https://www.w3.org/TR/css-color-3/
+     * @see text
+     */
+    complementary: function(color) {
+        let c = this._fromStringToArrayRgb(color),b;
+        b = this._rgbToHsv(c);
+        c = this._hsvToRgb([this._hueShift(b[0],180.0),b[1],b[2]]);
+        return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+    },
+    ///////////
+    ///internal - if color is an RGB Array return an RGB Formatted String
+    ///////////
+    _parseC: function(color) {
+        if (typeof color === 'string') {
+            if (color.indexOf('hsv') > -1) {
+                return this._fromStringToArrayRgb(color);
+            }else{
+                return color;
+            }
+        }else if (color instanceof Array) {
+            return this._fromArrayToStringRgb(color);
+        }else if(!color){
+            return color;
+        }
+    },
+    ////////////
+    ///internal - return an RGB String formatted color From an RGB Array
+    ////////////
+    _fromArrayToStringRgb: function(color) {
+        let a=av='';
+        if (color.length > 3) {a='a';av=','+color[3];}
+        return 'rgb'+a+'('+color[0]+','+color[1]+','+color[2]+av+')';
+    },
+    ///////////
+    //internal - return an RGB Array from a String formatted color
+    ///////////
+    _fromStringToArrayRgb: function(color) {
+        if (!color) {
+            return [0, 0, 0];
+        }
+        if (typeof color === 'string') {
+            var result = color.replace(/\s/g, "").toLowerCase();
+            var re, ar;
+            if (result.indexOf('rgb') > -1) {
+                re = /[rgba\(\)]/g;
+                ar = result.replace(re, '').split(',');
+                return [parseInt(ar[0]), parseInt(ar[1]), parseInt(ar[2])];
+            } else if (result.indexOf('#') > -1) {
+                var hex = this._hexToRgb(result);
+                return hex;
+            } else if (result.indexOf('hsl') > -1) {
+                re = /[hsla\(%?\)]/g;
+                ar = result.replace(re, '').split(',');
+                var hsl = this._hslToRgb(ar);
+                return hsl;
+            } else if (result.indexOf('hsv') > -1) {
+                re = /[hsva\(%?\)]/g;
+                ar = result.replace(re, '').split(',');
+                var hsv = this._hsvToRgb(ar);
+                return hsv;
+            } else if (result in this.namedColor) {
+                ar = this.namedColor[result][1];
+                return ar;
+            } else {
+                return [0, 0, 0];
+            }
+        } else if (color instanceof Array) {
+            return color;
+        } else {
+            throw 'You are attempting to translate an INVALID color: ' + color;
+        }
+    },
+    //////////
+    //internal - return color as type - 'hex' 'rgb' 'hsl' 'hsv' 'name'
+    //////////
+    _parseGetColor: function(color, type) {
+        if (!color) {
+            return 'rgb(0,0,0)';
+        }
+        type=type?type:'rgb';
+        if (typeof color === 'string') {
+            if (getType(color,type,this) === type) {
+                return color;
+            }else{
+                let c=this._fromStringToArrayRgb(color);
+                return toTarget(c,type,this);
+            }
+        }else{
+            return toTarget(color,type);
+        }
+        function getType(c,type,that) {
+            let result = c.replace(/\s/g, "").toLowerCase();
+            if (result.indexOf('rgb') > -1) {
+                return 'rgb';
+            } else if (result.indexOf('#') > -1) {
+                return 'hex';
+            } else if (result.indexOf('hsl') > -1) {
+                return 'hsl';
+            } else if (result.indexOf('hsv') > -1) {
+                return 'hsv';
+            } else if (result in that.namedColor) {
+                return 'name';
+            } else {
+                return false;
+            }
+        }
+        function toTarget(r,type,that){
+            switch (type) {
+                case 'hex':
+                    return that._rgbToHex(r);
+                    break;
+                case 'rgb':
+                    return 'rgb('+r[0]+','+r[1]+','+r[2]+')';
+                    break;
+                case 'hsl':
+                    r = that._rgbToHsl(r);
+                    return 'hsl(' + r[0] + ',' + r[1] + '%,' + r[2] + '%)';
+                    break;
+                case 'hsv':
+                    r = that._rgbToHsv(r);
+                    return 'hsv(' + r[0] + ',' + r[1] + '%,' + r[2] + '%)';
+                    break;
+                case 'name':
+                    function approx(a, b, c) {
+                        let low=(b-c)<=0?0:b-c;
+                        let high=(b+c)>=255?255:b+c;
+                        return (a<=high&&a>=low) ? true : false;
+                    }
+                    let ap = 5;
+                    return iterNamed(ap,r,that.namedColor);
+                    function iterNamed(ap,r,that){
+                        for (var i in that) {
+                            if (approx(that[i][1][0], r[0], ap) && approx(that[i][1][1], r[1], ap) && approx(that[i][1][2], r[2], ap)) {
+                                return i;
+                            }
+                        }
+                        ap+=5;
+                        return iterNamed(ap,r,that);
+                    }
+                    break;
+                case 'array':
+                    return c;
+                    break;
+                default:
+                    return c;
+                    break;
+            }
+        }
+    },
+    ///////////
+    //internal ONLY - convert an array RGB to an array HSL
+    ///////////
+    _rgbToHsl: function(color){
+        let r=color[0],g=color[1],b=color[2];
+        r/=255;
+        g/=255;
+        b/=255;
+        let h=s=d=c=0;
+        let mx=Math.max(r,g,b);
+        let mn=Math.min(r,g,b);
+        let l=(mx+mn)/2;
+        if (mx === mn){
+            h=s=0;
+        }else{
+            d=mx-mn;
+            if (l>0.5){
+                s=d/(2-mx-mn);
+            }
+            else{
+                s=d/(mx+mn);
+            }
+            if (mx === r){
+                c=0
+                if (g<b){
+                    c=6;
+                }
+                h = (g - b) / d + c;
+            }else if(mx === g){
+                h = (b - r) / d + 2;
+            }else if (mx === b){
+                h = (r - g) / d + 4;
+            }
+            h/=6;
+        }
+        return [this._rod2(h*360),this._rod2(s*100),this._rod2(l*100)]
+    },
+    ///////////
+    //internal ONLY - convert an array RGB to an array HSV
+    ///////////
+    _rgbToHsv: function(color){
+        let r=color[0],g=color[1],b=color[2];
+        r/=255;
+        g/=255;
+        b/=255;
+        let mx=Math.max(r,g,b);
+        let mn=Math.min(r,g,b);
+        let v=mx;
+        let d=mx-mn;
+        let s=d/mx;
+        if (mx==0){
+            s=0;
+        }
+        if (mx==mn){
+            h=0;
+        }
+        else{
+            if (r===mx){
+                h=(g - b) / d;
+                if (g < b){
+                    h=(g - b) / d +6;
+                }
+            }
+            if (g===mx){
+                h = (b - r) / d + 2;
+            }
+            if (b===mx){
+                h = (r - g) / d + 4;
+            }
+            h/=6;
+        }
+        return [this._rod2(h*360),this._rod2(s*100),this._rod2(v*100)];
+    },
+    ///////////
+    //internal ONLY - convert an array HSL to an array RGB
+    ///////////
+    _hslToRgb: function(color){
+        let h=color[0],s=color[1],l=color[2];
+        h/=360;
+        s/=100;
+        l/=100;
+        if (s === 0){
+            r=g=b=l;
+        }
+        else{
+            if (l < 0.5){
+                q=l* (1 + s);
+            }
+            else{
+                q=l + s - l * s;
+            }
+            p = 2 * l - q;
+            r = this._hue2rgb(p, q, h + 1 / 3);
+            g = this._hue2rgb(p, q, h);
+            b = this._hue2rgb(p, q, h - 1 / 3);
+        }
+        return [this._rod(r*255),this._rod(g*255),this._rod(b*255)];
+    },
+    ///////////
+    //internal ONLY - convert an array HSV to an array RGB
+    ///////////
+    _hsvToRgb: function(color){
+        let h=color[0],s=color[1],v=color[2];
+        h /= 360;
+        s /= 100;
+        v /= 100;
+        let r=g=b=0;
+        i = Math.floor(h * 6);
+        f = h * 6 - i;
+        p = v * (1 - s);
+        q = v * (1 - f * s);
+        t = v * (1 - (1 - f) * s);
+        if ((i % 6) ===0){
+            r = v;
+            g = t;
+            b = p;
+        }
+        if ((i % 6) ===1){
+            r = q;
+            g = v;
+            b = p;
+        }
+        if ((i % 6) ===2){
+            r = p;
+            g = v;
+            b = t;
+        }
+        if ((i % 6) ===3){
+            r = p;
+            g = q;
+            b = v;
+        }
+        if ((i % 6) ===4){
+            r = t;
+            g = p;
+            b = v;
+        }
+        if ((i % 6) ===5){
+            r = v;
+            g = p;
+            b = q;
+        }
+        return [this._rod(r*255),this._rod(g*255),this._rod(b*255)];
+    },
+    ///////////
+    //internal ONLY - convert a string HEX to an array RGB
+    ///////////
+    _hexToRgb: function(color){
+        return [this._toR(color), this._toG(color), this._toB(color)];
+    },
+    ///////////
+    //internal ONLY - convert an array RGB to a string HEX
+    ///////////
+    _rgbToHex: function(color){
+        return "#" + this._toHex(color[0]) + this._toHex(color[1]) + this._toHex(color[2]);
+    },
+    ///////////
+    //internal ONLY - to do
+    ///////////
+    _nameToRgb: function(color){
+        console.log(color);
+    },
+    ///////////
+    //internal ONLY - useful to rgb to hex convertion
+    ///////////
+    _toHex: function(N) {
+        if (N === null)
+            return "00";
+        N = parseInt(N);
+        if (N === 0 || isNaN(N))
+            return "00";
+        N = Math.max(0, N);
+        N = Math.min(N, 255);
+        N = Math.round(N);
+        return "0123456789ABCDEF".charAt((N - N % 16) / 16) + "0123456789ABCDEF".charAt(N % 16);
     },
     _toR: function(h) {
         return parseInt((this._cutHex(h)).substring(0, 2), 16);
@@ -4834,312 +5717,40 @@ var Colors = {
     _cutHex: function(h) {
         return (h.charAt(0) === "#") ? h.substring(1, 7) : h;
     },
-    /**
-     * Hex - Colors - return a hex string value from an rgb array color format
-     * @type static method Colors
-     * @description return a hex string value from an rgb array color format
-     * @param {array} rgb the color in rgb array format
-     * @example var myValue= Colors.Hex([r, g, b]);
-     * @returns {string} hex the HEX representation in string color format; '#value
-     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
-     * @see text
-     */
-    Hex: function(rgb) {
-        return "#" + this._toHex(rgb[0]) + this._toHex(rgb[1]) + this._toHex(rgb[2]);
+    ///////////
+    //internal ONLY - useful to rgb to hsl and hsv convertion
+    ///////////
+    _rod: function(no){
+        return parseInt(Math.floor(no/1) + Math.floor((no%1)/0.5)/1);
     },
-    _toHex: function(N) {
-        if (N === null)
-            return "00";
-        N = parseInt(N);
-        if (N === 0 || isNaN(N))
-            return "00";
-        N = Math.max(0, N);
-        N = Math.min(N, 255);
-        N = Math.round(N);
-        return "0123456789ABCDEF".charAt((N - N % 16) / 16) + "0123456789ABCDEF".charAt(N % 16);
+    _rod2: function(no){
+        return Math.round(no,2);
     },
-    /**
-     * RgbToHsl - Colors -
-     * @type static method Colors
-     * @description Converts an RGB color value to HSL. Assumes r, g, and b are contained in the set [0, 255] and returns h, s, and l in the set [0, 1].
-     * @param {number} r number The red color value
-     * @param {number} g number The green color value
-     * @param {number} b number The blue color value
-     * @example var myValue= Colors.RgbToHsl([r, g, b]);
-     * @returns {array} hsl The HSL representation in the set [0, 1]; [ h, s, l]
-     * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-     * @see text
-     */
-    RgbToHsl: function(r, g, b) {
-        r /= 255, g /= 255, b /= 255;
-        var max = Math.max(r, g, b),
-            min = Math.min(r, g, b);
-        var h, s, l = (max + min) / 2;
-
-        if (max === min) {
-            h = s = 0; // achromatic
-        } else {
-            var d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch (max) {
-                case r:
-                    h = (g - b) / d + (g < b ? 6 : 0);
-                    break;
-                case g:
-                    h = (b - r) / d + 2;
-                    break;
-                case b:
-                    h = (r - g) / d + 4;
-                    break;
-            }
-            h /= 6;
+    ///////////
+    //internal ONLY - useful to hsl and hsv to rgb convertion
+    ///////////
+    _hue2rgb: function(p,q,t){
+        if (t < 0){
+            t += 1;
         }
-
-        return [h, s, l];
-    },
-    /**
-     * HslToRgb - Colors -
-     * @type static method Colors
-     * @description Converts an HSL color value to RGB. Assumes h, s, and l are contained in the set [0, 1] and returns r, g, and b in the set [0, 255].
-     * @param {number} h Number The hue
-     * @param {number} s Number The saturation
-     * @param {number} l Number The lightness
-     * @example var myValue= Colors.HslToRgb([h, s, l]);
-     * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
-     * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-     * @see text
-     */
-    HslToRgb: function(h, s, l) {
-        var r, g, b;
-
-        if (s === 0) {
-            r = g = b = l; // achromatic
-        } else {
-            function hue2rgb(p, q, t) {
-                if (t < 0)
-                    t += 1;
-                if (t > 1)
-                    t -= 1;
-                if (t < 1 / 6)
-                    return p + (q - p) * 6 * t;
-                if (t < 1 / 2)
-                    return q;
-                if (t < 2 / 3)
-                    return p + (q - p) * (2 / 3 - t) * 6;
-                return p;
-            }
-
-            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            var p = 2 * l - q;
-            r = hue2rgb(p, q, h + 1 / 3);
-            g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1 / 3);
+        if (t > 1){
+            t -= 1;
         }
-
-        return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-    },
-    /**
-     * RgbToHsv - Colors -
-     * @type static method Colors
-     * @description Converts an RGB color value to HSV. Assumes r, g, and b are contained in the set [0, 255] and returns h, s, and v in the set [0, 1].
-     * @param {number} r Number The red color value
-     * @param {number} g Number The green color value
-     * @param {number} b Number The blue color value
-     * @example var myValue= Colors.RgbToHsv([r, g, b]);
-     * @returns {array} hsv The HSV representation in the set [0, 1]; [h, s, v]
-     * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-     * @see text
-     */
-    RgbToHsv: function(r, g, b) {
-        r = r / 255, g = g / 255, b = b / 255;
-        var max = Math.max(r, g, b),
-            min = Math.min(r, g, b);
-        var h, s, v = max;
-
-        var d = max - min;
-        s = max === 0 ? 0 : d / max;
-
-        if (max === min) {
-            h = 0; // achromatic
-        } else {
-            switch (max) {
-                case r:
-                    h = (g - b) / d + (g < b ? 6 : 0);
-                    break;
-                case g:
-                    h = (b - r) / d + 2;
-                    break;
-                case b:
-                    h = (r - g) / d + 4;
-                    break;
-            }
-            h /= 6;
+        if (t < 1 / 6){
+            return p + (q - p) * 6 * t;
         }
-
-        return [h, s, v];
-    },
-    /**
-     * HsvToRgb - Colors -
-     * @type static method Colors
-     * @description Converts an HSV color value to RGB. Assumes h, s, and v are contained in the set [0, 1] and returns r, g, and b in the set [0, 255].
-     * @param {number} h Number The hue
-     * @param {number} s Number The saturation
-     * @param {number} v Number The value
-     * @example var myValue= Colors.HsvToRgb([h, s, v]);
-     * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
-     * @link http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-     * @see text
-     */
-    HsvToRgb: function(h, s, v) {
-        var r, g, b;
-
-        var i = Math.floor(h * 6);
-        var f = h * 6 - i;
-        var p = v * (1 - s);
-        var q = v * (1 - f * s);
-        var t = v * (1 - (1 - f) * s);
-
-        switch (i % 6) {
-            case 0:
-                r = v, g = t, b = p;
-                break;
-            case 1:
-                r = q, g = v, b = p;
-                break;
-            case 2:
-                r = p, g = v, b = t;
-                break;
-            case 3:
-                r = p, g = q, b = v;
-                break;
-            case 4:
-                r = t, g = p, b = v;
-                break;
-            case 5:
-                r = v, g = p, b = q;
-                break;
+        if (t < 1 / 2){
+            return q;
         }
-
-        return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-    },
-    /**
-     * RandomRgb - Tweener - return a random rgb array value in range [0,255]
-     * @type static method Colors
-     * @description return a random rgb array value in range [0,255]
-     * @param {string} type string that represent the desired returned format value; string or array; default string
-     * @example var myValue= Colors.RandomRgb('array');
-     * @returns {mixed} rgb in string or array format; 'rgb(n, n, n)' or [r, g, b]
-     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
-     * @see text
-     */
-    RandomRgb: function(type) {
-        var t = type ? type : 'string';
-        var r = Math.round(Math.random() * 255);
-        var g = Math.round(Math.random() * 255);
-        var b = Math.round(Math.random() * 255);
-        if (t === 'array') {
-            return [Math.round(Math.random() * 255), Math.round(Math.random() * 255), Math.round(Math.random() * 255)];
-        } else {
-            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        if (t < 2 / 3){
+            return p + (q - p) * (2 / 3 - t) * 6;
         }
+        return p;
     },
-    /**
-     * PraseColor - Colors - return a rgb string
-     * @type static method Colors
-     * @description return a rgb string from any kind of accepted color formats
-     * @param {mixed} color any kind of accepted color formats; string, name, hex, array
-     * @example var myValue= Colors.ParseColor(myObject.color);
-     * @returns {array} rgb The RGB representation in the set [0, 255]; [r, g, b]
-     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
-     * @see text
-     */
-    ParseColor: function(color) {
-        if (!color) {
-            console.log(color, ' isn\'t a valid value.');
-            return null;
-        }
-        if (typeof color === 'string') {
-            var result = color.replace(/\s/g, "").toLowerCase();
-            var re, ar;
-            if (result.indexOf('rgb') > -1) {
-                return result;
-            } else if (result.indexOf('#') > -1) {
-                var hex = this.Rgb(result);
-                return 'rgb(' + hex[0] + ',' + hex[1] + ',' + hex[2] + ')';
-            } else if (result.indexOf('hsl') > -1) {
-                re = /[hsla\(\)]/g;
-                ar = result.replace(re, '').split(',');
-                var hsl = this.HslToRgb(parseFloat(ar[0]) / 360, parseFloat(ar[1]) / 100, parseFloat(ar[2]) / 100);
-                return 'rgb' + this._isSet(ar, 'a') + '(' + hsl[0] + ',' + hsl[1] + ',' + hsl[2] + this._isSet(ar, ',') + ')';
-            } else if (result.indexOf('hsv') > -1) {
-                re = /[hsva\(\)]/g;
-                ar = result.replace(re, '').split(',');
-                var hsv = this.HsvToRgb(parseInt(ar[1]), parseInt(ar[2]), parseInt(ar[3]));
-                return 'rgb' + this._isSet(ar, 'a') + '(' + hsv[0] + ',' + hsv[1] + ',' + hsv[2] + this._isSet(ar, ',') + ')';
-            } else if (result in this.namedColor) {
-                ar = this.namedColor[result][1];
-                return 'rgb(' + ar[0] + ',' + ar[1] + ',' + ar[2] + ')';
-            } else {
-                console.log(color, ' isn\'t a valid value.');
-                return 'rgb(0,0,0)';
-            }
-        } else if (Array.isArray(color)) {
-            return 'rgb' + this._isSet(color, 'a') + '(' + color[0] + ',' + color[1] + ',' + color[2] + this._isSet(color, ',') + ')';
-        } else {
-            return color;
-        }
-    },
-    _isSet: function(a, b) {
-        return a.length > 3 ? b + (b === ',' ? a[3] : '') : '';
-    },
-    _parseColor: function(color) {
-        if (!color) {
-            return [0, 0, 0];
-        }
-        if (typeof color === 'string') {
-            var result = color.replace(/\s/g, "").toLowerCase();
-            var re, ar;
-            if (result.indexOf('rgb') > -1) {
-                re = /[rgba\(\)]/g;
-                ar = result.replace(re, '').split(',');
-                return [parseInt(ar[0]), parseInt(ar[1]), parseInt(ar[2])];
-            } else if (result.indexOf('#') > -1) {
-                var hex = this.Rgb(result);
-                return hex;
-            } else if (result.indexOf('hsl') > -1) {
-                re = /[hsla\(\)]/g;
-                ar = result.replace(re, '').split(',');
-                var hsl = this.HslToRgb(ar[0] / 360, ar[1] / 100, ar[2] / 100);
-                return hsl;
-            } else if (result.indexOf('hsv') > -1) {
-                re = /[hsva\(\)]/g;
-                ar = result.replace(re, '').split(',');
-                var hsv = this.HsvToRgb(ar[0] / 360, ar[1] / 100, ar[2] / 100);
-                return hsv;
-            } else if (result in this.namedColor) {
-                ar = this.namedColor[result][1];
-                return ar;
-            } else {
-                return [0, 0, 0];
-            }
-        } else if (Array.isArray(color)) {
-            return color;
-        } else {
-            throw 'You are attempting to translate an INVALID color: ' + color;
-        }
-    },
-    Invert: function(args) {
-        var c = this._parseColor(args);
-        return [255 - c[0], 255 - c[1], 255 - c[2]];
-    },
-    Complementary: function(args) {
-        var c = this._parseColor(args),
-            b;
-        b = this.RgbToHsl(c[0], c[1], c[2]);
-        c = this.HslToRgb((b[0] + 0.5 > 1 ? 1 - (b[0] + 0.5) : b[0] + 0.5), b[1], b[2]);
-        return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
-    },
-    HueShift: function(h, s) {
+    /////////
+    //internal ONLY - useful for getting complementary color
+    /////////
+    _hueShift: function(h, s) {
         h += s;
         while (h >= 360.0) {
             h -= 360.0;
@@ -5155,7 +5766,7 @@ var Colors = {
      * @description an object containing all the color's name accordingly to the specification css; name:[hex value, array rgb]
      * @example var myValue= Colors.namedColor('azure'); resulting in ["#f0ffff", [240, 255, 255]]
      * @returns {undefined} none none
-     * @link http://www.w3.org/TR/2011/REC-css3-color-20110607/
+     * @link https://www.w3.org/TR/css-color-3/
      * @see text
      */
     namedColor: { //147 colors

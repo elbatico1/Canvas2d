@@ -1,0 +1,9 @@
+# Ignore all Examples files
+examples/
+
+# Ignore all Project files
+
+nbproject/
+
+# Ignore Point.js
+point.js

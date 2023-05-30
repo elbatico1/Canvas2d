@@ -1,105 +1,110 @@
 Canvas2d
 ========
-javascript library for managing 2d drawing through html 5 element canvas.
-Canvas2d it's an ease and friendly way of taking advantages of the great features of html 5 context 2d canvas. This library was intended particularly for who is thinking, or already did, moving from Flash actionscript to javascript and context 2d canvas, as well as I did.
+javascript library thought for ease the inetraction with the context 2d capabilities of the "canvas" HTML5 element.
+Canvas2D offer a set of methods for drawing and interact with animated objects.
 
 Browser Support
 --------
 
-Canvas2d has been tested and should work in
-- Internet Explorer 9+
-- Edge
-- Safari
-- Firefox
-- Chrome
-- Opera
+All major browsers
 
 Examples
 --------
 
-I just begin to set it free so, for right now, there isn't much to show.
-Some example and a draft documentation can be found at [www.somethinglikethis.it/canvas2d](http://www.somethinglikethis.it/canvas2d/).
+Under development [www.somethinglikethis.it/canvas2d](http://www.somethinglikethis.it).
 
 Usage
 --------
 
-Canvas2d it's subdivided into 4 main objects:
-* Stage
-* Sprite
-* DisplayObjects
-* Tweener 
+### instanciate Stage as Main DIV container
 
-and a separated object **Colors** in wich are placed some utils for converting and manage colors.
+*Three arguments accepted:*
 
-**Stage** is the first object to be instantiated, require 3 parameters and a fourth optional.
+* REQUIRED - {**container**} DIV Element or ID of a preexisting DIV Element
+* REQUIRED - {**point**} Size in form of Point; Point, Array, Number, or String as CSS format "width,height" or as a single word "full" to extend the DIV Element to the entire viewport
+* OPTIONAL - {**boolean**} Enable Event Listener TRUE or FALSE; default TRUE
 
-* container - The div element in wich place all the subsequent _layer_ ( **Sprite** )
-* width - The horizontal length
-* height - The vertical length
-* enableevent - A boolean defining if enable the loop listener for interaction
+`var stage=new Canvas2d.Stage('canva','100%,100%',false);`
 
-**Sprite** basically the layer ( _HTML5 canvas context 2d_ ) with an optional parameter.
+*the __canva__ argument refer to e preexisting DIV ELement with ID = "canva"*
 
-* name - The name given to the element
-* enableevent - A boolean defining if enable the loop listener for interaction
+*the __"100%,100%"__ argument calls for an extended container, equal to __"full"__ the __false__ argument disable the Event listeners*
 
-**DisplayObjects** is where the actual drawing it's made. It has several methods and constructor for managing the basics shapes and picture.
+#### more on __Stage__ at __Under development__ [www.somethinglikethis.it/canvas2d](http://www.somethinglikethis.it).
 
-* line - a straight line
-* rect - a simple rectangle
-* rectRound - a rounded rectangle
-* polygon - a free polygon shape
-* shape - a free shape
-* text - a line of text
-* img - an image
-* clip - a collection of cut from a given image
+### instanciate Layer as context2d element child of Stage
 
-**Tweener** is a collection of methods useful to edit in time every property of basic shapes, sprite and stage.
+* OPTIONAL - {**name**} a String representing the object name
+* OPTIONAL - {**boolean**} Enable Event Listener TRUE or FALSE; default TRUE
 
-* addTweener - the main method, takes the target element _required_ , the parameters to transition and a few optional parameters.
+`var layer=new Canvas2d.Layer('layer_1',false);`
 
-> duration - the actual duration in milliseconds - *required*
+*the __false__ argument disable the Event listeners*
 
-> ease - the type of transition, there is a collection of 41 different types
+#### more on __Layer__ at __Under development__ [www.somethinglikethis.it/canvas2d](http://www.somethinglikethis.it).
 
-> onStart - a function to be executed once first start
+### instanciate DisplayObjects as single basic shapes
 
-> onTween - a function to be executed while the transition take action
+* OPTIONAL - {**name**} a String representing the object name
+* OPTIONAL - {**boolean**} Enable Event Listener TRUE or FALSE; default TRUE
 
-> onEnd - a function to be executed once the transition ends
+`var dispObj=new Canvas2d.DisplayObjects('dispObj_1');`
 
+*a basic shape method can be called, as an example 'rect'*
 
+`dispObj.rect(0, [100,100], 'lightseagreen', 'darkorange', 4);`
 
-## Some simple example
+*A position and Size is pass as an argument. It can be a:*
+- *Point* - object
+- *Array* - in form `[x,y]`
+- *Number* - a single number
 
-### Stage
-```
-var stage=new Canvas2d.Stage("container",560,300,true);
-```
+**All DisplayObjects basic shapes:**
 
-### Sprite
-```
-var sprite=new Canvas2d.Sprite("mysprite");
-```
+- **rect** `.rect(p, size, color, linecolor, linewidth);`
+- **roundRect** `.rectRound(p, size, radius, color, linecolor, linewidth);`
+- **circle** `.circle(p, radius, startAngle, endAngle, color, linecolor, linewidth);`
+- **line** `.line(p, start, end, linecolor, linewidth, lineCap, lineJoin, lineMiter);`
+- **polygon** `.polygon(p, points, color, linecolor, linewidth, close);`
+- **shape** `.shape(p, obj, color, linecolor, linewidth, close);`
+- **img** `.img(p, source, show, color, paddingleft, paddingtop, crop);`
+- **clip** `.clip(p, source, framelist, show);`
+- **text** `.text(txt, p, fontweigth, fontsize, font, color, background, align, baseline);`
 
-### DisplayObjects
-```
-var myobj=new Canvas2d.DisplayObjects("myobj");
-myobj.rect(localx,localy,width,height,color,linecolor,linewidth);
-sprite.add(myobj);
-stage.add(sprite);
-stage.draw();
-```
+#### more on __DisplayObjects__ at __Under development__ [www.somethinglikethis.it/canvas2d](http://www.somethinglikethis.it).
 
-### Tweener
-```
-var tween=new Canvas2d.Tweener();
-tween.addTweener(myobj,{param...,duration:mls,ease:"easeNone",onStart:function,onTween:function,onEnd:function});
-```
-				
+**All DisplayObjects share some basic properties:**
+
+- **position** *a point Object with its own set of methods*
+- **size** *a point Object with its own set of methods*
+- **pivot** *a point Object with its own set of methods*
+- **scale** *a point Object with its own set of methods*
+- **color** *an __Array__ `[r,g,b]`, __String__ as hex, rgb, hsl or hsv*
+- **lineColor** *an __Array__ `[r,g,b]`, __String__ as hex, rgb, hsl or hsv*
+- **lineWidth**
+- **lineCap**
+- **lineJoin**
+- **lineMiter**
+- **gradient** *an object `{'color': ['blue', 'green'],
+                    'offset': [0, 1],
+                    'coord': {'x0': 0, 'y0': 0, 'x1': w, 'y1': 0}, 'type': 'linear'};`*
+- **lineGradient** *see _gradient_*
+
+#### Add dispObj to the childlist of Layer to be later draw
+`layer.add(dispObj);`
+
+*layer can accept multiple DisplayObjects elements as arguments*
+
+#### Add layer to its parent container childlist Stage
+`stage.add(layer);`
+
+* finally the draw method can be called either from Stage, to draw all Layers and its children or from Layer to draw all DisplayObjects as children of Layer
+
+`stage.draw();`
+
 License
 -------
-Canvas2d is released under [MIT license](http://opensource.org/licenses/mit-license.php).
+Canvas2d is released under [Apache license](http://www.apache.org/licenses/LICENSE-2.0).
 
 Credits
 -------
